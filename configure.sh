@@ -758,7 +758,15 @@ cat ${OMINAS_DIR}/config/bashcomments.txt >> ~/.ominas/ominas
 #head -1 ${idlbin} > ~/.ominas/ominas
 asetting=`eval echo ${setting}`
 echo ". ${asetting}" >> ~/.ominas/ominas
-echo "if [ "\$#" -eq 0 ]; then args=\"\${OMINAS_DIR}/util/printver.pro\"; else args=("\$@"); fi" >> ~/.ominas/ominas
+
+#echo "if [ "\$#" -eq 0 ]; then args=\"\${OMINAS_DIR}/util/printver.pro\"; else args=("\$@"); fi" >> ~/.ominas/ominas
+echo "if [ "\$#" -eq 0 ]; then args=\"\${OMINAS_DIR}/util/printver.pro\"" >> ~/.ominas/ominas
+echo "else" >> ~/.ominas/ominas
+echo " for arg in \$@; do" >> ~/.ominas/ominas
+echo "  if [[ \$arg == +* ]] ; then export \${arg:1:127}; else args+=(\$arg); fi" >> ~/.ominas/ominas
+echo " done" >> ~/.ominas/ominas
+echo "fi" >> ~/.ominas/ominas
+
 if [ -e "/opt/X11/lib/flat_namespace/" ]; then
   cat <<LDCMD >> ~/.ominas/ominas
     if [ "\${DYLD_LIBRARY_PATH}" = "" ]; then
