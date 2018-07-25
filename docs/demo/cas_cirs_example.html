@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <title>graft_example-batch.pro (OMINAS Documentation)</title>
+    <title>cas_cirs_example.pro (OMINAS Documentation)</title>
 
     
 
@@ -160,7 +160,7 @@
 
     <script type="text/javascript">
       function setTitle() {
-        parent.document.title="graft_example-batch.pro (OMINAS Documentation)";
+        parent.document.title="cas_cirs_example.pro (OMINAS Documentation)";
       }
     </script>
   </head>
@@ -170,140 +170,126 @@
 
     <div class="content">
       
-      <h1 class="basename">graft_example-batch.pro<span class="file-attributes"></span></h1>
+      <h1 class="basename">cas_cirs_example.pro<span class="file-attributes"></span></h1>
       
 
-      <span class="file_attribute small">batch file</span>
       
+      <span class="file_attribute small">includes main-level program</span>
       
       <br/>
 
       
       <div id="file_comments">
-        <div class="small "><p>                            GRAFT EXAMPLE
+        <div class="small "><h2> CIRS EXAMPLE</h2>
+
+<p>   This script demonstrates reading a Cassini CIRS cube and projecting it
+   onto an orthographical map for display with a Cassini ISS image of Mimas.
 </p>
 
-<p>  Created by Joe Spitale
+<p>   Setup: The instrument detectors, translators and transforms must contain the
+   CIRS and ISS definitions, as is included in <code>demo/data/instrument_detectors.tab</code>,
+   <code>demo/data/translators.tab</code>, and <code>demo/data/transforms.tab</code>.
 </p>
 
-<p>  This example file demonstrates the use the GRIM interface programs
-  GRIFT and GRAFT.  While GRIFT cheats GRIM out of its object references,
-  GRAFT corruptly inserts (or grafts) data arrays into a GRIM instance.
+<p>   This example requires SPICE/Icy to have been setup. It can be run by doing:
+<div><div><code class="listing"><code class="source"> .run cas_cirs_example</code>
+</code></div></div>   From within an OMINAS IDL session.
 </p>
 
-<p>  The usage demonstrated here is a bit contrived, as one could accomplish
-  a better result by specifying the desired overlays in the call to GRIM,
-  as in grim_example, but let's live a little.
-</p>
+<h2> Extract CIRS files</h2>
 
-<p>  This example file can be executed from the shell prompt in the ominas/demo
-  directory using:
-<div><div><code class="listing"></code></div></div>  	ominas graft_example-batch
-</p>
+<p>   The cubes from PDS are too large to include in the OMINAS repository uncompressed,
+   so we will uncompress the tar files included with OMINAS:
+<div><div><code class="listing"><code class="source"> ;Extract the CIRS files, if needed</code>
+<code class="source"> ldir='~/ominas_data/cirs'</code>
+<code class="source"> spawn,'eval echo '+ldir,res</code>
+<code class="source"> ldir=res</code>
+<code class="source"> imgs=ldir[0]+path_sep()+['126MI_FP3DAYMAP001_CI006_601_F3_039E.DAT','126MI_FP3DAYMAP001_CI004_601_F3_039E.DAT']</code>
+<code class="source"> foreach img,imgs do if ~file_test(img,/read) then begin</code>
+<code class="source">   print,'CIRS DAT file needed for the demo not found. Extracting it from the tar.gz file provided with OMINAS...'</code>
+<code class="source">   file_untar,getenv('OMINAS_DEMO')+path_sep()+'data'+path_sep()+file_basename(img,'.DAT')+'.tar.gz',ldir,/verbose</code>
+<code class="source"> endif</code>
 
-<p>  or from within IDL using:
-<div><div><code class="listing"></code></div></div>  	@graft_example-batch
-</p>
 
-<p>  You can also just paste line-by-line if you want to inspect the variables
-  at each step.
-</p>
-
-<p>  After the example stops, later code samples in this file may be executed by
-  pasting them onto the IDL command line.
- READ AND DISPLAY IMAGE
-</p>
-
-<p>  Use GRIM to open and display an image:
-<div><div><code class="listing"><code class="source"> grim, './data/n1350122987.2', zoom=0.75, /order</code>
 </code></div></div></p>
 
-<p> GRIFT
+<h2> Display CIRS files</h2>
+
+<p>   Since the cubes have many wavelenghts, create a single-band product for
+   visualization, by adding the flux on all bands:
+<div><div><code class="listing"><code class="source"> for i=0,1 do begin</code>
+<code class="source">   da=dat_data(dd[i])</code>
+<code class="source">   dat_set_data,dd[i],reverse(total(da.core,3),2)</code>
+<code class="source">   tvim,dat_data(dd[i]),/order,/new</code>
+<code class="source"> endfor</code>
+
+</code></div></div>   <img src="graphics/cirs_ex1_1.png"/>
+   <img src="graphics/cirs_ex1_2.png"/>
 </p>
 
-<p>  First, GRIFT the data descriptor out of poor old GRIM.  Note that the
-  returned object is a reference to the same object as GRIM is using:
-<div><div><code class="listing"><code class="source"> grift, dd=dd</code>
-</code></div></div>  Be warned that GRIM jealously watches over its objects and updates whenever
-  it detects any changes, so you can simultaneously operate on objects from
-  within GRIM and from the command line.  For example, try:
-<div><div><code class="listing"></code></div></div>	dat_set_data, dd, rotate(dat_data(dd),7)
+<p></p>
+
+<h2> Map CIRS and ISS files</h2>
+
+<p>   CIRS cube data are provided in PDS as a map on the target, in a rectangular projection, shown above.
+   To use them, first we need to obtain the proper map descriptor from the data object:
+<div><div><code class="listing"></code></div></div>   Create the new map descriptor:
+<div><div><code class="listing"><code class="source"> map_xsize = 1000</code>
+<code class="source"> map_ysize = 1000</code>
+
+<code class="source"> mdp= pg_get_maps(/over,  $</code>
+<code class="source">   name='MIMAS',$</code>
+<code class="source">   projection='ORTHOGRAPHIC', $</code>
+<code class="source">   size=[map_xsize,map_ysize], $</code>
+<code class="source">   origin=[map_xsize,map_ysize]/2, $</code>
+<code class="source">   center=[0d0,-0.7d0*!dpi])</code>
+</code></div></div>   Now, read the ISS image and put it into an array with the CIRS cubes:
+<div><div><code class="listing"><code class="source"> dd=[(dat_read(getenv('OMINAS_DIR')+'/demo/data/N1644787857_1.IMG'))[0],dd]</code>
+</code></div></div>   Get the necessary camera, map, planet descriptors:
+<div><div><code class="listing"><code class="source"> nv=3</code>
+<code class="source"> mdr=objarr(nv) & cd=objarr(nv) & pd=objarr(nv) & ltd=objarr(nv) & dd_map=objarr(nv)</code>
+<code class="source"> gd = replicate({cd:obj_new(), gbx:obj_new(), dkx:obj_new(), ltd:obj_new()}, nv)</code>
+<code class="source"> for i=0,nv-1 do begin</code>
+<code class="source">   gd[i].cd = pg_get_cameras(dd[i])</code>
+<code class="source">   gd[i].gbx = pg_get_planets(dd[i], od=cd[i],name='MIMAS')</code>
+<code class="source">   gd[i].ltd = pg_get_stars(dd[i], od=cd[i], name='SUN')</code>
+<code class="source">   if i gt 0 then begin</code>
+<code class="source">     mdr[i]=pg_get_maps(dd[i])</code>
+<code class="source">     dd_map[i]=pg_map(dd[i],md=mdp,cd=mdr[i],pc_xsize=500,pc_ysize=500)</code>
+<code class="source">   endif else begin</code>
+<code class="source">     dd_map[i]=pg_map(dd[i], md=mdp, gd=gd[i],aux=['EMM'])</code>
+<code class="source">   endelse</code>
+<code class="source">   ;Scale the data in all bands to the same range (0-1)</code>
+<code class="source">   da=dat_data(dd_map[i])</code>
+<code class="source">   r=minmax(da)</code>
+<code class="source">   dat_set_data,dd_map[i],(da-r[0])/(r[1]-r[0])</code>
+<code class="source"> endfor</code>
+</code></div></div>   Visualize the result, now with grim:
+<div><div><code class="listing"><code class="source"> grim,dd_map,cd=replicate(mdp,3),od=gd.cd,ltd=gd.ltd,pd=gd.gbx,channel=[1b,2b,2b],overlays=['planet_grid'],/new,vis=1</code>
+
+</code></div></div>   <img src="graphics/cirs_ex1_3.png"/>
 </p>
 
-<p>  GRIM resigns itself to having its data descriptor tampered with and
-  updates the display accordingly.  Run the same command again if you
-  want flip the image back.
+<p></p>
+
+<h2> Create composite images</h2>
+
+<p>   Combine the channels, as a grayscale ISS image, with a transparent color CIRS overlay:
+<div><div><code class="listing"><code class="source"> im0=image(dat_data(dd_map[0]),dimensions=[map_xsize,map_ysize],/no_toolbar,margin=0)</code>
+<code class="source"> im1=image(dat_data(dd_map[1])&gt;dat_data(dd_map[2]),/current,transparency=60,rgb_table=13)</code>
+
+</code></div></div>   <img src="graphics/cirs_ex1_4.png"/>
 </p>
 
-<p> OBTAIN GEOMETRY
-</p>
+<p>   Now, combine using ISS as the intensity, CIRS as the hue for the image:
+<div><div><code class="listing"><code class="source"> s=dblarr(map_xsize,map_ysize) & l=s & h=s</code>
+<code class="source"> s[*]=(dat_data(dd_map[1])) gt 0d0</code>
+<code class="source"> l[*]=dat_data(dd_map[0])</code>
+<code class="source"> h[*]=(dat_data(dd_map[1]))*240d0</code>
+<code class="source"> color_convert,h,l,s,r,g,b,/hls_rgb</code>
+<code class="source"> im2=image([[[r]],[[g]],[[b]]],dimensions=[map_xsize,map_ysize],/no_toolbar,margin=0)</code>
 
-<p>  Now compute geometry for this dd.  This is the same business you have
-  seen in all of the other demos, cd, pd, etc.  Of course, you could have
-  just had GRIM do this:
-<div><div><code class="listing"><code class="source"> cd = pg_get_cameras(dd, 'ck_in=auto')</code>
-<code class="source"> pd = pg_get_planets(dd, od=cd, $</code>
-<code class="source">        name=['JUPITER', 'IO', 'EUROPA', 'GANYMEDE', 'CALLISTO'])</code>
-<code class="source"> rd = pg_get_rings(dd, pd=pd, od=cd)</code>
-<code class="source"> ltd = pg_get_stars(dd, od=cd, name='SUN')</code>
-</code></div></div></p>
-
-<p> MAKE A GENERIC DESCRIPTOR
-</p>
-
-<p>  And of course we shove everything into a generic descriptor because it
-  makes everything so much easier:
-<div><div><code class="listing"><code class="source"> gd = {cd:cd, gbx:pd, dkx:rd, ltd:ltd}</code>
-</code></div></div></p>
-
-<p> COMPUTE OVERLAY ARRAYS
-</p>
-
-<p>  Same old story;  PG_LIMB, PG_DISK, PG_HIDE, etc.  GRIM would have been
-  happy to do this for you:
-<div><div><code class="listing"><code class="source"> limb_ptd = pg_limb(gd=gd) & pg_hide, limb_ptd, gd=gd, /rm, bx=rd</code>
-<code class="source">           pg_hide, limb_ptd, /assoc, gd=gd, bx=pd, od=ltd</code>
-<code class="source"> ring_ptd = pg_disk(gd=gd) & pg_hide, ring_ptd, gd=gd, bx=pd</code>
-<code class="source"> term_ptd = pg_limb(gd=gd, od=gd.ltd) & pg_hide, term_ptd, gd=gd, bx=pd, /assoc</code>
-<code class="source"> center_ptd = pg_center(gd=gd, bx=pd)</code>
-</code></div></div></p>
-
-<p> DISPLAY OVERLAYS
-</p>
-
-<p>  Ok, now let's draw those overlays, just like in the PG example.  This
-  is going to be great:
-<div><div><code class="listing"><code class="source"> pg_draw, center_ptd, col=ctwhite(), psym=1, plabel=cor_name(pd)</code>
-<code class="source"> pg_draw, limb_ptd, col=ctyellow()</code>
-<code class="source"> pg_draw, term_ptd, col=ctred()</code>
-<code class="source"> pg_draw, ring_ptd, col=ctorange()</code>
-</code></div></div>  Now let's zoom in and take a look at things.  You can use the mouse wheel
-  with Ctrl depressed, or you can use one of the Zoom cursor modes, or you
-  can use the View-&gt;Zoom menu, or the associated keyboard shortcuts if
-  have your Xdefaults-grim installed; basically just throw a flip-flop at
-  your computer and you should be able to make this happen.
-</p>
-
-<p>  But wait, where did my overlays go?  Did they ever even exist?  If you
-  are older than two years of age and have mastered object permanence,
-  then you probably have this one figured out.  We need a way to draw
-  these things permanently; some way of GRAFTing them into GRIM...
-</p>
-
-<p> GRAFT
-</p>
-
-<p>  GRAFT "grafts" the POINT objects into GRIM.  Note that these are entered
-  as user arrays in GRIM, so they're pretty much second class as far as
-  GRIM is concerned.  This would have been way better if you had just
-  specified these as overlays in your call to GRIM.  Now you have wasted
-  your time and GRIM's.
-</p>
-
-<p>    graft, center_ptd, col=ctwhite(), psym=1;, plabel=cor_name(pd)
-    graft, limb_ptd, col=ctyellow()
-    graft, term_ptd, col=ctred()
-    graft, ring_ptd, col=ctorange()
+</code></div></div>   <img src="graphics/cirs_ex1_5.png"/>
 </p>
 
 <p></p>
@@ -336,12 +322,12 @@
         <table class="attribute small" summary="File attributes">
           <tr>
             <td class="name">Modification date:</td>
-            <td>Mon May  7 13:19:54 2018</td>
+            <td>Tue Jul 24 16:30:45 2018</td>
           </tr>
 
           <tr>
             <td class="name">Lines:</td>
-            <td>23</td>
+            <td>51</td>
           </tr>
 
           
@@ -360,7 +346,7 @@
     
       <table class="smaller" summary="footer">
         <tr>
-          <td class="left">Produced by IDLdoc 3.6.1 on Tue Jul 24 16:33:58 2018</td>
+          <td class="left">Produced by IDLdoc 3.6.1 on Tue Jul 24 16:33:57 2018</td>
           <td class="right"><a target="_top" href="http://github.com/mgalloy/idldoc">IDLdoc project information</a></td>
         </tr>
       </table>
