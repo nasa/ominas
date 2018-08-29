@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <title>graft_example-batch.pro (OMINAS Documentation)</title>
+    <title>geotiff_example.pro (OMINAS Documentation)</title>
 
     
 
@@ -160,7 +160,7 @@
 
     <script type="text/javascript">
       function setTitle() {
-        parent.document.title="graft_example-batch.pro (OMINAS Documentation)";
+        parent.document.title="geotiff_example.pro (OMINAS Documentation)";
       }
     </script>
   </head>
@@ -170,143 +170,70 @@
 
     <div class="content">
       
-      <h1 class="basename">graft_example-batch.pro<span class="file-attributes"></span></h1>
+      <h1 class="basename">geotiff_example.pro<span class="file-attributes"></span></h1>
       
 
-      <span class="file_attribute small">batch file</span>
       
+      <span class="file_attribute small">includes main-level program</span>
       
       <br/>
 
       
       <div id="file_comments">
-        <div class="small "><p>                            GRAFT EXAMPLE
+        <div class="small "><h2> GEOTIFF EXAMPLE</h2>
+
+<p>   This script demonstrates reading a Mars MOLA DEM geotiff and projecting it
+   onto an orthographical map for display. The geotiff provided in the demo
+   directory was downsampled by a factor of 20 from the original MOLA DEM from
+   https://astrogeology.usgs.gov/search/map/Mars/GlobalSurveyor/MOLA/Mars_MGS_MOLA_ClrShade_merge_global_463m
 </p>
 
-<p>  Created by Joe Spitale
+<p>   There is no need for SPICE/Icy for this example. It can be run by doing:
+<div><div><code class="listing"><code class="source"> .run geotiff_example</code>
+</code></div></div>   From within an OMINAS IDL session.
 </p>
 
-<p>  This example file demonstrates the use the GRIM interface programs
-  GRIFT and GRAFT.  While GRIFT cheats GRIM out of its object references,
-  GRAFT corruptly inserts (or grafts) data arrays into a GRIM instance.
+<h2> Read geotiff file</h2>
+
+<p>     dd=dat_read(getenv('OMINAS_DEMO')+path_sep()+'data'+path_sep()+'Mars_MGS_MOLA_DEM_mosaic_global_9260m.tif')
 </p>
 
-<p>  The usage demonstrated here is a bit contrived, as one could accomplish
-  a better result by specifying the desired overlays in the call to GRIM,
-  as in grim_example, but let's live a little.
+<p></p>
+
+<h2> Display geotiff on grim</h2>
+
+<p>   Get a map descriptor and use it to show the DEM on grim with a map grid:
+<div><div><code class="listing"><code class="source"> md=pg_get_maps(dd)</code>
+<code class="source"> ;subtract the minimum elevation, so that the data range starts at 0, for visualization</code>
+<code class="source"> da=double(dat_data(dd))</code>
+<code class="source"> damin=min(da)</code>
+<code class="source"> da-=damin</code>
+<code class="source"> dat_set_data,dd,da</code>
+<code class="source"> grim,dd,cd=md,order=0,overlay=['planet_grid']</code>
+
+</code></div></div>   <img src="graphics/geotiff_example_1.png"/>
 </p>
 
-<p>  This example file can be executed from the shell prompt in the ominas/demo
-  directory using:
-<div><div><code class="listing"></code></div></div>  	ominas graft_example-batch
-</p>
+<p></p>
 
-<p>  or from within IDL using:
-<div><div><code class="listing"></code></div></div>  	@graft_example-batch
-</p>
+<h2> Map into orthographic projection</h2>
 
-<p>  You can also just paste line-by-line if you want to inspect the variables
-  at each step.
-</p>
+<p>   Now we will display it in an orthogonal projection. First we define it:
+<div><div><code class="listing"><code class="source"> map_xsize = 4000</code>
+<code class="source"> map_ysize = 4000</code>
+</code></div></div>   Create the new map descriptor:
+<div><div><code class="listing"><code class="source"> mdp= pg_get_maps(/over,  $</code>
+<code class="source">   name='MARS',$</code>
+<code class="source">   projection='ORTHOGRAPHIC', $</code>
+<code class="source">   size=[map_xsize,map_ysize], $</code>
+<code class="source">   origin=[map_xsize,map_ysize]/2, $</code>
+<code class="source">   center=[0d0,-60d0*!dpi/180d0])</code>
+</code></div></div>   Now, do the projection:
+<div><div><code class="listing"><code class="source"> dd_map=pg_map(dd,md=mdp,cd=md,pc_xsize=800,pc_ysize=800)</code>
+</code></div></div>   Visualize the result, now with grim:
+<div><div><code class="listing"><code class="source"> grim,dd_map,cd=mdp,overlays=['planet_grid'],order=0,/new</code>
 
-<p>  After the example stops, later code samples in this file may be executed by
-  pasting them onto the IDL command line.
- READ AND DISPLAY IMAGE
-</p>
-
-<p>  Use GRIM to open and display an image:
-<div><div><code class="listing"><code class="source"> grim, './data/n1350122987.2', zoom=0.75, /order</code>
-</code></div></div></p>
-
-<p> GRIFT
-</p>
-
-<p>  First, GRIFT the data descriptor out of poor old GRIM.  Note that the
-  returned object is a reference to the same object as GRIM is using:
-<div><div><code class="listing"><code class="source"> grift, dd=dd</code>
-</code></div></div>  Be warned that GRIM jealously watches over its objects and updates whenever
-  it detects any changes, so you can simultaneously operate on objects from
-  within GRIM and from the command line.  For example, try:
-<div><div><code class="listing"></code></div></div>	dat_set_data, dd, rotate(dat_data(dd),7)
-</p>
-
-<p>  GRIM resigns itself to having its data descriptor tampered with and
-  updates the display accordingly.  Run the same command again if you
-  want flip the image back.
-</p>
-
-<p> OBTAIN GEOMETRY
-</p>
-
-<p>  Now compute geometry for this dd.  This is the same business you have
-  seen in all of the other demos, cd, pd, etc.  Of course, you could have
-  just had GRIM do this:
-<div><div><code class="listing"><code class="source"> cd = pg_get_cameras(dd, 'ck_in=auto')</code>
-<code class="source"> pd = pg_get_planets(dd, od=cd, $</code>
-<code class="source">        name=['JUPITER', 'IO', 'EUROPA', 'GANYMEDE', 'CALLISTO'])</code>
-<code class="source"> rd = pg_get_rings(dd, pd=pd, od=cd)</code>
-<code class="source"> ltd = pg_get_stars(dd, od=cd, name='SUN')</code>
-</code></div></div></p>
-
-<p> MAKE A GENERIC DESCRIPTOR
-</p>
-
-<p>  And of course we shove everything into a generic descriptor because it
-  makes everything so much easier:
-<div><div><code class="listing"><code class="source"> gd = {cd:cd, gbx:pd, dkx:rd, ltd:ltd}</code>
-</code></div></div></p>
-
-<p> COMPUTE OVERLAY ARRAYS
-</p>
-
-<p>  Same old story;  PG_LIMB, PG_DISK, PG_HIDE, etc.  GRIM would have been
-  happy to do this for you:
-<div><div><code class="listing"><code class="source"> limb_ptd = pg_limb(gd=gd) & pg_hide, limb_ptd, gd=gd, /rm, bx=rd</code>
-<code class="source">           pg_hide, limb_ptd, /assoc, gd=gd, bx=pd, od=ltd</code>
-<code class="source"> ring_ptd = pg_disk(gd=gd) & pg_hide, ring_ptd, gd=gd, bx=pd</code>
-<code class="source"> term_ptd = pg_limb(gd=gd, od=gd.ltd) & pg_hide, term_ptd, gd=gd, bx=pd, /assoc</code>
-<code class="source"> center_ptd = pg_center(gd=gd, bx=pd)</code>
-</code></div></div></p>
-
-<p> DISPLAY OVERLAYS
-</p>
-
-<p>  Ok, now let's draw those overlays, just like in the PG example.  This
-  is going to be great:
-<div><div><code class="listing"><code class="source"> pg_draw, center_ptd, col=ctwhite(), psym=1, plabel=cor_name(pd)</code>
-<code class="source"> pg_draw, limb_ptd, col=ctyellow()</code>
-<code class="source"> pg_draw, term_ptd, col=ctred()</code>
-<code class="source"> pg_draw, ring_ptd, col=ctorange()</code>
-</code></div></div>  Now let's zoom in and take a look at things.  You can use the mouse wheel
-  with Ctrl depressed, or you can use one of the Zoom cursor modes, or you
-  can use the View-&gt;Zoom menu, or the associated keyboard shortcuts if
-  have your Xdefaults-grim installed; basically just throw a flip-flop at
-  your computer and you should be able to make this happen.
-</p>
-
-<p>  But wait, where did my overlays go?  Did they ever even exist?  If you
-  are older than two years of age and have mastered object permanence,
-  then you probably have this one figured out.  We need a way to draw
-  these things permanently; some way of GRAFTing them into GRIM...
-</p>
-
-<p> GRAFT
-</p>
-
-<p>  GRAFT "grafts" the POINT objects into GRIM.  Note that these are entered
-  as user arrays in GRIM, so they're pretty much second class as far as
-  GRIM is concerned.  This would have been way better if you had just
-  specified these as overlays in your call to GRIM.  Now you have wasted
-  your time and GRIM's.
-</p>
-
-<p>    graft, center_ptd, col=ctwhite(), psym=1;, plabel=cor_name(pd)
-    graft, limb_ptd, col=ctyellow()
-    graft, term_ptd, col=ctred()
-    graft, ring_ptd, col=ctorange()
-</p>
-
-<p>  <img src="graphics/graft_example_01.png"/>
+</code></div></div>   <img src="graphics/geotiff_example_1.png"/>
 </p>
 
 <p></p>
@@ -339,12 +266,12 @@
         <table class="attribute small" summary="File attributes">
           <tr>
             <td class="name">Modification date:</td>
-            <td>Sat Aug 25 16:35:39 2018</td>
+            <td>Wed Aug 29 11:16:36 2018</td>
           </tr>
 
           <tr>
             <td class="name">Lines:</td>
-            <td>23</td>
+            <td>20</td>
           </tr>
 
           
