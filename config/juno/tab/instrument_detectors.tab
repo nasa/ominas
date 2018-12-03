@@ -1,0 +1,5 @@
+# detector fn                   filetype
+# (returns instrument string)   (only detectors for the correct
+#                                filetype are called)
+
+  detect_juno_epo_cam                 PNG

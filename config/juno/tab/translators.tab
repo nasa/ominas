@@ -1,0 +1,16 @@
+# Instrument	Input			Output		Keyword arguments
+# string	translator		translator
+#------------------------------------------------------------------------------
+
+ JUNO_EPO_CAMERA     juno_epo_spice_input    juno_epo_spice_output \
+#                                                  klist=juno.kernels 
+                                                        ck_in=auto \
+                                                        pck_in=auto \
+                                                        lsk_in=auto \
+                                                        fk_in=auto \
+                                                        ik_in=auto \
+                                                        sck_in=auto \
+                                                        xk_in=extra.tpc  \
+                                                        /spk_strict \
+                                                        spk_in=auto
+ 

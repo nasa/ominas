@@ -1,0 +1,4 @@
+# filetype      input function          output function         keyword function
+#               
+
+  PNG         dh_read_png           ominas_write_png        -
