@@ -35,10 +35,10 @@ function dh_read_pds, dd, label, dim, type, min, max, abscissa=abscissa, $
     
    w=wi[0]
    s = pdspar(label, 'LINE_SAMPLES')
-   xsize = long(s[w])
+   xsize = long(s[w<(n_elements(s)-1)])
 
    s = pdspar(label, 'LINES')
-   ysize = long(s[w])
+   ysize = long(s[w<(n_elements(s)-1)])
 
    dim = [xsize, ysize]
   end
