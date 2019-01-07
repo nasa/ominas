@@ -166,7 +166,9 @@ function tvrec, win_num, $
   if(keyword_set(button)) then old_button = button
   button = !mouse.button
 
-  if((qx EQ old_qx) AND (qy EQ old_qy)) then released = 1
+help, button
+;;;  if((qx EQ old_qx) AND (qy EQ old_qy)) then stop
+;;;  if((qx EQ old_qx) AND (qy EQ old_qy)) then released = 1
   if(button EQ 0) then released = 1 
 
   if(qx EQ -1) then qx = old_qx

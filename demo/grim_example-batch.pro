@@ -222,8 +222,7 @@ grim, /new, './data/' + ['N1460072434_1.IMG', $
 ;------------------------------------------------------------------------------
 ;+
 ; 
-;  Here's a spectral cube.  You'll need to stretch the levels to see 
-;  anything::
+;  Here's a spectral cube::
 ;
 ;    grim, /new, './data/CM_1503358311_1_ir_eg.cub'
 ;    

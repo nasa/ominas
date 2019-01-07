@@ -179,9 +179,10 @@ function grim_image, grim_data, plane=plane, pn=pn, colormap=colormap, $
  if(NOT keyword_set(plane)) then plane = grim_get_plane(grim_data)
  ctmod, top=top
 
-;;; dim = (dat_dim(plane.dd))[0:1]
  dim = dat_dim(plane.dd)
  if(NOT keyword_set(dim)) then return, 0
+
+;; dim = grim_redimension(dim, 2)
  dim = dim[0:1]
 
  ;---------------------------------------

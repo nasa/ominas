@@ -9,6 +9,7 @@
 ;===================================================================================
 pro x_window, free=free, xsize=xsize, ysize=ysize, pixmap=pixmap, retain=retain, $
      title=title, base=base
+common x_window_block, __wnums, __ids
 
  if(NOT defined(retain)) then retain = 2
 
@@ -25,6 +26,8 @@ pro x_window, free=free, xsize=xsize, ysize=ysize, pixmap=pixmap, retain=retain,
 
  if(NOT keyword_set(title)) then $
          widget_control, base, tlb_set_title='idl ' + strtrim(!d.window, 2)
-
+ 
+ __wnums = append_array(__wnums, !d.window, /def_)
+ __ids = append_array(__ids, draw, /def_)
 end
 ;===================================================================================

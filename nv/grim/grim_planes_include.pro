@@ -175,8 +175,6 @@ function grim_get_image, grim_data, plane=plane, abscissa=abscissa, $
 
  if(NOT keyword_set(plane)) then plane = grim_get_plane(grim_data)
 
- dim = (dat_dim(plane.dd))[0:1]
-
  ;--------------------------------------------------------------------
  ; if rgb plane, then override offset to yield image corresponding
  ; to specified channel

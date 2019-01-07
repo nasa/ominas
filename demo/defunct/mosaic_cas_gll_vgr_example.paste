@@ -16,5 +16,5 @@ for i=0, n_elements(dd)-1 do $
  end
 
 
-grim, dd, over=['center', 'limb:EUROPA', 'terminator:EUROPA']
+grim, dd, over=['center', 'limb:EUROPA', 'terminator:EUROPA'], nhist=1
 
