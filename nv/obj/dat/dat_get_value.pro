@@ -150,7 +150,7 @@ function dat_get_value, dd, keyword, status=status, trs=trs, $
    ;--------------------------------------
    if(stat EQ 0) then $
     begin
-     nv_message, verb=1.5, $
+     nv_message, verb=0.9, $
                     'Returned descriptors: ' + str_comma_list([cor_name(xd)])
 
      if(keyword_set(xd)) then $
@@ -212,7 +212,7 @@ function dat_get_value, dd, keyword, status=status, trs=trs, $
     else result = xds
   end
 
- nv_message, verb=1.5, 'Output descriptors: ' + str_comma_list([cor_name(result)])
+ nv_message, verb=0.9, 'Output descriptors: ' + str_comma_list([cor_name(result)])
 
  nv_resume_events
  return, result

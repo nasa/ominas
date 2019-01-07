@@ -96,11 +96,6 @@ end
 ;
 ;
 ; FIELDS:
-;	sld:	SOLID class descriptor.  
-;
-;		Methods: dsk_solid, dsk_set_solid
-;
-;
 ;	sma:	Array ndv+1 x 2 giving the semimajor axes and derivatives
 ;		for each edge. 
 ;

@@ -67,11 +67,6 @@ end
 ;
 ;
 ; FIELDS:
-;	bd:	BODY class descriptor.  
-;
-;		Methods: stn_body, stn_set_body
-;
-;
 ;	surface_pt:	Vector giving the surface coordinates of the 
 ;			stations location on the primary.  This 
 ;			is redundant with the location of bd, but it 

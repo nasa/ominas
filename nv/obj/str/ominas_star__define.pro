@@ -68,11 +68,6 @@ end
 ;
 ;
 ; FIELDS:
-;	gbd:	GLOBE class descriptor.  
-;
-;		Methods: str_globe, str_set_globe
-;
-;
 ;	lum:	Luminosity value.
 ;
 ;		Methods: str_lum, str_set_lum

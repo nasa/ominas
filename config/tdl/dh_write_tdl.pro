@@ -7,7 +7,7 @@ function dh_write_tdl, dd, filename, nodata=nodata, sample=sample, status=status
  if(keyword_set(nodata)) then return, 0
  if(defined(sample)) then return, -1
 
- filename = dat_filename(dd)
+; filename = dat_filename(dd)
  if(NOT keyword_set(filename)) then filename = dat_filename(dd)
 
  label = dat_header(dd)

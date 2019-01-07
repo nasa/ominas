@@ -63,10 +63,7 @@ end
 ;	N/A 
 ;
 ;
-; FIELDS:
-;	gbd:	GLOBE class descriptor.  
-;
-;		Methods: str_globe, str_set_globe
+; FIELDS: NONE
 ;
 ;
 ; STATUS:

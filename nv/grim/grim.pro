@@ -480,6 +480,19 @@
 ;               there may be other cirumstances that can cause initial overlays
 ;               to be loaded without actually viewing a plane.
 ;
+;      `*settings_overlays`:
+;               Structure giving initial overlay settings.  Fields are as 
+;               follows:
+;
+;                name    : Name of overlay type.  If not present, all types are 
+;                          affected.
+;                color   : String giving overlay color.
+;                shade   : Float giving color shade.
+;                psym    : Plotting symbol.
+;                symsize : Symbol size.
+;                tlab    : Label toggle.
+;                tshade  : Shading toggle.
+;
 ;      `*activate`:
 ;               If set, inital overlay are activated.
 ;
@@ -906,6 +919,8 @@
 ;
 ;	File-> Save Postscript doesn't work right: the image order is
 ;	sometimes wrong, and the overlays don't line up.
+;
+;	Stars are not always correctly computed for wider fields of view.  
 ;
 ;
 ;
@@ -3279,7 +3294,7 @@ end
 ; grim_sync_action
 ;
 ;=============================================================================
-pro grim_sync_action, grim_data
+pro grim_sync_action, grim_data, fn=fn
 
  if(NOT keyword_set(grim_data.repeat_fn)) then return
  fn = grim_data.repeat_fn
@@ -3307,6 +3322,19 @@ pro grim_sync_action, grim_data
  grim_data.pn = pn
  grim_set_data, grim_data
  grim_refresh, /use_pixmap
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_actions
+;  NOT COMPLETE
+;=============================================================================
+pro grim_actions, grim_data, actions
+
+ for i=0, n_elements(actions)-1 do grim_sync_action, grim_data, fn=actions[i]
+
 end
 ;=============================================================================
 
@@ -4123,7 +4151,7 @@ pro grim, arg1, arg2, _extra=keyvals, $
 	mode_init=mode_init, modal=modal, xzero=xzero, frame=frame, $
 	refresh_callbacks=refresh_callbacks, refresh_callback_data_ps=refresh_callback_data_ps, $
 	plane_callbacks=plane_callbacks, plane_callback_data_ps=plane_callback_data_ps, $
-	max=max, path=path, symsize=symsize, lights=lights, $
+	max=max, path=path, symsize=symsize, lights=lights, settings_overlays=settings_overlays, $
 	user_psym=user_psym, workdir=workdir, mode_args=mode_args, $
         save_path=save_path, load_path=load_path, overlays=overlays, exclude_overlays=exclude_overlays, pn=pn, $
 	menu_fname=menu_fname, cursor_swap=cursor_swap, fov=fov, clip=clip, hide=hide, $
@@ -4177,7 +4205,7 @@ common colors, r_orig, g_orig, b_orig, r_curr, g_curr, b_curr
 	render_minimum=render_minimum, slave_overlays=slave_overlays, rgb=rgb, $
 	delay_overlays=delay_overlays, auto_stretch=auto_stretch, guideline=guideline, $
 	render_rgb=render_rgb, render_current=render_current, render_spawn=render_spawn, render_auto=render_auto, render_sky=render_sky, $
-        integer_zoom=integer_zoom
+        integer_zoom=integer_zoom, settings_overlays=settings_overlays
 
  if(keyword_set(ndd)) then dat_set_ndd, ndd
 
@@ -4335,6 +4363,12 @@ if(NOT defined(render_auto)) then render_auto = 0
        render_rgb=render_rgb, render_current=render_current, render_spawn=render_spawn, render_minimum=render_minimum, $
        render_auto=render_auto, render_sky=render_sky, render_numbra=render_numbra, render_sampling=render_sampling, $
        overlays=overlays, activate=activate)
+
+
+   ;----------------------------------------------
+   ; initialize overlay settings
+   ;----------------------------------------------
+   grim_initial_overlay_settings, grim_data, settings_overlays
 
 
    ;----------------------------------------------
@@ -4500,7 +4534,8 @@ if(NOT defined(render_auto)) then render_auto = 0
  for i=0, n_elements(dd)-1 do $
   if(NOT keyword_set(dat_dim(dd[i]))) then $
    begin
-    if(keyword_set(cd)) then cam_size = image_size(cd)
+    if(keyword_set(cd)) then cam_size = image_size(cd) $
+    else cam_size = [512,512]
     dat_set_maintain, dd[i], 0, /noevent
     dat_set_compress, dd[i], compress, /noevent
     dat_set_data, dd[i], grim_blank(cam_size[0], cam_size[1]) , /noevent
@@ -4521,7 +4556,8 @@ if(NOT defined(render_auto)) then render_auto = 0
       for i=0, nplanes-1 do $
          dat_set_sampling_fn, planes[i].dd, 'grim_sampling_fn', /noevent
 
-   entire = 1 & default = 0
+;   entire = 1 & default = 0
+   default = 0
    if(type EQ 'PLOT') then $
     begin
      entire = 0 & default = 1

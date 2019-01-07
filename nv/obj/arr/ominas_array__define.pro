@@ -60,7 +60,7 @@ end
 ;
 ;
 ; CATEGORY:
-;	NV/LIB/arr
+;	NV/LIB/ARR
 ;
 ;
 ; CALLING SEQUENCE:
@@ -68,11 +68,6 @@ end
 ;
 ;
 ; FIELDS:
-;	bd:	BODY class descriptor.  
-;
-;		Methods: arr_body, arr_set_body
-;
-;
 ;	surface_pts:	Vector giving the surface coordinates of the 
 ;			array points on the primary.  
 ;

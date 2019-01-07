@@ -338,6 +338,7 @@ pro grim_edit_header, grim_data
  if(NOT widget_info(grim_data.header_text, /valid)) then $
   begin
    header = dat_header(plane.dd)   
+   if(NOT keyword_set(header)) then return
    grim_data.header_text = $
                textedit(header, base=base, resource='grim_header', ysize=40)
    grim_data.header_base = base
@@ -2185,6 +2186,7 @@ end
 pro grim_menu_file_save_png_event, event
 
  grim_data = grim_get_data(event.top)
+ plane = grim_get_plane(grim_data)
  grim_set_primary, grim_data.base
 
  ;------------------------------------------------------
@@ -2195,7 +2197,8 @@ pro grim_menu_file_save_png_event, event
 
  filename = pickfiles(get_path=get_path, $
                options=['', 'Color', 'B/W'], selected_option=selected_option, $
-                              title='Select filename for saving', path=path, /one)
+               title='Enter filename for saving', path=path, /one, $
+               def=ext_rep(grim_title(plane), 'png'))
  if(NOT keyword__set(filename)) then return
 
  ;------------------------------------------------------

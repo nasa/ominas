@@ -83,11 +83,6 @@ end
 ;
 ;
 ; FIELDS:
-;	bd:	BODY class descriptor.  
-;
-;		Methods: cam_body, cam_set_body
-;
-;
 ;	scale:	2-element array giving the camera scale (radians/pixel) in 
 ;		each direction.  The meaning of this quantity depends on the
 ;		distortion model.

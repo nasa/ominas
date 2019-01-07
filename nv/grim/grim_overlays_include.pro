@@ -945,7 +945,6 @@ function grim_match_overlays, ptd, ptd0, general=general
  if(n_elements(w) EQ 1) then return, w
 
 
-
  ;-------------------------------------------------------------------------
  ; compare observers for remaining candidates; multiple ods are possible
  ; for points hidden wrt a light source.  There should be only one match,
@@ -2369,7 +2368,8 @@ pro grim_copy_activations, grim_data, plane=plane0
     for j=0, n_elements(ptd)-1 do $
      begin
       w = grim_match_overlays(ptd[j], ptd0, /general)
-      if(w[0] NE -1) then $
+      if(defined(w)) then $
+        if(w[0] NE -1) then $
            cor_set_udata, ptd[j], 'GRIM_ACTIVE_FLAG', active0[w], /noevent
      end
    grim_update_activations, grim_data, plane=planes[i], /no_sync
@@ -2814,6 +2814,40 @@ end
 
 
 ;=============================================================================
+; grim_initial_overlay_settings
+;
+;=============================================================================
+pro grim_initial_overlay_settings, grim_data, settings_overlays
+
+ if(NOT keyword_set(settings_overlays)) then return
+
+ planes = grim_get_plane(grim_data, /all)
+ for i=0, n_elements(planes)-1 do $
+  begin
+   overlays = *planes[i].overlays_p
+   ii = lindgen(n_elements(overlays))
+
+   tags = tag_names(settings_overlays)
+   w = where(tags EQ 'NAME')
+   if(w[0] NE -1) then $
+          ii = where(overlays.name EQ strupcase(settings_overlays.name))
+
+   for j=0, n_elements(ii)-1 do $
+    begin
+     info = overlays[ii[j]]
+     struct_assign, /nozero, settings_overlays, info
+     overlays[ii[j]] = info
+    end
+
+   *planes[i].overlays_p = overlays
+  end
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
 ; grim_create_overlay
 ;
 ;=============================================================================
@@ -3018,7 +3052,7 @@ pro grim_overlay, grim_data, name, plane=plane, source_xd=source_xd, ptd=ptd, so
  if(keyword_set(obj_name)) then $
   begin
    xds = cor_dereference_gd(gd)
-   w = nwhere(cor_name(xds), obj_name)
+   w = nwhere(strlowcase(cor_name(xds)), strlowcase(obj_name))
    if(w[0] EQ -1) then return
    active_xds = xds[w]
   end

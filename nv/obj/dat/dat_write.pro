@@ -145,12 +145,12 @@ pro dat_write, arg1, arg2, arg3, nodata=nodata, $
    filename = filenames[i]
    if(filename EQ '') then nv_message, 'No file name for dd[' + strtrim(i,2) + '].'
    filename0 = (*_dd[i].dd0p).filename
-   dat_set_filename, dd, filename
+   dat_set_filename, dd[i], filename
 
    ;------------------------------
    ; write detached header
    ;------------------------------
-   dh_write, dh_fname(/write, filename), dat_dh(dd)
+   dh_write, dh_fname(/write, filename), dat_dh(dd[i])
 
    ;------------------------------
    ; get filetype
@@ -182,7 +182,7 @@ pro dat_write, arg1, arg2, arg3, nodata=nodata, $
    if(NOT catch_errors) then err = 0 $
    else catch, err
 
-   if(err EQ 0) then status = call_function(output_fn, dd, nodata=nodata) $
+   if(err EQ 0) then status = call_function(output_fn, dd[i], nodata=nodata) $
    else nv_message, /warning, $
               'Output method ' + strupcase(output_fn) + ' crashed; ignoring.'
 

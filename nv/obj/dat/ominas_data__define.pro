@@ -273,7 +273,7 @@ end
 ;
 ;
 ; CATEGORY:
-;	NV/SYS
+;	NV/SYS/DAT
 ;
 ;
 ; CALLING SEQUENCE:

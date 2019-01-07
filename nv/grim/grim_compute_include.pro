@@ -650,7 +650,7 @@ function grim_shade_star, data, ptd
 
  norm = (mmax - mags)/(mmax-mmin)
 
- return, norm*(smax-smin) + smin
+; return, norm*(smax-smin) + smin
 
  max = max(mags) + 2
  return, (max - mags) / max

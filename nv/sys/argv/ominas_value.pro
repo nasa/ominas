@@ -46,7 +46,7 @@
 ;
 ;	double:	If set, result is converted to double.
 ;
-;	null:	Null return value to use instea of !null 
+;	null:	Null return value to use instead of !null 
 ;
 ;	delim:	 Delimiters(s) to use instead of '==' and '='.
 ;
@@ -140,7 +140,8 @@ common ominas_argv_block, ___argv
  if(NOT defined(___argv)) then return, ''
  w = where(___argv NE '-args')
  if(w[0] NE -1) then ___argv = ___argv[w]
- argv = ___argv
+;;; argv = strlowcase(___argv)
+argv = ___argv
 
  argv0 = ''
 
@@ -191,6 +192,7 @@ function ominas_value, keyword, delim=delim, toggle=toggle, keywords=keywords, $
           null=null, argv0=argv0, rm=rm
  
  if(keyword_set(set)) then null = 0
+;;; if(keyword_set(keyword)) then keyword = strlowcase(keyword)
 
  ;----------------------------------------------------------------
  ; get all keyword/value pairs

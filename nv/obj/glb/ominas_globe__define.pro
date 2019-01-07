@@ -43,7 +43,6 @@ end_keywords)
  ;----------------------------------------
  ; ellipsoid parameters
  ;----------------------------------------
- self.model = 'ELLIPSOID'
  if(keyword_set(radii)) then self.radii = radii[*,ii]
  if(keyword_set(lora)) then self.lora = decrapify(lora[ii])
 
@@ -83,7 +82,7 @@ end
 ;
 ;
 ; CATEGORY:
-;	NV/LIB/CAM
+;	NV/LIB/GLOBE
 ;
 ;
 ; CALLING SEQUENCE:
@@ -91,17 +90,6 @@ end
 ;
 ;
 ; FIELDS:
-;	sld:	SOLID class descriptor.  
-;
-;		Methods: glb_solid, glb_set_solid
-;
-;
-;	model:	String giving the model.  ELLIPSOID, FACET, or HARMONIC.
-;		Currently only ellipsoids are supported.
-;
-;
-;		Methods: glb_model, glb_set_model
-;
 ;	lref:	Longitude reference note.  Used to describe the longitude
 ;		reference system.
 ;
@@ -146,8 +134,6 @@ pro ominas_globe__define
 
  struct = $
     { ominas_globe, inherits ominas_solid, $
-	model:		 '', $			; ELLIPSOID, FACET, or HARMONIC
-
 	lref:	 	 '', $			; longitude reference note
 
 	;----------------------------------------

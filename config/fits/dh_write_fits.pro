@@ -7,7 +7,7 @@ function dh_write_fits, dd, filename, nodata=nodata, sample=sample, status=statu
  if(keyword_set(nodata)) then return, 0
  if(defined(sample)) then return, -1
 
- filename = dat_filename(dd)
+; filename = dat_filename(dd)
  if(NOT keyword_set(filename)) then filename = dat_filename(dd)
 
  header = dat_header(dd)

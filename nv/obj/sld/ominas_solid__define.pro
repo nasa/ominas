@@ -97,11 +97,6 @@ end
 ;
 ;
 ; FIELDS:
-;	bd:	BODY class descriptor.  
-;
-;		Methods: sld_body, sld_set_body
-;
-;
 ;	opacity: Normalized opacity for ray tracing.
 ;
 ;		Methods: sld_opacity, sld_set_opacity

@@ -420,7 +420,7 @@ end
 function widget_pickfiles, parent, path=_path, one=one, filter=filter, $
         cancel_callback=cancel_callback, ok_callback=ok_callback, $
         must_exist=must_exist, button_base=button_base, default=_default, $
-        ok_button=ok_button, nofile=nofile
+        ok_button=ok_button, nofile=nofile, filename=filename
 
  if(NOT keyword__set(cancel_callback)) then cancel_callback = 'wpf_cancel_event'
  if(NOT keyword__set(ok_callback)) then ok_callback = ''

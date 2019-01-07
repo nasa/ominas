@@ -41,7 +41,7 @@ if(defined(abscissa)) then nv_message, /con, 'Abscissa not supported.'
  data_offset[0] = nbb/elm_size
 
  gff = gff_create(filename[0], dim, type, $
-                 file_offset=file_offset, data_offset=data_offset)
+                     file_offset=file_offset, data_offset=data_offset)
 
 
  return, data

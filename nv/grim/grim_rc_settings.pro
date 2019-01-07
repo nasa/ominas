@@ -35,7 +35,8 @@ pro grim_rc_settings, rcfile=rcfile, keyvals=keyvals, $
         render_numbra=render_numbra, render_sampling=render_sampling, render_minimum=render_minimum, slave_overlays=slave_overlays, $
         delay_overlays=delay_overlays, auto_stretch=auto_stretch, lights=lights, $
         render_rgb=render_rgb, render_current=render_current, render_spawn=render_spawn, render_auto=render_auto, render_sky=render_sky, $
-	guideline=guideline, integer_zoom=integer_zoom, exclude_overlays=exclude_overlays
+	guideline=guideline, integer_zoom=integer_zoom, exclude_overlays=exclude_overlays, $
+	settings_overlays=settings_overlays
 
 
  ;----------------------------------------------------
@@ -384,6 +385,11 @@ pro grim_rc_settings, rcfile=rcfile, keyvals=keyvals, $
                       _exclude_overlays = extra_value(kv, 'EXCLUDE_OVERLAYS') $
  else _exclude_overlays = exclude_overlays
  if(keyword_set(_exclude_overlays)) then exclude_overlays = _exclude_overlays
+
+ if(n_elements(settings_overlays) EQ 0) then $
+                      _settings_overlays = extra_value(kv, 'SETTINGS_OVERLAYS') $
+ else _settings_overlays = settings_overlays
+ if(keyword_set(_settings_overlays)) then settings_overlays = _settings_overlays
 
 
  ;-----------------------------------------------------------------

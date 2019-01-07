@@ -221,7 +221,8 @@ function pg_get_rings, arg1, arg2, rd=_rd, pd=pd, od=od, _extra=keyvals, $
    else sub=lindgen(n)
 
    n = n_elements(sub)
-   _rs = rd[sub]
+;   _rs = rd[sub]
+   rd = rd[sub]
 
    ;-------------------------------------------------------------------
    ; override the specified values (name cannot be overridden)

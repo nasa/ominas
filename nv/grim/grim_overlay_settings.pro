@@ -474,7 +474,6 @@ common grim_overlay_settings_block, tops
   end
 
 
-
  ;-----------------------------------------------
  ; settings form widget
  ;-----------------------------------------------

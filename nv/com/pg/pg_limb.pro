@@ -98,7 +98,8 @@ function pg_limb, cd=cd, od=od, gbx=gbx, dd=dd, gd=gd, clip=clip, cull=cull, $
  count = 0
 
  desc = 'LIMB'
- if(keyword_set(od)) then desc = 'TERMINATOR'
+; if(keyword_set(od)) then desc = 'TERMINATOR'
+ if(keyword_set(od)) then desc = desc + '-' + cor_name(od)
 
  ;-----------------------------------------------
  ; dereference the generic descriptor if given

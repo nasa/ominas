@@ -67,11 +67,6 @@ end
 ;
 ;
 ; FIELDS:
-;	dkd:	DISK class descriptor.  
-;
-;		Methods: rng_disk, rng_set_disk
-;
-;
 ;	desc:	String giving the description of the ring.  Valid values
 ;		are 'EDGE', 'PEAK', 'TROUGH'.
 ;

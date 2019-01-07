@@ -36,6 +36,7 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
   if(NOT keyword_set(keyvals)) then keyvals = ''
   if(NOT keyword_set(dd0)) then dd0 = obj_new()
   if(NOT keyword_set(nhist)) then nhist = 1
+  if(NOT keyword_set(zoom)) then zoom = 0
 
   beta = keyword_set(beta)
   activate = keyword_set(activate)

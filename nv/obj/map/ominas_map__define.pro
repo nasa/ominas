@@ -111,7 +111,7 @@ end
 ;
 ;
 ; CATEGORY:
-;	NV/LIB/CAM
+;	NV/LIB/MAP
 ;
 ;
 ; CALLING SEQUENCE:
@@ -119,11 +119,6 @@ end
 ;
 ;
 ; FIELDS:
-;	crd:	CORE class descriptor.  
-;
-;		Methods: map_core
-;
-;
 ;	projection:	
 ;		String giving the map projection, e.g., RECTANGULAR, 
 ;		ORTHOGRAPHIC.  Map transformation functions are named

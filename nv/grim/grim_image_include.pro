@@ -196,7 +196,6 @@ function grim_image, grim_data, plane=plane, pn=pn, colormap=colormap, $
  max = plane.max[0]
  if(NOT keyword_set(max)) then max = max(dat_max(planes.dd))
 
-
  ;---------------------------------------
  ; get appropriate channel if specified
  ;---------------------------------------
@@ -366,7 +365,6 @@ pro grim_display_image, grim_data, plane=plane, $
    wset, grim_data.wnum
 
    zoom = min([entire_xsize/dim[0], entire_ysize/dim[1]]) * 0.95
-
    offset = 0.5 * [dim[0]-entire_xsize/zoom, $
                      dim[1]-entire_ysize/zoom]
   end

@@ -85,11 +85,6 @@ end
 ;
 ;
 ; FIELDS:
-;	crd:	CORE class descriptor.  
-;
-;		Methods: bod_core
-;
-;
 ;	opaque:	Flag describing whether a body is "easily visible".  
 ;
 ;		Methods: bod_opaque, bod_set_opaque
