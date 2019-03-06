@@ -212,7 +212,7 @@ cam=spice_cameras(dd, ref, '', '', pos=pos, $`
   cam_time = time, $
   cam_scale = scale, $
   cam_oaxis = oaxis, $
-  cam_fn_psf = make_array(ndd, val='cas_iss_psf'), $
+  cam_fn_psf = make_array(ndd, val=''), $
   cam_filters = filters, $
   cam_size = size, $
   cam_exposure = exposure, $
@@ -236,7 +236,7 @@ foreach t,table,icd do begin
 		cam_time = time, $
 		cam_scale = scale, $
 		cam_oaxis = oaxis, $
-		cam_fn_psf = make_array(ndd, val='cas_iss_psf'), $
+		cam_fn_psf = make_array(ndd, val=''), $
 		cam_filters = filters, $
 		cam_size = size, $
 		cam_exposure = exposure, $

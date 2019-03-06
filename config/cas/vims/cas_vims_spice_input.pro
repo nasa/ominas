@@ -211,7 +211,7 @@ compile_opt idl2
     cam_time = time, $
     cam_scale = make_array(2,ndd, val=cam_scale), $
     cam_oaxis = oaxis, $
-    cam_fn_psf = make_array(ndd, val='cas_iss_psf'), $
+    cam_fn_psf = make_array(ndd, val=''), $
     cam_filters = dat_instrument(dd[0]), $
     cam_size = size, $
     cam_exposure = exposure, $
