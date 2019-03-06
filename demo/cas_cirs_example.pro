@@ -151,7 +151,7 @@ mdp= pg_get_maps(/over,  $
   center=[0d0,-0.7d0*!dpi])
 
 ;dd=[(dat_read(getenv('OMINAS_DEMO')+path_sep()+'data'+path_sep()+'N1644787857_1.IMG'))[0],dd]
-dd=[(dat_read(getenv('OMINAS_DIR')+path_setp()+'demo'+path_sep()+'data'+path_sep()+'N1644787857_1.IMG'))[0],dd]
+dd=[(dat_read(getenv('OMINAS_DIR')+path_sep()+'demo'+path_sep()+'data'+path_sep()+'N1644787857_1.IMG'))[0],dd]
 
 nv=3
 mdr=objarr(nv) & cd=objarr(nv) & pd=objarr(nv) & ltd=objarr(nv) & dd_map=objarr(nv)
