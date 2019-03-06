@@ -34,7 +34,7 @@ compile_opt idl2,logical_predicate
 
 ;Read the file 
 ;dd=dat_read(getenv('OMINAS_DEMO')+path_sep()+'data'+path_sep()+'Mars_MGS_MOLA_DEM_mosaic_global_9260m.tif')
-dd=dat_read('./data'+path_sep()+'Mars_MGS_MOLA_DEM_mosaic_global_9260m.tif')
+dd=dat_read(getenv('OMINAS_DIR')+path_sep()+'demo'+path_sep()+'data'+path_sep()+'Mars_MGS_MOLA_DEM_mosaic_global_9260m.tif')
 
 ;-------------------------------------------------------------------------
 ;+
