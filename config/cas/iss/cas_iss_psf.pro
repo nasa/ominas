@@ -38,7 +38,7 @@ function cas_iss_psf, cd, x, y
  filters = cam_filters(cd)
 
  dir = getenv('CAS_FILTERS')
- if(NOT keyword_set(dir)) then dir = getenv('OMINAS_CAS') + '/iss/psfs'
+ if(NOT keyword_set(dir)) then dir = getenv('OMINAS_CAS') ? getenv('OMINAS_CAS') : getenv('OMINAS_DIR')+sep+'config'+sep+'cas'+sep+'iss'+sep+'psfs'
  dir = dir + sep
 
  filespec = dir + 'default_psf_generic_00200.dat'
