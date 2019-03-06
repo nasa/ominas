@@ -47,12 +47,14 @@ pro split_filename, filename, dir, name, ext
 
  name = filename & dir = make_array(n, val='')
 
- if((strpos(filename, sep))[0] NE -1) then $
+
+ w = where(strpos(filename, sep) NE -1)
+ if(w[0] NE -1) then $
   begin
-   ff = str_flip(filename)
+   ff = str_flip(filename[w])
    front = str_nnsplit(ff, sep, rem=back)
-   dir = str_flip(back)
-   name = str_flip(front)
+   dir[w] = str_flip(back)
+   name[w] = str_flip(front)
   end
 
  if(arg_present(ext)) then $

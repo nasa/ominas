@@ -33,7 +33,8 @@ compile_opt idl2,logical_predicate
 
 
 ;Read the file 
-dd=dat_read(getenv('OMINAS_DEMO')+path_sep()+'data'+path_sep()+'Mars_MGS_MOLA_DEM_mosaic_global_9260m.tif')
+;dd=dat_read(getenv('OMINAS_DEMO')+path_sep()+'data'+path_sep()+'Mars_MGS_MOLA_DEM_mosaic_global_9260m.tif')
+dd=dat_read('./data'+path_sep()+'Mars_MGS_MOLA_DEM_mosaic_global_9260m.tif')
 
 ;-------------------------------------------------------------------------
 ;+
@@ -127,8 +128,8 @@ grim,dd_map,cd=mdp,overlays=['planet_grid'],order=0,/new
 ;     ndd_map=nv_clone(dd_map)
 ;     dat_set_data,ndd,bytscl(dat_data(ndd))
 ;     dat_set_data,ndd_map,bytscl(dat_data(ndd_map))
-;     dat_write,'geotiff_ex1.tif',ndd,filetype='GEOTIFF'
-;     ;dat_write,'geotiff_ex2.tif',ndd_map,filetype='GEOTIFF'
+;     dat_write,'./outputs/geotiff_ex1.tif',ndd,filetype='GEOTIFF'
+;     ;dat_write,'./outputs/geotiff_ex2.tif',ndd_map,filetype='GEOTIFF'
 ;
 ;
 ;   This is how the image looks like on GoogleEarth Pro
@@ -151,8 +152,8 @@ ndd=nv_clone(dd)
 ndd_map=nv_clone(dd_map)
 dat_set_data,ndd,bytscl(dat_data(ndd))
 dat_set_data,ndd_map,bytscl(dat_data(ndd_map))
-dat_write,'geotiff_ex1.tif',ndd,filetype='GEOTIFF'
-;dat_write,'geotiff_ex2.tif',ndd_map,filetype='GEOTIFF'
+dat_write,'./outputs/geotiff_ex1.tif',ndd,filetype='GEOTIFF'
+;dat_write,'./outputs/geotiff_ex2.tif',ndd_map,filetype='GEOTIFF'
 
 
 end

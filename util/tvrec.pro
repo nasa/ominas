@@ -162,39 +162,40 @@ function tvrec, win_num, $
  released = 0
  repeat begin
   plots, xarr, yarr, /device, thick=thick, linestyle=linestyle, color=color
-  cursor, qx, qy, /device, /change
-  if(keyword_set(button)) then old_button = button
-  button = !mouse.button
 
-help, button
-;;;  if((qx EQ old_qx) AND (qy EQ old_qy)) then stop
-;;;  if((qx EQ old_qx) AND (qy EQ old_qy)) then released = 1
-  if(button EQ 0) then released = 1 
-
-  if(qx EQ -1) then qx = old_qx
-  if(qy EQ -1) then qy = old_qy
-
-  q = call_function(grid_function, [qx, qy])
-  qx = q[0]
-  qy = q[1]
-
-  oldxarr = xarr
-  oldyarr = yarr
-  old_qx = qx
-  old_qy = qy
-  tvrec_constrain, px, py, qx, qy, aspect
-
-  xarr = [px, qx, qx, px, px]
-  yarr = [py, py, qy, qy, py]
-  if(keyword_set(vline)) then $
+  cursor, qx, qy, /device, /nowait
+  if(!mouse.button EQ 0) then released = 1 $
+  else $
    begin
-    xarr = [px, px]
-    yarr = [qy, py]
-   end $
-  else if(keyword_set(hline)) then $
-   begin
-    xarr = [px, qx]
-    yarr = [py, py]
+    cursor, qx, qy, /device, /change
+    if(keyword_set(button)) then old_button = button
+    button = !mouse.button
+
+    if(qx EQ -1) then qx = old_qx
+    if(qy EQ -1) then qy = old_qy
+
+    q = call_function(grid_function, [qx, qy])
+    qx = q[0]
+    qy = q[1]
+
+    oldxarr = xarr
+    oldyarr = yarr
+    old_qx = qx
+    old_qy = qy
+    tvrec_constrain, px, py, qx, qy, aspect
+
+    xarr = [px, qx, qx, px, px]
+    yarr = [py, py, qy, qy, py]
+    if(keyword_set(vline)) then $
+     begin
+      xarr = [px, px]
+      yarr = [qy, py]
+     end $
+    else if(keyword_set(hline)) then $
+     begin
+      xarr = [px, qx]
+      yarr = [py, py]
+     end
    end
 
   if(xor_graphics) then $

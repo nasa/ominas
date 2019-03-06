@@ -199,6 +199,10 @@
 ;            Name of a file containing additional menus to add to
 ;            the GRIM widget.  The file syntax follows that for cw_pdmenu.
 ;
+;      `*arg_menus`:
+;            Argument to be provided to the menu extension definition
+;            function above.
+;
 ;
 ;      Other Keywords
 ;      ~~~~~~~~~~~~~~
@@ -4156,7 +4160,7 @@ pro grim, arg1, arg2, _extra=keyvals, $
         save_path=save_path, load_path=load_path, overlays=overlays, exclude_overlays=exclude_overlays, pn=pn, $
 	menu_fname=menu_fname, cursor_swap=cursor_swap, fov=fov, clip=clip, hide=hide, $
 	menu_extensions=menu_extensions, button_extensions=button_extensions, $
-	arg_extensions=arg_extensions, loadct=loadct, grn=grn, tag=tag, $
+	arg_extensions=arg_extensions, arg_menus=arg_menus, loadct=loadct, grn=grn, tag=tag, $
 	extensions=extensions, beta=beta, rendering=rendering, npoints=npoints, $
 	cam_trs=cam_trs, plt_trs=plt_trs, rng_trs=rng_trs, str_trs=str_trs, $
         lgt_trs=lgt_trs, stn_trs=stn_trs, arr_trs=arr_trs, assoc_xd=assoc_xd, $
@@ -4194,7 +4198,7 @@ common colors, r_orig, g_orig, b_orig, r_curr, g_curr, b_curr
 	zoom=zoom, rotate=rotate, order=order, offset=offset, filter=filter, retain=retain, $
 	path=path, save_path=save_path, load_path=load_path, symsize=symsize, $
         overlays=overlays, exclude_overlays=exclude_overlays, menu_fname=menu_fname, cursor_swap=cursor_swap, $
-	fov=fov, clip=clip, menu_extensions=menu_extensions, button_extensions=button_extensions, arg_extensions=arg_extensions, $
+	fov=fov, clip=clip, menu_extensions=menu_extensions, button_extensions=button_extensions, arg_extensions=arg_extensions, arg_menus=arg_menus, $
 	cam_trs=cam_trs, plt_trs=plt_trs, rng_trs=rng_trs, str_trs=str_trs, lgt_trs=lgt_trs, stn_trs=stn_trs, arr_trs=arr_trs, $
 	hide=hide, mode_args=mode_args, xzero=xzero, lights=lights, $
         psym=psym, nhist=nhist, maintain=maintain, ndd=ndd, workdir=workdir, $
@@ -4646,7 +4650,7 @@ if(NOT defined(render_auto)) then render_auto = 0
     begin
      for i=0, n_elements(menu_extensions)-1 do $
          if(routine_exists(menu_extensions[i]+'_init')) then $
-                  call_procedure, menu_extensions[i]+'_init', grim_data
+                  call_procedure, menu_extensions[i]+'_init', grim_data, arg_menus
     end
   end
 

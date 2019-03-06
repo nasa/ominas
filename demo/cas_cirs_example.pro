@@ -53,7 +53,8 @@ ldir=res
 imgs=ldir[0]+path_sep()+['126MI_FP3DAYMAP001_CI006_601_F3_039E.DAT','126MI_FP3DAYMAP001_CI004_601_F3_039E.DAT']
 foreach img,imgs do if ~file_test(img,/read) then begin
   print,'CIRS DAT file needed for the demo not found. Extracting it from the tar.gz file provided with OMINAS...'
-  file_untar,getenv('OMINAS_DEMO')+path_sep()+'data'+path_sep()+file_basename(img,'.DAT')+'.tar.gz',ldir,/verbose
+;  file_untar,getenv('OMINAS_DEMO')+path_sep()+'data'+path_sep()+file_basename(img,'.DAT')+'.tar.gz',ldir,/verbose
+  file_untar,'./data'+path_sep()+file_basename(img,'.DAT')+'.tar.gz',ldir,/verbose
 endif
 
 
@@ -149,7 +150,8 @@ mdp= pg_get_maps(/over,  $
   origin=[map_xsize,map_ysize]/2, $
   center=[0d0,-0.7d0*!dpi])
 
-dd=[(dat_read(getenv('OMINAS_DEMO')+path_sep()+'data'+path_sep()+'N1644787857_1.IMG'))[0],dd]
+;dd=[(dat_read(getenv('OMINAS_DEMO')+path_sep()+'data'+path_sep()+'N1644787857_1.IMG'))[0],dd]
+dd=[(dat_read('./data'+path_sep()+'N1644787857_1.IMG'))[0],dd]
 
 nv=3
 mdr=objarr(nv) & cd=objarr(nv) & pd=objarr(nv) & ltd=objarr(nv) & dd_map=objarr(nv)

@@ -27,7 +27,7 @@ common x_window_block, __wnums, __ids
  if(NOT keyword_set(title)) then $
          widget_control, base, tlb_set_title='idl ' + strtrim(!d.window, 2)
  
- __wnums = append_array(__wnums, !d.window, /def_)
- __ids = append_array(__ids, draw, /def_)
+ __wnums = append_array(__wnums, !d.window, /def)
+ __ids = append_array(__ids, draw, /def)
 end
 ;===================================================================================

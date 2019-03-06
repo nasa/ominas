@@ -93,6 +93,8 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
   if(NOT keyword_set(ytitle)) then ytitle = ''
 
   if(NOT keyword_set(tag)) then tag = ''
+ 
+  crd = cor_create_descriptors()
 
   ;----------------------
   ; main data structure
@@ -256,6 +258,8 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
 
 		exclude_overlays_p	: ptr_new(0), $
 		enable_refresh		: 1b, $
+
+		crd			: crd, $
 
 	;---------------
 	; planes

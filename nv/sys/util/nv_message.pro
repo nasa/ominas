@@ -35,7 +35,11 @@
 ;
 ;	continue:	If set, execution is not halted.
 ;
-;	stop:		If set, execution is halted in nv_message.
+;	stop:		If set, execution is halted after a terminal message 
+;			is printed.
+;
+;	exit:		If set, IDL is exited after a terminal message is 
+;			printed.
 ;
 ;	get_message:	If set, the last message sent through nv_message
 ;			is returned in the _string keyword and no other
@@ -118,7 +122,7 @@ pro nv_message, string, name=name, anonymous=anonymous, continue=continue, $
              message=_string, explanation=explanation, warning=warning, $
              callback=callback, cb_data_p=cb_data_p, disconnect=disconnect, $
              cb_tag=cb_tag, verbose=verbose, silent=silent, stop=stop, $
-             get_verbosity=get_verbosity, test_verbose=test_verbose
+             get_verbosity=get_verbosity, test_verbose=test_verbose, exit=exit
 common nv_message_block, last_message, cb_tlp, verbosity
 @core.include
 @nv_block.common
@@ -240,6 +244,7 @@ common nv_message_block, last_message, cb_tlp, verbosity
    last_message = string
   end
  if(keyword_set(stop)) then stop
+ if(keyword_set(exit)) then exit
  if(NOT keyword_set(continue)) then retall
 
 

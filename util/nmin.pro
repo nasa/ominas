@@ -54,6 +54,8 @@
 ;=============================================================================
 function nmin, __array, dir, subscripts=subscripts, positive=positive
 
+ if(NOT keyword_set(dir)) then dir = 0
+
  ;--------------------------------------------
  ; determine size and type of array
  ;--------------------------------------------

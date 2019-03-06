@@ -173,7 +173,7 @@ pg_put_maps, dd_map1, md=md1			; create detached header on dd_map1
 pg_put_cameras, dd_map1, cd=cd
 ;pg_put_planets, dd_map1, od=cd, pd=pd
 ;pg_put_rings, dd_map1, od=cd, pd=pd
-dat_write, 'globe-1.map', dd_map1		; write data file, and detached header
+dat_write, './outputs/globe-1.map', dd_map1		; write data file, and detached header
 
 
 
@@ -184,7 +184,7 @@ dat_write, 'globe-1.map', dd_map1		; write data file, and detached header
 
 
 
-dd_map = dat_read('globe-1.map')
+dd_map = dat_read('./outputs/globe-1.map')
 md = pg_get_maps(dd_map)
 
 grid_ptd = pg_grid(cd=md, gbx=pd)

@@ -15,6 +15,7 @@ pro grim_user_ptd_struct__define
 	shade_threshold	:	0d, $
 	fn_graphics	:	3, $
 	xgraphics	:	0b, $
+	xradius		:	0b, $
 	symsize		:	0. $
     }
 
@@ -30,7 +31,9 @@ end
 ;=============================================================================
 pro grim_add_user_points, grn=grn, user_ptd, tag, update=update, $
                   color=color, fn_color=fn_color, fn_shade=fn_shade, psym=psym, thick=thick, line=line, symsize=symsize, $
-                  shade_threshold=shade_threshold, fn_graphics=fn_graphics, xgraphics=xgraphics, nodraw=nodraw, inactive=inactive, $
+                  shade_threshold=shade_threshold, $
+                  fn_graphics=fn_graphics, xgraphics=xgraphics, xradius=xradius, $
+                  nodraw=nodraw, inactive=inactive, $
                   no_refresh=no_refresh, plane=plane, lock=lock
 
  if(NOT keyword_set(tag)) then tag = 'no_name'
@@ -51,6 +54,7 @@ pro grim_add_user_points, grn=grn, user_ptd, tag, update=update, $
 
  if(NOT keyword_set(fn_graphics)) then fn_graphics = grim_data.default_user_fn_graphics
  if(NOT keyword_set(xgraphics)) then xgraphics = 0
+ if(NOT keyword_set(xradius)) then xradius = 0
  if(NOT keyword_set(psym)) then psym = grim_data.default_user_psym
  if(NOT keyword_set(thick)) then thick = grim_data.default_user_thick
  if(NOT keyword_set(line)) then line = grim_data.default_user_line
@@ -63,6 +67,7 @@ pro grim_add_user_points, grn=grn, user_ptd, tag, update=update, $
  user_struct.shade_threshold = shade_threshold
  user_struct.fn_graphics = fn_graphics
  user_struct.xgraphics = xgraphics
+ user_struct.xradius = xradius
  user_struct.thick = thick
  user_struct.line = line
  user_struct.symsize = symsize
@@ -359,6 +364,28 @@ pro grim_invert_active_user_overlays, grim_data, plane
  ptd = grim_get_user_ptd(plane=plane)
  grim_invert_active_overlays, grim_data, plane, ptd
  
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_set_udata
+;
+;=============================================================================
+pro grim_set_udata, grim_data, name, udata
+ cor_set_udata, grim_data.crd, name, udata
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_udata
+;
+;=============================================================================
+function grim_udata, grim_data, name
+ return, cor_udata(grim_data.crd, name)
 end
 ;=============================================================================
 

@@ -30,7 +30,7 @@ pro grim_rc_settings, rcfile=rcfile, keyvals=keyvals, $
 	filetype=filetype, hide=hide, mode_args=mode_args, xzero=xzero, rgb=rgb, $
         psym=psym, nhist=nhist, maintain=maintain, ndd=ndd, workdir=workdir, $
         activate=activate, frame=frame, compress=compress, loadct=loadct, maxdat=maxdat, $
-	arg_extensions=arg_extensions, extensions=extensions, beta=beta, rendering=rendering, $
+	arg_extensions=arg_extensions, arg_menus=arg_menus, extensions=extensions, beta=beta, rendering=rendering, $
         plane_syncing=plane_syncing, tiepoint_syncing=tiepoint_syncing, curve_syncing=curve_syncing, action_syncing=action_syncing, activation_syncing=activation_syncing, visibility=visibility, channel=channel, $
         render_numbra=render_numbra, render_sampling=render_sampling, render_minimum=render_minimum, slave_overlays=slave_overlays, $
         delay_overlays=delay_overlays, auto_stretch=auto_stretch, lights=lights, $
@@ -199,6 +199,11 @@ pro grim_rc_settings, rcfile=rcfile, keyvals=keyvals, $
                _arg_extensions = extra_value(kv, 'ARG_EXTENSIONS') $
  else _arg_extensions = arg_extensions
  if(keyword_set(_arg_extensions)) then arg_extensions = _arg_extensions
+
+ if(n_elements(arg_menus) EQ 0) then $
+               _arg_menus = extra_value(kv, 'ARG_MENUS') $
+ else _arg_menus = arg_menus
+ if(keyword_set(_arg_menus)) then arg_menus = _arg_menus
 
  if(n_elements(cam_trs) EQ 0) then _cam_trs = extra_value(kv, 'CAM_TRS') $
  else _cam_trs = cam_trs

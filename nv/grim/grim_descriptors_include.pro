@@ -45,6 +45,7 @@ end
 pro grim_suspend_events
 @grim_block.include
 
+
  _suspend_events = 1
 
 end
@@ -825,9 +826,12 @@ function grim_get_rings, grim_data, plane=plane, names=names
  grim_print, grim_data, 'Getting ring descriptors...'
  if(NOT keyword_set(pd)) then return, obj_new()
 
+;help, names
+;help, plane.rng_trs
  rd = pg_get_rings(plane.dd, $
          od=cd, pd=pd, name=names, $
                    plane.rng_trs, fov=fov, cov=cov, _extra=*grim_data.keyvals_p)
+;help, rd
  cor_set_udata, plane.dd, 'GRIM_RNG_NAMES', names, /noevent
  cor_set_udata, plane.dd, 'GRIM_RNG_TRS', plane.rng_trs, /noevent
 
@@ -1016,7 +1020,6 @@ pro grim_load_descriptors, grim_data, name, plane=plane, class=class, $
        obj_name=obj_name, gd=gd
 
  if(NOT keyword_set(plane)) then plane = grim_get_plane(grim_data)
-
 
  ;-----------------------------------------------------------------------
  ; get dependencies

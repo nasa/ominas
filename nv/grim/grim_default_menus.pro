@@ -1486,7 +1486,7 @@ end
 ; grim_default_menus_init
 ;
 ;=============================================================================
-pro grim_default_menus_init, grim_data
+pro grim_default_menus_init, grim_data, arg
  grim_update_menu_toggle, grim_data, $
          'grim_menu_toggle_reorigin_event', $
           grim_get_toggle_flag(grim_data, 'SHIFT_REORIGIN')

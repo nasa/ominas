@@ -8,7 +8,7 @@
 ;	Calls input translators, supplying the given keyword, and builds 
 ;	a list of returned descriptors.  Translators that crash are ignored 
 ;	and a warning is issued.  This behavior is disabled if $NV_DEBUG is 
-;	set.
+;	set (e.g., +NV_DEBUG=1 from the shell prompt).
 ;
 ;
 ; CATEGORY:

@@ -263,14 +263,14 @@ function ring_input, dd, keyword, prefix, values=values, status=status, $
      continue = 1
      if(keyword_set(sel_names)) then $
       begin
+       ww = -1
        for j=0, n_elements(sel_names)-1 do $
-               ww = append_array(ww, where(strupcase(dat.ring) EQ strupcase(sel_names[j])), /def)
-       w = ww[where(ww NE -1)]
-       if(w[0] EQ -1) then continue = 0 $
-       else dat = dat[w]
+               ww = append_array(ww, where(strupcase(dat.ring) EQ strupcase(sel_names[j])), /pos)
+       if(ww[0] EQ -1) then dat = 0 $
+       else dat = dat[ww]
       end
 
-    if(continue) then $
+    if(keyword_set(dat)) then $
       begin
        ;- - - - - - - - - - - - - - - - - -
        ; build descriptors

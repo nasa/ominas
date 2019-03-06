@@ -309,6 +309,7 @@ pro grim_draw_user_points, grim_data, plane, tags, inactive_color, xmap=xmap, $
    user_shade_threshold = user_struct.shade_threshold
    user_fn_graphics = user_struct.fn_graphics
    user_xgraphics = user_struct.xgraphics
+   user_xradius = user_struct.xradius
    user_psym = user_struct.psym
    user_thick = user_struct.thick
    user_line = user_struct.line
@@ -340,7 +341,8 @@ pro grim_draw_user_points, grim_data, plane, tags, inactive_color, xmap=xmap, $
        ;- - - - - - - - - - - - - - - - - - - -
        ; determine which points are visible
        ;- - - - - - - - - - - - - - - - - - - -
-       if(keyword_set(user_fn_shade[j]) AND defined(user_shade_threshold[j])) then $
+;;;       if(keyword_set(user_fn_shade[j]) AND defined(user_shade_threshold[j])) then $
+       if(keyword_set(user_fn_shade[j]) AND keyword_set(user_shade_threshold[j])) then $
                p = grim_shade_threshold(user_ptd[j], shade, user_shade_threshold[j], sub=sub) $
        else p = pnt_points(user_ptd[j], /visible)
 
@@ -372,7 +374,7 @@ pro grim_draw_user_points, grim_data, plane, tags, inactive_color, xmap=xmap, $
          if(keyword_set(user_xgraphics[j])) then $
           begin
            if(NOT keyword_set(noxgraphics)) then $
-                 shade = xshade(p, shade, map=xmap, color=uxcol, /getmap, /tv)
+                 shade = xshade(p, shade, map=xmap, color=uxcol, radius=user_xradius, /getmap, /tv)
           end $
          else $
           pg_draw, p, col=ucol, psym=user_psym[j], $
@@ -464,7 +466,6 @@ pro grim_draw_user_overlays, grim_data, plane, inactive_color, $
        grim_draw_user_points, grim_data, plane, inactive_tags, inactive_color, $
                  xmap=xmap, override_color=override_color, noxgraphics=noxgraphics
   end
-
 
  ;-------------------------------------
  ; draw xgraphics map
@@ -2980,6 +2981,8 @@ pro grim_overlay, grim_data, name, plane=plane, source_xd=source_xd, ptd=ptd, so
  if(grim_data.slave_overlays) then plane = grim_get_plane(grim_data, pn=0)
  if(NOT keyword_set(plane)) then plane = grim_get_plane(grim_data)
 
+ if(keyword_set(name)) then name = strupcase(name)
+ if(keyword_set(obj_name)) then obj_name = strupcase(obj_name)
 
  ;-----------------------------------------------------------------------
  ;  If the given name gives no result, then if there is an 'S' at the 
