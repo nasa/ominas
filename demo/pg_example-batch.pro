@@ -47,7 +47,7 @@
 ;
 ;-
 ;-------------------------------------------------------------------------
-dd = dat_read('./data/N1350122987_2.IMG', im, label)
+dd = dat_read('./data/N1350122987_2.IMG', 'test=blah', im, label)
 tvim, im, zoom=0.75, /order, /new
 
 ;-------------------------------------------------------------------------
@@ -585,7 +585,7 @@ pg_draw, dgrid_ptd, color=ctpurple()
 ;             /map_graphic,
 ;             size=[400,200])
 ;
-;          .. image:: graphics/jupiter_rectangular.jpeg
+;    .. image:: graphics/jupiter_rectangular.jpeg
 ;
 ;
 ;    Orthographic::
@@ -595,7 +595,7 @@ pg_draw, dgrid_ptd, color=ctpurple()
 ;             size=[400,400], $
 ;             center=[!dpi/6d,!dpi])
 ;
-;          .. image:: graphics/jupiter_orthographic.jpeg
+;    .. image:: graphics/jupiter_orthographic.jpeg
 ;
 ;
 ;    Stereographic::
@@ -605,7 +605,7 @@ pg_draw, dgrid_ptd, color=ctpurple()
 ;              scale=0.5, $
 ;              size=[400,400], center=[!dpi/2d,0d])
 ;
-;          .. image:: graphics/jupiter_stereographic.jpeg
+;    .. image:: graphics/jupiter_stereographic.jpeg
 ;
 ;
 ;    Mercator::
@@ -614,7 +614,7 @@ pg_draw, dgrid_ptd, color=ctpurple()
 ;             projection='MERCATOR', $	
 ;              size=[400,200])
 ;
-;          .. image:: graphics/jupiter_mercator.jpeg
+;    .. image:: graphics/jupiter_mercator.jpeg
 ;
 ;-
 ;-------------------------------------------------------------------------
@@ -648,18 +648,6 @@ md = pg_get_maps(/over, bx=pd[ii], $
 ;     dd_map = pg_map(dd, md=md, gd=gd, bx=pd[ii], map=map)
 ;     tvim, /new, map
 ;
-;    Rectangular::
-;          .. image:: graphics/jupiter_rectangular.jpeg
-;
-;    Orthographic::
-;          .. image:: graphics/jupiter_orthographic.jpeg
-;
-;    Stereographic::
-;          .. image:: graphics/jupiter_stereographic.jpeg
-;
-
-;    Mercator::
-;          .. image:: graphics/jupiter_mercator.jpeg
 ;
 ;
 ;   You could bound the map like this::
@@ -771,10 +759,12 @@ tvim, /new, map1
 ;   These commands write the descriptor information out through the 
 ;   translators.  The exact behavior is translator-dependent.  In the default
 ;   configuration, the detached header translator modifies the detached header 
-;   stored in the data descriptor.  It is not written until DAT_WRITE is called::
+;   stored in the data descriptor.  It is not written until DAT_WRITE is called.
+;   We write only pd[0] because some translator setups may return large
+;   numbers of planet descriptors, making it pretty slow::
 ;   
 ;     pg_put_rings, dd, od=cd, rd=rd
-;     pg_put_planets, dd, od=cd, pd=pd
+;     pg_put_planets, dd, od=cd, pd=pd[0]
 ;     pg_put_cameras, dd, cd=cd
 ;     pg_put_stars, dd, sd=ltd, od=cd
 ;
@@ -794,7 +784,7 @@ tvim, /new, map1
 ;-
 ;---------------------------------------------------------------------------
 pg_put_rings, dd, od=cd, rd=rd
-pg_put_planets, dd, od=cd, pd=pd
+pg_put_planets, dd, od=cd, pd=pd[0]
 pg_put_cameras, dd, cd=cd
 pg_put_stars, dd, sd=ltd, od=cd
 print, transpose(dat_dh(dd))

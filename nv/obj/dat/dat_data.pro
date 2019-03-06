@@ -45,7 +45,7 @@
 ;	true:     If set, the actual data array is returned, even if there is
 ;	          a sampling function.
 ;
-;	abscissa: If set to 1, the abscissa is rurned instead of the data.
+;	abscissa: If set to 1, the abscissa is returned instead of the data.
 ;
 ;  OUTPUT: 
 ;	abscissa: The abscissa is returned in this array.
@@ -159,7 +159,7 @@ function dat_data, dd, samples=_samples, current=current, slice=slice, $
  ;-------------------------------------------------------------------------
  ; Uncompress
  ;-------------------------------------------------------------------------
- _dat_uncompress_data, _dd, cdata=cdata, cabscissa=cabscissa
+ _dat_uncompress_data, _dd
 
 
  ;-------------------------------------------------------------------------
@@ -180,6 +180,12 @@ function dat_data, dd, samples=_samples, current=current, slice=slice, $
 
 
  ;-------------------------------------------------------------------------
+ ; Unload data array if maintain == 2
+ ;-------------------------------------------------------------------------
+ if((*_dd.dd0p).maintain EQ 2) then dat_unload_data, _dd
+
+
+ ;-------------------------------------------------------------------------
  ; If possible, reorganize to the proper dimensions.  This is not possible
  ; if the data array is being subsampled.
  ;-------------------------------------------------------------------------
@@ -191,19 +197,51 @@ function dat_data, dd, samples=_samples, current=current, slice=slice, $
 
 
  ;-------------------------------------------------------------------------
- ; compute data ranges -- not reliable if data array is being subsampled
+ ; Compute data and abscissa ranges for numeric data types
+ ;  These track the maximum and minimum values that have ever been loaded,
+ ;  so if the data array is being subsampled, these values are not 
+ ;  necessarily the true maxes and mins.  
  ;-------------------------------------------------------------------------
- max = max(data)
- min = min(data)
- abmax = max(abscissa)
- abmin = min(abscissa)
 
- if(max GT _dd.max) then _dd.max = max
- if(min LT _dd.min) then _dd.min = min
+ ;- - - - - - - - - - - - - - - - - -
+ ; data
+ ;- - - - - - - - - - - - - - - - - -
+ if(NOT isnum(data)) then $
+  begin
+;   max = !values.d_nan
+;   min = !values.d_nan
+   max = -1d100
+   min = 1d100
+  end $
+ else $
+  begin
+   max = max(data)
+   min = min(data)
+   if(max GT _dd.max) then _dd.max = max
+   if(min LT _dd.min) then _dd.min = min
+  end
+
+ ;- - - - - - - - - - - - - - - - - -
+ ; abscissa
+ ;- - - - - - - - - - - - - - - - - -
+ if(NOT isnum(abscissa)) then $
+  begin
+;   abmax = !values.d_nan
+;   abmin = !values.d_nan
+   abmax =-1d100
+   abmin = 1d100
+  end $
+ else $
+  begin
+   abmax = max(abscissa)
+   abmin = min(abscissa)
+   if(abmax GT _dd.abmax) then _dd.abmax = abmax
+   if(abmin LT _dd.abmin) then _dd.abmin = abmin
+  end
 
 
  ;-------------------------------------------------------------------------
- ; get abscissa
+ ; get abscissa for output
  ;-------------------------------------------------------------------------
  if(keyword_set(abscissa)) then _abscissa = abscissa $
  else $
@@ -212,8 +250,6 @@ function dat_data, dd, samples=_samples, current=current, slice=slice, $
    else _abscissa = lindgen(dim)
   end
 
- if(abmax GT _dd.abmax) then _dd.abmax = abmax
- if(abmin LT _dd.abmin) then _dd.abmin = abmin
 
  cor_rereference, dd, _dd
 
@@ -221,9 +257,9 @@ function dat_data, dd, samples=_samples, current=current, slice=slice, $
  ;-------------------------------------------------------------------------
  ; restore compression
  ;-------------------------------------------------------------------------
- _dat_compress_data, _dd, cdata=cdata, cabscissa=cabscissa
+ _dat_compress_data, _dd
 
- if(return_abscissa) then return, abscissa
+ if(return_abscissa) then return, _abscissa
  return, data
 end
 ;===========================================================================

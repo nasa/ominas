@@ -109,13 +109,7 @@ pro nv_clone_recurse, xd, protect=protect
  ;----------------------------------------------
  else if(type EQ 11) then $
   begin
-   if (obj_valid(xd,/cast) ne obj_valid(xd[0],/cast)) then begin
-     if ~isa(xd,'ominas_core') then begin
-       xd=xd[*]
-       return
-     endif
-   endif
-   foreach ixd,xd,i do if(obj_valid(xd[i])) then $
+   for i=0, n-1 do if(obj_valid(xd[i])) then $
     begin
      _xd = cor_dereference(xd[i])
 

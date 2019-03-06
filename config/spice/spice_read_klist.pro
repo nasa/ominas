@@ -129,18 +129,20 @@ common spice_klist_block, klist_last, _inlines
  ;--------------------------------------------
  ; remove degenerate slashes
  ;--------------------------------------------
+ sep = path_sep()
+
  nfiles = n_elements(outfiles)
  for i=0, nfiles-1 do if(keyword__set(outfiles[i])) then $
   begin
    slash = 0
-   if(strmid(outfiles[i], 0, 1) EQ '/') then slash = 1
+   if(strmid(outfiles[i], 0, 1) EQ sep) then slash = 1
 
-   ss = strtrim(str_nsplit(outfiles[i], '/'), 2)
+   ss = strtrim(str_nsplit(outfiles[i], sep), 2)
    w = where(ss NE '')
    if(w[0] EQ -1) then outfiles[i] = '' $
-;   else outfiles[i] = '/' + str_cat(ss[w], ins='/')
-   else outfiles[i] = str_cat(ss[w], ins='/')
-   if(slash) then outfiles[i] = '/' + outfiles[i]
+;   else outfiles[i] = sep + str_cat(ss[w], ins=sep)
+   else outfiles[i] = str_cat(ss[w], ins=sep)
+   if(slash) then outfiles[i] = sep + outfiles[i]
   end
 
 

@@ -5,13 +5,15 @@
 function skp_simple, dd, path, ext=ext0
 
 ext0='bc'
+ sep = path_sep()
+
  split_filename, cor_name(dd), dir, name, ext
  if(NOT keyword_set(name)) then return, ''
 
- ff = file_search(path + '/' + name + '.' + ext0)
+ ff = file_search(path + sep + name + '.' + ext0)
  if(keyword_set(ff)) then return, ff
 
- return, file_search(path + '/' + name + '.' + ext + '.' + ext0)
+ return, file_search(path + sep + name + '.' + ext + '.' + ext0)
 end
 ;=============================================================================
 
@@ -25,6 +27,7 @@ function spice_kernel_parse, dd, prefix, inst, type, ext=ext, time=_time, $
                        explicit=explicit, strict=strict, all=all
 
  if(keyword_set(_time)) then time = _time[0]
+ sep = path_sep()
 
  ;-------------------------------------------------------------------
  ; Construct kernel input keyword and name of auto-detect function
@@ -45,7 +48,7 @@ function spice_kernel_parse, dd, prefix, inst, type, ext=ext, time=_time, $
  ;---------------------------------------
  ; Get raw kernel keyword value
  ;---------------------------------------
- _k_in = tr_keyword_value(dd, kw)
+ _k_in = dat_keyword_value(dd, kw)
  if(NOT keyword_set(_k_in)) then return, ''
 
  ;---------------------------------------
@@ -55,7 +58,7 @@ function spice_kernel_parse, dd, prefix, inst, type, ext=ext, time=_time, $
  ;- - - - - - - - - - - - - - - - - - - - - - - - - - - -
  ; get path specific to this translator
  ;- - - - - - - - - - - - - - - - - - - - - - - - - - - -
-; kpath = subdirs(getenv(env)) + '/'
+; kpath = subdirs(getenv(env)) + sep
  kpath = getenv(env)
  w = where(kpath NE '')
  if(w[0] EQ -1) then $
@@ -118,7 +121,7 @@ function spice_kernel_parse, dd, prefix, inst, type, ext=ext, time=_time, $
     begin
      for j=0, nkpath-1 do $
       begin
-       if(strpos(_k_in[i], '/') EQ -1) then _k_in[i] = kpath[j] + _k_in[i]
+       if(strpos(_k_in[i], sep) EQ -1) then _k_in[i] = kpath[j] + _k_in[i]
        ff = file_search(_k_in[i])
        if(keyword_set(ff)) then explicit = append_array(explicit, ff) $
        else $

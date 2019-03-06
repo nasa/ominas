@@ -70,7 +70,7 @@ function ringcat_read, filename, names=names, default=default, $
  ;- - - - - - - - - - - - - - - - - - - - -
  ; separate inner/outer ring edges
  ;- - - - - - - - - - - - - - - - - - - - -
- rings = str_nnsplit(names, '/', rem=types)
+ rings = str_nnsplit(names, path_sep(), rem=types)
  w = where(rings EQ '')
  if(w[0] NE -1) then $
   begin

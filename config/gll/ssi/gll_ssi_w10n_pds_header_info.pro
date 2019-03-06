@@ -24,7 +24,7 @@ function gll_ssi_w10n_pds_header_info, dd
  ;------------------------------------------------
  ; nominal optic axis coordinate, camera scale
  ;------------------------------------------------
- meta.oaxis = meta.size/2d
+ meta.oaxis = meta.size/2d - 0.5
  meta.scale = [1.016d-05, 1.016d-05]		    ; from trial and error
 
  ;------------------------------------------------

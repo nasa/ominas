@@ -1,4 +1,21 @@
 ;=============================================================================
+; grim_test_motion_event
+;
+;=============================================================================
+function grim_test_motion_event, event
+
+ struct = tag_names(event, /struct)
+ if(struct EQ 'WIDGET_TRACKING') then return, 1
+
+ if(struct EQ 'WIDGET_DRAW') then if(event.type EQ 2) then return, 1
+
+ return, 0
+end
+;=============================================================================
+
+
+
+;=============================================================================
 ; grim_write_ps
 ;
 ;=============================================================================
@@ -213,7 +230,7 @@ end
 ; grim_load_files
 ;
 ;=============================================================================
-pro grim_load_files, grim_data, filenames, load_path=load_path
+pro grim_load_files, grim_data, filenames, load_path=load_path, norefresh=norefresh
 
  plane = grim_get_plane(grim_data)
  filter = plane.filter
@@ -260,7 +277,8 @@ pro grim_load_files, grim_data, filenames, load_path=load_path
  offset = [0d,0d]
 
  grim_wset, grim_data, grim_data.wnum, get_info=tvd
- grim_refresh, grim_data, zoom=zoom, offset=offset, order=tvd.order
+ if(NOT keyword_set(norefresh)) then $
+         grim_refresh, grim_data, zoom=zoom, offset=offset, order=tvd.order
  grim_wset, grim_data, /save
 
 end
@@ -274,7 +292,7 @@ end
 ;=============================================================================
 pro grim_deactivate_all, grim_data, plane
 
- grim_deactivate_all_overlays, grim_data, plane
+ grim_activate_all_overlays, grim_data, plane, /deactivate
 
 end
 ;=============================================================================
@@ -320,6 +338,7 @@ pro grim_edit_header, grim_data
  if(NOT widget_info(grim_data.header_text, /valid)) then $
   begin
    header = dat_header(plane.dd)   
+   if(NOT keyword_set(header)) then return
    grim_data.header_text = $
                textedit(header, base=base, resource='grim_header', ysize=40)
    grim_data.header_base = base
@@ -376,14 +395,45 @@ end
 
 
 ;=============================================================================
+; grim_frame_current_overlays
+;
+;=============================================================================
+pro grim_frame_current_overlays, grim_data
+
+ plane = grim_get_plane(grim_data)
+
+ widget_control, grim_data.draw, /hourglass
+
+ active_ptd = grim_ptd(plane, /active)
+ if(NOT keyword_set(ptd)) then ptd = grim_ptd(plane)
+ if(NOT keyword_set(ptd)) then return
+
+ grim_frame_overlays, grim_data, plane, ptd
+
+ grim_refresh, grim_data
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
 ; grim_edit_dd_notes
 ;
 ;=============================================================================
 pro grim_edit_dd_notes, grim_data, plane=plane
 
  base = grim_data.notes_base
+
+ if(widget_info(base, /valid)) then $
+  begin
+   widget_control, base, /map
+   return
+  end
+
  grim_data.notes_text = grim_edit_notes(plane.dd, base=base)
  grim_data.notes_base = base
+ grim_set_data, grim_data, grim_data.base
 
 end
 ;=============================================================================
@@ -402,7 +452,7 @@ function grim_user_ptd_fname, grim_data, plane, basename=basename
    if(NOT keyword_set(basename)) then basename = 'grim-' + strtrim(plane.pn,2)
   end
 
- return, grim_data.workdir + '/' + basename + '.user_ptd'
+ return, grim_data.workdir + path_sep() + basename + '.user_ptd'
 end
 ;=============================================================================
 
@@ -468,7 +518,7 @@ end
 ;=============================================================================
 function grim_mask_fname, grim_data, plane, basename=basename
  if(NOT keyword_set(basename)) then basename = cor_name(plane.dd)
- return, grim_data.workdir + '/' + basename + '.mask'
+ return, grim_data.workdir + path_sep() + basename + '.mask'
 end
 ;=============================================================================
 
@@ -563,17 +613,9 @@ end
 ; grim_jumpto
 ;
 ;=============================================================================
-function grim_jumpto, grim_data, id
+function grim_jumpto, grim_data, pn
 
- if(keyword_set(id)) then $
-  begin
-   widget_control, id, get_value=pns
-   if(pns[0] EQ '') then return, 0
-   widget_control, grim_data.jumpto_text, set_value=''
-   w = str_isnum(pns)
-   if(w[0] EQ -1) then return, 0
-  end $
- else $
+ if(NOT keyword_set(pn)) then $
   begin
    done = 0
    repeat $
@@ -583,9 +625,9 @@ function grim_jumpto, grim_data, id
      w = str_isnum(pns)
      if(w[0] NE -1) then done = 1
     endrep until(done)
+   pn = (long(pns))[0]
   end
 
- pn = (long(pns))[0]
  grim_jump_to_plane, grim_data, pn, valid=valid
 
  return, valid
@@ -994,7 +1036,7 @@ end
 ; PURPOSE:
 ;	Allows user to load images into new image planes using the BRIM 
 ;	browser.  Images are selected using the left mouse button and
-;	each image is loaded on a new plane.
+;	each image is loaded on a new plane after the browse window is closed.
 ;
 ;
 ; CATEGORY:
@@ -1012,7 +1054,7 @@ pro grim_menu_file_browse_help_event, event
  if(keyword_set(text)) then grim_help, grim_get_data(event.top), text
 end
 ;----------------------------------------------------------------------------
-pro grim_browse_file_left_event, base, i, id, status=status
+pro grim_browse_file_left_event, brim_data, base, i, dd, status=status
 
  status = -1
  grim_data = grim_get_data(base)
@@ -1035,19 +1077,17 @@ pro grim_menu_file_browse_event, event
  if(keyword__set(plane.load_path)) then path = plane.load_path
  grim_wset, grim_data, grim_data.wnum, get_info=tvd
 
- brim, filenames, path=plane.load_path, get_path=get_path, ids=filenames, $
-      left_fn='grim_browse_file_left_event', fn_data=event.top, /modal, $
-      select=select, title='Select images to load', order=tvd.order, $
-      filter=plane.filter, /enable
- if(NOT keyword__set(select)) then return
- if(select[0] EQ '') then return
+ brim, path=plane.load_path, get_path=get_path, /modal, order=tvd.order, $
+      title='Select files to load', picktitle='Select files to browse', $
+      filter=plane.filter, select=select
+ if(NOT keyword_set(select)) then return
 
  ;----------------------------------
  ; load each file into a new plane
  ;----------------------------------
  widget_control, grim_data.base, /hourglass
- grim_load_files, grim_data, select, load_path=get_path
-
+ grim_load_files, grim_data, select, load_path=get_path, /norefresh
+ grim_refresh, grim_data
 end
 ;=============================================================================
 
@@ -2146,6 +2186,7 @@ end
 pro grim_menu_file_save_png_event, event
 
  grim_data = grim_get_data(event.top)
+ plane = grim_get_plane(grim_data)
  grim_set_primary, grim_data.base
 
  ;------------------------------------------------------
@@ -2156,7 +2197,8 @@ pro grim_menu_file_save_png_event, event
 
  filename = pickfiles(get_path=get_path, $
                options=['', 'Color', 'B/W'], selected_option=selected_option, $
-                              title='Select filename for saving', path=path, /one)
+               title='Enter filename for saving', path=path, /one, $
+               def=ext_rep(grim_title(plane), 'png'))
  if(NOT keyword__set(filename)) then return
 
  ;------------------------------------------------------
@@ -2441,6 +2483,76 @@ end
 ;=============================================================================
 ;+
 ; NAME:
+;	grim_menu_plane_first_event
+;
+;
+; PURPOSE:
+;	Changes to the first image plane. 
+;
+;
+; CATEGORY:
+;	NV/GR
+;
+;
+; MODIFICATION HISTORY:
+; 	Written by:	Spitale, 3/2018
+;	
+;-
+;=============================================================================
+pro grim_menu_plane_first_help_event, event
+ text = ''
+ nv_help, 'grim_menu_plane_first_help_event', cap=text
+ if(keyword_set(text)) then grim_help, grim_get_data(event.top), text
+end
+;----------------------------------------------------------------------------
+pro grim_menu_plane_first_event, event
+
+ grim_data = grim_get_data(event.top)
+
+ grim_change_plane, grim_data, /first
+end
+;=============================================================================
+
+
+
+;=============================================================================
+;+
+; NAME:
+;	grim_menu_plane_last_event
+;
+;
+; PURPOSE:
+;	Changes to the last image plane. 
+;
+;
+; CATEGORY:
+;	NV/GR
+;
+;
+; MODIFICATION HISTORY:
+; 	Written by:	Spitale, 3/2018
+;	
+;-
+;=============================================================================
+pro grim_menu_plane_last_help_event, event
+ text = ''
+ nv_help, 'grim_menu_plane_last_help_event', cap=text
+ if(keyword_set(text)) then grim_help, grim_get_data(event.top), text
+end
+;----------------------------------------------------------------------------
+pro grim_menu_plane_last_event, event
+
+ grim_data = grim_get_data(event.top)
+
+ grim_change_plane, grim_data, /last
+end
+;=============================================================================
+
+
+
+;=============================================================================
+;+
+; NAME:
 ;	grim_menu_plane_next_event
 ;
 ;
@@ -2467,7 +2579,7 @@ pro grim_menu_plane_next_event, event
 
  grim_data = grim_get_data(event.top)
 
- grim_next_plane, grim_data
+ grim_change_plane, grim_data, /next
 end
 ;=============================================================================
 
@@ -2502,7 +2614,7 @@ pro grim_menu_plane_previous_event, event
 
  grim_data = grim_get_data(event.top)
 
- grim_previous_plane, grim_data
+ grim_change_plane, grim_data, /previous
 end
 ;=============================================================================
 
@@ -2571,13 +2683,11 @@ pro grim_menu_plane_browse_help_event, event
  if(keyword_set(text)) then grim_help, grim_get_data(event.top), text
 end
 ;----------------------------------------------------------------------------
-pro grim_browse_plane_left_event, base, i, id, status=status
+pro grim_browse_plane_left_event, brim_data, base, pn, dd, status=status
 
  status = -1
  grim_data = grim_get_data(base)
  if(NOT grim_exists(grim_data)) then return
-
- pn = id[0]
 
  grim_jump_to_plane, grim_data, pn, valid=valid
  if(valid) then $
@@ -2586,26 +2696,8 @@ pro grim_browse_plane_left_event, base, i, id, status=status
    status = 1
   end
 
-end
-;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-pro grim_browse_refresh_event, data_p
-
- base = *data_p
- if(NOT widget_info(base, /valid_id)) then $
-  begin
-   grim_rm_refresh_callback, data_p
-   return
-  end
-
- grim_data = grim_get_data()
- plane = grim_get_plane(grim_data)
-
- widget_control, base, get_uvalue=brim_data
-
- planes = grim_get_plane(grim_data, /all)
- brim_select, brim_data, plane.pn, dd=planes.dd, id=planes.pn
-
-
+ brim_select, brim_data, /clear
+ brim_select, brim_data, pn, /select
 end
 ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 pro grim_menu_plane_browse_event, event
@@ -2615,11 +2707,9 @@ pro grim_menu_plane_browse_event, event
  planes = grim_get_plane(grim_data, /all, pn=pns)
 
  grim_wset, grim_data, grim_data.wnum, get_info=tvd
- brim, planes.dd, ids=pns, $
+ brim, planes.dd, $
       left_fn='grim_browse_plane_left_event', fn_data=event.top, $
-      select=grim_data.pn, /exclusive, order=tvd.order, /enable, base=base
-
- grim_add_refresh_callback, 'grim_browse_refresh_event', nv_ptr_new(base)
+      order=tvd.order, base=base
 
 end
 ;=============================================================================
@@ -3021,10 +3111,9 @@ pro grim_menu_plane_coregister_event, event
  ;------------------------------------------------
  ; recenter image
  ;------------------------------------------------
-; we don't want one event for every registration here....
- nv_suspend_events;, /flush
+ grim_refresh, /disable
  pg_coregister, dd, cd=cd, bx=bx
- nv_resume_events;, /flush
+ grim_refresh, /enable
 
  grim_refresh, grim_data
 end
@@ -3161,6 +3250,56 @@ pro grim_menu_plane_highlight_event, event
 ; widget_control, grim_data.draw, /hourglass
  
  grim_refresh, grim_data
+end
+;=============================================================================
+
+
+
+;=============================================================================
+;+
+; NAME:
+;	grim_menu_view_zoom_force_integer_event
+;
+;
+; PURPOSE:
+;	Toggles integer zoom on/off.  
+;
+;
+; CATEGORY:
+;	NV/GR
+;
+;
+; MODIFICATION HISTORY:
+; 	Written by:	Spitale, 5/2018
+;	
+;-
+;=============================================================================
+pro grim_menu_view_zoom_force_integer_help_event, event
+ text = ''
+ nv_help, 'grim_menu_view_zoom_force_integer_help_event', cap=text
+ if(keyword_set(text)) then grim_help, grim_get_data(event.top), text
+end
+;----------------------------------------------------------------------------
+pro grim_menu_view_zoom_force_integer_event, event
+
+ widget_control, /hourglass
+
+ grim_data = grim_get_data(event.top)
+ plane = grim_get_plane(grim_data)
+
+
+ grim_data = grim_get_data(event.top)
+
+ flag = grim_get_toggle_flag(grim_data, 'INTEGER_ZOOM')
+ flag = 1 - flag
+ 
+ grim_set_toggle_flag, grim_data, 'INTEGER_ZOOM', flag
+ grim_update_menu_toggle, grim_data, $
+                       'grim_menu_view_zoom_force_integer_event', flag
+
+
+ if(flag) then grim_refresh, grim_data
+
 end
 ;=============================================================================
 
@@ -3549,6 +3688,57 @@ pro grim_menu_plane_toggle_activation_syncing_event, event
                       'grim_menu_plane_toggle_activation_syncing_event', flag
 
 ; grim_sync_activations, grim_data
+grim_copy_activations, grim_data, plane=plane
+; grim_refresh, grim_data, /use_pixmap
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
+;+
+; NAME:
+;	grim_menu_plane_toggle_action_syncing_event
+;
+;
+; PURPOSE:
+;	Toggles action syncing on/off.  
+;
+;
+; CATEGORY:
+;	NV/GR
+;
+;
+; MODIFICATION HISTORY:
+; 	Written by:	Spitale, 6/2018
+;	
+;-
+;=============================================================================
+pro grim_menu_plane_toggle_action_syncing_help_event, event
+ text = ''
+ nv_help, 'grim_menu_plane_toggle_action_syncing_help_event', cap=text
+ if(keyword_set(text)) then grim_help, grim_get_data(event.top), text
+end
+;----------------------------------------------------------------------------
+pro grim_menu_plane_toggle_action_syncing_event, event
+
+ widget_control, /hourglass
+
+ grim_data = grim_get_data(event.top)
+ plane = grim_get_plane(grim_data)
+
+
+ grim_data = grim_get_data(event.top)
+ 
+ flag = grim_get_toggle_flag(grim_data, 'ACTION_SYNCING')
+ flag = 1 - flag
+
+ grim_set_toggle_flag, grim_data, 'ACTION_SYNCING', flag
+ grim_update_menu_toggle, grim_data, $
+                      'grim_menu_plane_toggle_action_syncing_event', flag
+
+; grim_sync_actions, grim_data
 ; grim_refresh, grim_data, /use_pixmap
 
 end
@@ -5296,17 +5486,19 @@ end
 pro grim_menu_view_frame_event, event
 
  grim_data = grim_get_data(event.top)
- plane = grim_get_plane(grim_data)
+ grim_frame_current_overlays, grim_data
 
- widget_control, grim_data.draw, /hourglass
+; plane = grim_get_plane(grim_data)
 
- active_ptd = grim_ptd(plane, /active)
- if(NOT keyword_set(ptd)) then ptd = grim_ptd(plane)
- if(NOT keyword_set(ptd)) then return
+; widget_control, grim_data.draw, /hourglass
 
- grim_frame_overlays, grim_data, plane, ptd
+; active_ptd = grim_ptd(plane, /active)
+; if(NOT keyword_set(ptd)) then ptd = grim_ptd(plane)
+; if(NOT keyword_set(ptd)) then return
 
- grim_refresh, grim_data
+; grim_frame_overlays, grim_data, plane, ptd
+
+; grim_refresh, grim_data
 
 end
 ;=============================================================================

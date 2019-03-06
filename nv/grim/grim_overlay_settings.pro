@@ -31,8 +31,6 @@ pro gros_update_form, grim_data, plane, base
  data.grim_data = grim_data
  data.plane = plane
 
-
-
  ;-----------------------------------------------------
  ; record user base size
  ;-----------------------------------------------------
@@ -61,6 +59,7 @@ pro gros_update_form, grim_data, plane, base
    user_colors = user_struct.color
    user_psyms = user_struct.psym
    user_psizes = user_struct.symsize
+   user_fn_color = user_struct.fn_color
 
    if(NOT keyword_set(user_ptd)) then $
     begin 
@@ -96,7 +95,8 @@ pro gros_update_form, grim_data, plane, base
              data.ids, data.tags, gros_user_tag(i, 'label'), $
                                 str_pad(utags[i], data.user_label_len-2) + ' :'
          grim_set_form_entry, $
-             data.ids, data.tags, gros_user_tag(i, 'color'), w[0], /drop
+             data.ids, data.tags, gros_user_tag(i, 'color'), w[0], /drop, $
+                sensitive=(user_fn_color[i] EQ '')
          grim_set_form_entry, $
              data.ids, data.tags, gros_user_tag(i, 'psym'), user_psyms[i]
          grim_set_form_entry, $
@@ -120,6 +120,8 @@ pro gros_update_form, grim_data, plane, base
  ;-----------------------------------------------------
  ; set form entries
  ;-----------------------------------------------------
+ overlays = *plane.overlays_p
+
  if(keyword_set(utags)) then  $
   for i=0, n_utags-1 do $
    begin
@@ -132,7 +134,7 @@ pro gros_update_form, grim_data, plane, base
  ;- - - - - - - - - - - - - - - - - - - - - - -
  ; overlay colors
  ;- - - - - - - - - - - - - - - - - - - - - - -
- colors = (*plane.overlays_p).color
+ colors = strlowcase(overlays.color)
  for i=0, n_elements(colors)-1 do $
   begin
    w = where(data.colors EQ colors[i])
@@ -142,7 +144,7 @@ pro gros_update_form, grim_data, plane, base
  ;- - - - - - - - - - - - - - - - - - - - - - -
  ; overlay psyms
  ;- - - - - - - - - - - - - - - - - - - - - - -
- psyms = (*plane.overlays_p).psym
+ psyms = overlays.psym
  for i=0, n_elements(psyms)-1 do $
       grim_set_form_entry, data.ids, data.tags, $
                                  gros_overlay_tag(i,'psym'), strtrim(psyms[i], 2)
@@ -150,7 +152,7 @@ pro gros_update_form, grim_data, plane, base
  ;- - - - - - - - - - - - - - - - - - - - - - -
  ; overlay symsizes
  ;- - - - - - - - - - - - - - - - - - - - - - -
- symsizes = (*plane.overlays_p).symsize
+ symsizes = overlays.symsize
  for i=0, n_elements(symsizes)-1 do $
       grim_set_form_entry, data.ids, data.tags, $
                                  gros_overlay_tag(i,'symsize'), strtrim(symsizes[i], 2)
@@ -158,7 +160,7 @@ pro gros_update_form, grim_data, plane, base
  ;- - - - - - - - - - - - - - - - - - - - - - -
  ; overlay label toggles
  ;- - - - - - - - - - - - - - - - - - - - - - -
- tlabs = (*plane.overlays_p).tlab NE 1
+ tlabs = overlays.tlab NE 1
  for i=0, n_elements(tlabs)-1 do $
         grim_set_form_entry, data.ids, data.tags, $
                                gros_overlay_tag(i,'tlabels'), tlabs[i], /cwbutton
@@ -166,7 +168,7 @@ pro gros_update_form, grim_data, plane, base
  ;- - - - - - - - - - - - - - - - - - - - - - -
  ; overlay shading toggles
  ;- - - - - - - - - - - - - - - - - - - - - - -
- tshades = (*plane.overlays_p).tshade NE 1
+ tshades = overlays.tshade NE 1
  for i=0, n_elements(tshades)-1 do $
         grim_set_form_entry, data.ids, data.tags, $
                                gros_overlay_tag(i,'tshades'), tshades[i], /cwbutton
@@ -347,25 +349,31 @@ pro gros_apply_settings, data
     for j=0, n_utags-1 do $
      begin
       user_ptd = grim_get_user_ptd(plane=planes[i], utags[j], user_struct=user_struct)
-      fn_shade = user_struct.fn_shade
-      fn_graphics = user_struct.fn_graphics
-      xgraphics = user_struct.xgraphics
+      if(keyword_set(user_ptd)) then $
+       begin
+        thick = user_struct.thick
+        fn_shade = user_struct.fn_shade
+        fn_color = user_struct.fn_color
+        fn_graphics = user_struct.fn_graphics
+        xgraphics = user_struct.xgraphics
 
-      psym = ''
-      _psym = grim_parse_form_entry(data.ids, data.tags, $
+        psym = ''
+        _psym = grim_parse_form_entry(data.ids, data.tags, $
                                                gros_user_tag(j, 'psym'), /num)
-      if((_psym[0] GT -8) AND (_psym[0] LT 8)) then psym = _psym $
-      else grim_message, 'Invalid psym for user overlay ' + utags[j] + '.'
+        if((_psym[0] GT -8) AND (_psym[0] LT 8)) then psym = _psym $
+        else grim_message, 'Invalid psym for user overlay ' + utags[j] + '.'
   
-      psize = ''
-      _psize = grim_parse_form_entry(data.ids, data.tags, $
+        psize = ''
+        _psize = grim_parse_form_entry(data.ids, data.tags, $
                                                gros_user_tag(j, 'psize'), /num)
-      psize = _psize    
+        psize = _psize    
 
-      col = data.colors[grim_parse_form_entry(data.ids, data.tags, $
+        col = data.colors[grim_parse_form_entry(data.ids, data.tags, $
                                        gros_user_tag(j, 'color'), /drop)]
-      grim_add_user_points, /update, /nodraw, user_ptd, utags[j], plane=planes[i], $
-         color=col, psym=psym, symsize=psize, fn_shade=fn_shade, fn_graphics=fn_graphics, xgraphics=xgraphics
+        grim_add_user_points, /update, /nodraw, user_ptd, utags[j], plane=planes[i], $
+           color=col, psym=psym, thick=thick, symsize=psize, fn_shade=fn_shade, fn_color=fn_color, $
+           fn_graphics=fn_graphics, xgraphics=xgraphics
+       end
      end
 
 
@@ -464,7 +472,6 @@ common grim_overlay_settings_block, tops
    if(w[0] NE -1) then return
    tops = [tops, top]
   end
-
 
 
  ;-----------------------------------------------

@@ -91,6 +91,7 @@
 pro tag_list_set, tlp, name, data, index=index, new=new
 
  if(NOT ptr_valid(tlp)) then tlp = nv_ptr_new({tag_list_struct})
+ if(NOT keyword_set(*tlp)) then *tlp = {tag_list_struct}
 
  if(n_elements(index) EQ 0) then index = (where(name EQ (*tlp).name))[0]
  new = 0

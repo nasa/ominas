@@ -24,27 +24,40 @@ function dh_read_pds, dd, label, dim, type, min, max, abscissa=abscissa, $
  ;- - - - - - - - - - - - - - - - - - - - -
  names = pdspar(label, 'OBJECT')
 
- w = where(names EQ 'IMAGE')
- w = w[0]
- if (w ne -1) then begin
+
+ wi=where(strmatch(names,'*IMAGE',/fold_case),/null)
+ wq=where(strmatch(names,'*QUBE',/fold_case),/null)
+ wt=where(strmatch(names,'*TABLE',/fold_case),/null)
+ 
+ dat=!null
+ case 1 of
+  n_elements(wi) gt 0 : begin
+    
+   w=wi[0]
    s = pdspar(label, 'LINE_SAMPLES')
-   xsize = long(s[w])
+   xsize = long(s[w<(n_elements(s)-1)])
 
    s = pdspar(label, 'LINES')
-   ysize = long(s[w])
+   ysize = long(s[w<(n_elements(s)-1)])
 
    dim = [xsize, ysize]
-   
- endif else begin
-   s=strsplit(pdspar(label,'CORE_ITEMS'),'() ,',/extract)
-;   xsize=long(s[2])
-;   ysize=long(s[1])
-;   dim = [xsize, ysize]
-   zsize=long(s[2])
-   xsize=long(s[0])
-   ysize=long(s[1])
-   dim = [xsize, ysize, zsize]
- endelse
+  end
+  n_elements(wq) gt 0 : begin
+
+     s=strsplit(pdspar(label,'CORE_ITEMS'),'() ,',/extract)
+;     xsize=long(s[2])
+;     ysize=long(s[1])
+;     dim = [xsize, ysize]
+     zsize=long(s[2])
+     xsize=long(s[0])
+     ysize=long(s[1])
+     dim = [xsize, ysize, zsize]
+  end
+  n_elements(wt) gt 0: begin
+     dat = readpds(filename, /silent)
+     dim=[n_elements(dat.table.column1)]
+  end 
+ endcase
 
 ;;; type = pdspar(label, 'SAMPLE_TYPE')
 ;;; need to convert this to IDL type code
@@ -58,17 +71,29 @@ max=0
  ;--------------------------------------------------------
  ; read image
  ;--------------------------------------------------------
- dat = readpds(filename, /silent)
+ if n_elements(dat) eq 0 then dat = readpds(filename, /silent)
 
- w=where(tag_names(dat) eq 'IMAGE')
- if w[0] ne -1 then begin
-   image = dat.image
- endif else image=dat.qube.core
+ wi=where(strmatch(tag_names(dat),'*IMAGE',/fold_case),/null)
+ wq=where(strmatch(tag_names(dat),'*QUBE',/fold_case),/null)
+ wt=where(strmatch(tag_names(dat),'*TABLE',/fold_case),/null)
+ case 1 of
+  n_elements(wi) gt 0 : image=dat.(wi[0])
+  n_elements(wq) gt 0 : image=fix(dat_keyword_value(dd,'struct')) ? dat.(wq[0]) : (dat.(wq[0])).core 
+  n_elements(wt) gt 0 : begin
+    image={}
+    foreach name,dat.(wt[0]).names,iname do image=create_struct(image,name,(dat.(wt[0]).(iname+1))[0])
+    image=replicate(image,n_elements(dat.(wt[0]).column1))
+    foreach name,dat.(wt[0]).names,iname do image.(iname)=dat.(wt[0]).(iname+1)
+  end
+ endcase
  type = size(image, /type)
- if(type EQ 8) then image = image.image
+ if(type EQ 8) && (n_elements(wi) gt 0) then image = image.image
  type = size(image, /type)
 
  return, image
+
+
+
 
 
 

@@ -56,17 +56,8 @@ pro grim_mode_tiepoints_mouse_event, event, data
   end $
  else if(event.press EQ 4) then $
   begin
-   grim_rm_tiepoint, grim_data, p[0:1];, pp=pp
-
-   grim_refresh, grim_data, /use_pixmap
-;   if(keyword_set(pp)) then $
-;    begin
-;     pp = convert_coord(pp[0,*], pp[1,*], /data, /to_device)
-;     grim_display, grim_data, /use_pixmap, $
-; 	 pixmap_box_center=[pp[0],pp[1]], pixmap_box_side=30
-;     grim_draw, grim_data, /tiepoints, /nopoints
-;     grim_refresh, grim_data, /use_pixmap
-;    end
+   grim_rm_tiepoint, grim_data, p[0:1], flabel=flabel
+   if(keyword_set(flabel)) then grim_refresh, grim_data, /use_pixmap
   end
 
 
@@ -137,7 +128,7 @@ end
 pro grim_mode_tiepoints_mode, grim_data, data_p
 
  grim_mode_tiepoints_cursor, swap=swap
- grim_print, grim_data, 'TIEPOINTS -- LEFT: Add; RIGHT: Remove'
+ grim_print, grim_data, 'TIEPOINTS -- L:Add R:Remove'
 
 end
 ;=============================================================================

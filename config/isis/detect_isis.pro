@@ -2,10 +2,8 @@
 ; detect_isis.pro
 ;
 ;===========================================================================
-function detect_isis, dd
+function detect_isis, filename=filename, header=header
 
- filename = dat_filename(dd)
- header = dat_header(dd)
  status = 0
 
  ;===============================================
@@ -16,6 +14,7 @@ function detect_isis, dd
   begin
    openr, unit, filename, /get_lun, error=error
    if(error NE 0) then return, 0
+   if((fstat(unit)).size LT 4) then return, 0
    record = assoc(unit, bytarr(4,/nozero))
    s = string(record[0])
    close, unit

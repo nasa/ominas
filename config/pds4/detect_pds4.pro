@@ -2,10 +2,7 @@
 ; detect_pds4.pro
 ;
 ;===========================================================================
-function detect_pds4, dd
-
- filename = dat_filename(dd)
- header = dat_header(dd)
+function detect_pds4, filename=filename, header=header
 
  ;==============================================================================
  ; there is no standard pds4 header so don't continue if a header is present
@@ -19,6 +16,7 @@ function detect_pds4, dd
  openr, unit, filename, /get_lun, error=error
  if(error NE 0) then return, 0
 
+ if((fstat(unit)).size LT 13) then return, 0
  record = assoc(unit, bytarr(13,/nozero))
  s = string(record[0])
  close, unit

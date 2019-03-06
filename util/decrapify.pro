@@ -4,8 +4,8 @@
 ;       decrapify
 ;
 ; PURPOSE:
-;       Circumvents a quirk of idl, returns first value of input if number
-;       of elements in array is 1.
+;       Circumvents a quirk of idl, returns first value of input as a scalar
+;       if number of elements in array is 1.
 ;
 ;
 ; CATEGORY:

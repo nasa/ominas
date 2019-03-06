@@ -120,12 +120,14 @@ end
 ;=============================================================================
 pro wpf_get_dirs, data
 
+ sep = path_sep()
+
  ;-------------------------------
  ; get directories
  ;-------------------------------
  dirs = file_search(data.path + '/*', /test_dir)
- dirs = str_flip(str_nnsplit(str_flip(dirs), '/'))
- dirs = append_array('..', dirs) + '/' 
+ dirs = str_flip(str_nnsplit(str_flip(dirs), sep))
+ dirs = append_array('..', dirs) + sep 
 
  ;-------------------------------
  ; set list widget
@@ -139,7 +141,7 @@ pro wpf_get_dirs, data
  ;-------------------------------
  widget_control, data.sel_list, get_value=file
  if(keyword_set(file[0])) then $
-      widget_control, data.sel_list, set_value=dir_rep(file, data.path + '/')
+      widget_control, data.sel_list, set_value=dir_rep(file, data.path + sep)
 
 end
 ;=============================================================================
@@ -153,18 +155,20 @@ end
 pro wpf_get_files, data
 
 
+ sep = path_sep()
+ 
  ;-------------------------------
  ; get filter
  ;-------------------------------
  widget_control, data.filter_text, get_value=filter
- if(strmid(filter, strlen(filter)-1, 1) EQ '/') then filter = filter + '*'
+ if(strmid(filter, strlen(filter)-1, 1) EQ sep) then filter = filter + '*'
 
  ;-------------------------------
  ; get files
  ;-------------------------------
  files = findfile(filter[0])
 
- w = where(strpos(files, '/') NE -1)
+ w = where(strpos(files, sep) NE -1)
  if(w[0] NE -1) then files = files[w] $
  else files = ''
 
@@ -311,7 +315,7 @@ pro wpf_file_list_event, event
  ;----------------------------------
  w = widget_info(data.file_list, /list_select)
  files = ''
- if(w[0] NE -1) then files = data.path + '/' + (*data.files_p)[w]
+ if(w[0] NE -1) then files = data.path + path_sep() + (*data.files_p)[w]
 
 
  ;----------------------------------
@@ -337,6 +341,8 @@ pro wpf_dir_list_event, event
  base = widget_info(event.top, find_by_uname='pickfiles_base')
  widget_control, base, get_uvalue=data
 
+ sep = path_sep()
+
  ;----------------------------------
  ; contruct new path
  ;----------------------------------
@@ -350,7 +356,7 @@ pro wpf_dir_list_event, event
    split_filename, s, dd, nn
    data.path = dd
   end $
- else data.path = data.path + '/' + dir
+ else data.path = data.path + sep + dir
 
  data.path = wpf_clean(data.path)
 
@@ -359,7 +365,7 @@ pro wpf_dir_list_event, event
  ;----------------------------------
  widget_control, data.filter_text, get_value=filter
  split_filename, filter, dir, spec
- filter = data.path + '/' + spec
+ filter = data.path + sep + spec
  widget_control, data.filter_text, set_value=filter
 
  ;----------------------------------
@@ -414,12 +420,14 @@ end
 function widget_pickfiles, parent, path=_path, one=one, filter=filter, $
         cancel_callback=cancel_callback, ok_callback=ok_callback, $
         must_exist=must_exist, button_base=button_base, default=_default, $
-        ok_button=ok_button, nofile=nofile
+        ok_button=ok_button, nofile=nofile, filename=filename
 
  if(NOT keyword__set(cancel_callback)) then cancel_callback = 'wpf_cancel_event'
  if(NOT keyword__set(ok_callback)) then ok_callback = ''
  if(NOT keyword__set(_path)) then cd, current = _path
  if(NOT keyword__set(filter)) then filter = '*'
+
+ sep = path_sep()
 
  if(keyword_set(_path)) then path = (file_search(_path, /fully_qualify_path))[0]
  if(keyword_set(_default)) then $
@@ -430,7 +438,7 @@ function widget_pickfiles, parent, path=_path, one=one, filter=filter, $
   end
 
  if(NOT keyword_set(path)) then path = ''
- sel = path + '/'
+ sel = path + sep
  if(keyword_set(default)) then sel = default
 
  one = keyword__set(one)
@@ -449,7 +457,7 @@ function widget_pickfiles, parent, path=_path, one=one, filter=filter, $
 
  filter_label = widget_label(base, value='Filter:', /align_left)
  filter_text = widget_text(base, ysize=1, $
-                   value=path + '/' + filter, /editable, $
+                   value=path + sep + filter, /editable, $
                                              event_pro='wpf_filter_event')
 
 

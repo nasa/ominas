@@ -2,11 +2,10 @@
 ; detect_vgr_cd.pro
 ;
 ;===========================================================================
-function detect_vgr_cd, dd
+function detect_vgr_cd, filename=filename, header=header, dd
 
-return, ''	; this detector is obslete, needs to be updated
+return, ''	; this detector is obsolete, needs to be updated
  status = 1 
- filename = dat_filename(dd)
 
  ;==============================
  ; open the file

@@ -98,15 +98,15 @@ end
 ;
 ;===========================================================================
 pro gll_ssi_spice_output, dd, keyword, value, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
 
  
  spice_output, dd, keyword, value, 'gll', status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
 end

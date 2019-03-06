@@ -4,7 +4,7 @@
 ; MULTI-INSTRUMENT EXAMPLE
 ; ------------------------
 ; 
-;   This script demonstrates reading Cassini RADAR SAR, VIMS and ISS images and
+;   This script demonstrates reading Cassini RADAR SAR, VIMS, and ISS images and
 ;   projecting them onto an orthographical map for display as a RGB composite.
 ;   
 ;   The SAR data file used, `BIFQI22N068_D045_T003S01_V02.IMG`, is too large (202 MB)
@@ -66,7 +66,7 @@ compile_opt idl2,logical_predicate
 ;
 ;   Show it a 1/20 resolution::
 ;
-;     tvim,0d0>da<1d0,zoom=0.05,/order,/new
+;     tvim,da,zoom=0.05,/order,/new
 ;
 ;   .. image:: graphics/mis_ex1.png
 ;
@@ -92,7 +92,8 @@ dd=dat_read(img)
 
 da=dat_data(dd)
 dat_set_data,dd,0d0>da<1d0
-tvim,0d0>da<1d0,zoom=0.05,/order,/new
+da=dat_data(dd)
+tvim,da,zoom=0.05,/order,/new
 ;write_png,'graphics/mis_ex1.png',tvrd()
 
 
@@ -181,7 +182,12 @@ for i=0,1 do begin
   zoom=sb[i] ? 1 : 8
   offset=sb[i] ? [200d0,200d0] : [-15,-10]
   sband=sb[i] ? 0 : band
-  tvim, (dat_data(ddv[i]))[*,*,sband], $
+  da=dat_data(ddv[i])
+  if size(da,/type) eq 8 then begin
+    da=da.core
+    dat_set_data,ddv[i],da
+  endif
+  tvim, (da)[*,*,sband], $
     zoom=zoom,/order, /new,offset=offset,$
     xsize=600,ysize=600
   ;write_png,'graphics/mis_ex'+strtrim(i+2,2)+'.png',tvrd()
@@ -271,6 +277,6 @@ for i=0,2 do begin
 endfor
 
 
-grim,mds,cd=replicate(mdp,3),/new,vis=1,channel=[1b,2b,4b];,overlays=['planet_grid']
+grim,mds,cd=replicate(mdp,3),/new,vis=1,channel=[1b,2b,4b],order=0;,overlays=['planet_grid']
 
 end

@@ -81,28 +81,6 @@
 
 
 ;===========================================================================
-; gll_ssi_spice_label_struct__define
-;
-;===========================================================================
-pro gll_ssi_spice_label_struct__define
-
- struct = {gll_ssi_spice_label_struct, $
-		dt: 0d, $
-		time: 0d, $
-		stime: '', $
-		exposure: 0d, $
-		size: [1024,1024], $
-		filters: ['',''], $
-		scale: [0d,0d], $
-		target: '', $
-		oaxis: [0d,0d] $
-           }
-end
-;===========================================================================
-
-
-
-;===========================================================================
 ; gll_ssi_spice_parse_labels
 ;
 ;===========================================================================
@@ -114,6 +92,7 @@ pro gll_ssi_spice_parse_labels, dd, _time, $
 
  meta0 = {gll_ssi_spice_label_struct}
  meta0.size = [1024,1024]
+ meta0.oaxis = [511.5,511.5]
 
  for i=0, ndd-1 do $
   begin
@@ -225,14 +204,14 @@ end
 ;
 ;===========================================================================
 function gll_ssi_spice_input, dd, keyword, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
 
  return, spice_input(dd, keyword, 'gll', 'ssi', values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords)
 
 end

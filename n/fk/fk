@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+ <head>
+  <title>Index of /pub/naif/CASSINI/kernels/fk</title>
+ </head>
+ <body>
+<h1>Index of /pub/naif/CASSINI/kernels/fk</h1>
+<table><tr><th><img src="/icons/blank.gif" alt="[ICO]"></th><th><a href="?C=N;O=D">Name</a></th><th><a href="?C=M;O=A">Last modified</a></th><th><a href="?C=S;O=A">Size</a></th><th><a href="?C=D;O=A">Description</a></th></tr><tr><th colspan="5"><hr></th></tr>
+<tr><td valign="top"><img src="/icons/back.gif" alt="[DIR]"></td><td><a href="/pub/naif/CASSINI/kernels/">Parent Directory</a></td><td>&nbsp;</td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="Archive/">Archive/</a></td><td align="right">05-Feb-2001 10:19  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="aareadme.txt">aareadme.txt</a></td><td align="right">22-Jan-2003 11:43  </td><td align="right">3.1K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v02.tf">cas_rocks_v02.tf</a></td><td align="right">13-Feb-2004 14:04  </td><td align="right">9.4K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v03.tf">cas_rocks_v03.tf</a></td><td align="right">27-Apr-2004 14:41  </td><td align="right">9.6K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v04.tf">cas_rocks_v04.tf</a></td><td align="right">08-Dec-2004 16:21  </td><td align="right"> 11K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v05.tf">cas_rocks_v05.tf</a></td><td align="right">22-Dec-2004 09:07  </td><td align="right"> 11K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v06.tf">cas_rocks_v06.tf</a></td><td align="right">08-Apr-2005 13:36  </td><td align="right"> 11K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v07.tf">cas_rocks_v07.tf</a></td><td align="right">14-Dec-2005 12:05  </td><td align="right"> 11K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v08.tf">cas_rocks_v08.tf</a></td><td align="right">28-Feb-2006 13:01  </td><td align="right"> 16K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v09.tf">cas_rocks_v09.tf</a></td><td align="right">06-Dec-2006 13:41  </td><td align="right"> 19K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v10.tf">cas_rocks_v10.tf</a></td><td align="right">19-Apr-2007 11:24  </td><td align="right"> 24K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v11.tf">cas_rocks_v11.tf</a></td><td align="right">16-Aug-2007 14:18  </td><td align="right"> 24K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v12.tf">cas_rocks_v12.tf</a></td><td align="right">02-Oct-2007 15:15  </td><td align="right"> 20K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v13.tf">cas_rocks_v13.tf</a></td><td align="right">21-Aug-2008 16:54  </td><td align="right"> 20K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v14.tf">cas_rocks_v14.tf</a></td><td align="right">26-Aug-2008 09:17  </td><td align="right"> 20K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v15.tf">cas_rocks_v15.tf</a></td><td align="right">04-Feb-2009 11:07  </td><td align="right"> 21K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v16.tf">cas_rocks_v16.tf</a></td><td align="right">10-Mar-2009 11:39  </td><td align="right"> 22K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v17.tf">cas_rocks_v17.tf</a></td><td align="right">11-Mar-2009 14:19  </td><td align="right"> 22K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_rocks_v18.tf">cas_rocks_v18.tf</a></td><td align="right">11-May-2009 12:04  </td><td align="right"> 22K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_status_v01.tf">cas_status_v01.tf</a></td><td align="right">14-Jun-2005 12:33  </td><td align="right">9.2K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_status_v02.tf">cas_status_v02.tf</a></td><td align="right">20-Jun-2005 11:29  </td><td align="right">9.1K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_status_v03.tf">cas_status_v03.tf</a></td><td align="right">27-Jun-2005 13:00  </td><td align="right">9.3K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_status_v04.tf">cas_status_v04.tf</a></td><td align="right">19-Feb-2009 22:15  </td><td align="right">9.8K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="cas_v40.tf">cas_v40.tf</a></td><td align="right">07-Nov-2008 09:41  </td><td align="right">177K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="earth_topo_050714.tf">earth_topo_050714.tf</a></td><td align="right">27-Jul-2005 15:09  </td><td align="right"> 34K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="fovinfo.txt">fovinfo.txt</a></td><td align="right">07-Nov-2008 09:41  </td><td align="right"> 11K</td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.01/">release.01/</a></td><td align="right">05-Feb-2001 10:19  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.02/">release.02/</a></td><td align="right">05-Feb-2001 10:20  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.03/">release.03/</a></td><td align="right">04-May-2001 17:57  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.04/">release.04/</a></td><td align="right">09-Aug-2001 15:29  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.05/">release.05/</a></td><td align="right">28-Jan-2002 14:09  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.06/">release.06/</a></td><td align="right">20-Feb-2002 13:54  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.07/">release.07/</a></td><td align="right">07-Oct-2002 12:15  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.08/">release.08/</a></td><td align="right">07-Oct-2002 12:15  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.09/">release.09/</a></td><td align="right">24-Apr-2003 11:54  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.10/">release.10/</a></td><td align="right">21-Nov-2003 08:44  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.11/">release.11/</a></td><td align="right">10-May-2004 12:40  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.12/">release.12/</a></td><td align="right">19-Oct-2004 10:56  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/folder.gif" alt="[DIR]"></td><td><a href="release.13/">release.13/</a></td><td align="right">07-Nov-2008 09:40  </td><td align="right">  - </td><td>&nbsp;</td></tr>
+<tr><td valign="top"><img src="/icons/text.gif" alt="[TXT]"></td><td><a href="release.txt">release.txt</a></td><td align="right">07-Nov-2008 09:44  </td><td align="right">2.8K</td><td>&nbsp;</td></tr>
+<tr><th colspan="5"><hr></th></tr>
+</table>
+</body></html>

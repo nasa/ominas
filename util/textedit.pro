@@ -17,7 +17,7 @@ pro textedit_event, event
 
 
  ;-----------------------------------------------------
- ; update pointer if editable
+ ; callback
  ;-----------------------------------------------------
  widget_control, event.id, get_uvalue = struct
  if(NOT keyword_set(struct)) then return
@@ -33,7 +33,7 @@ end
 ;
 ;===========================================================================
 function textedit, text, xsize=xsize, ysize=ysize, base=base, $
-   editable=editable, resource_prefix=resource_prefix, title=title, $
+   resource_prefix=resource_prefix, title=title, $
    callback=callback, data=data
 
  if(NOT keyword_set(title)) then title = ''
@@ -50,13 +50,18 @@ function textedit, text, xsize=xsize, ysize=ysize, base=base, $
  txt = widget_text(base, xsize=xsize, ysize=ysize, $
                     /scroll, /wrap, /all_events, editable=editable, $
                          resource_name=resource_prefix + '_text')
+
  widget_control, txt, set_value=text
  if(keyword_set(callback)) then $
         widget_control, txt, set_uvalue = {callback:callback, data:data}
 
+; if(editable) then $
+;  begin
+;   button_base = widget_base(base, /row)
+;   commit_button = widget_button(button_base, value='Commit')
+;  end
 
  widget_control, base, /realize
-
  xmanager, 'textedit', base, /no_block
 
  return, txt

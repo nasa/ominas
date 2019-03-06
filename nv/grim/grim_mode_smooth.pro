@@ -38,6 +38,7 @@ pro grim_smooth, grim_data, plane=plane, box
  max = 30
 
  data = double(dat_data(plane.dd, abscissa=abscissa))
+ size = size(data, /dim)
 
  if(grim_data.type EQ 'PLOT') then $
   begin
@@ -67,6 +68,34 @@ pro grim_smooth, grim_data, plane=plane, box
    ny = fix(dy)
    if((nx LT 1) OR (ny LT 1)) then return
 
+   xmin = (ymin = 0)
+   xmax = size[0]-1 & ymax = size[1]-1
+   roi_ptd = grim_get_roi(grim_data, plane, /outline)
+   roi = lindgen(size[0], size[1])
+
+   if(keyword_set(roi_ptd)) then $
+    begin
+     roi_pts = round(pnt_points(roi_ptd))
+
+     xmin = min(roi_pts[0,*])-nx > 0
+     xmax = max(roi_pts[0,*])+nx < size[0]-1
+     ymin = min(roi_pts[1,*])-ny > 0
+     ymax = max(roi_pts[1,*])+ny < size[1]-1
+
+     subsize = [xmax-xmin, ymax-ymin] + 1
+     roi_pts_sub = roi_pts
+     roi_pts_sub[0,*] = roi_pts_sub[0,*] - xmin
+     roi_pts_sub[1,*] = roi_pts_sub[1,*] - ymin
+
+     roi = polyfillv(roi_pts[0,*], roi_pts[1,*], size[0], size[1])
+    end
+
+   subimage = data[xmin:xmax, ymin:ymax]
+   xy = w_to_xy(data, roi)
+   xy[0,*] = xy[0,*] - xmin
+   xy[1,*] = xy[1,*] - ymin
+   roi_sub = xy_to_w(subimage, xy)
+
    kernel = dblarr(nx, ny)
    kernel[*] = 1d/(double(nx)*double(ny))
 
@@ -77,7 +106,8 @@ pro grim_smooth, grim_data, plane=plane, box
            ['The smoothing kernel is rather large.  Continue anyway?']
    if(result NE 'Yes') then return
 
-   data = convol(data, kernel, /center)
+   subimage = convol(subimage, kernel, /center)
+   data[roi] = subimage[roi_sub]
   end
 
  dat_set_data, plane.dd, data
@@ -128,7 +158,7 @@ end
 pro grim_mode_smooth_mode, grim_data, data_p
 
  device, cursor_standard = 64
- grim_print, grim_data, 'SMOOTH -- LEFT: Square kernel; RIGHT: Rectangular kernel'
+ grim_print, grim_data, 'SMOOTH -- L:Square Kernel R:Rectangular Kernel'
 
 end
 ;=============================================================================
@@ -151,7 +181,8 @@ end
 ;
 ; OPERATION:
 ;	The user selects a box, which is used to determine the kernel
-;	size for smothing the data set.
+;	size for smoothing the data set.  If a ROI exists, only the data within
+;	the ROI are smoothed.
 ;
 ;
 ; MODIFICATION HISTORY:

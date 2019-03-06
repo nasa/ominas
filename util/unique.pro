@@ -17,7 +17,8 @@
 ;
 ;
 ; ARGUMENTS:
-;  INPUT: array:
+;  INPUT: 
+;       array:
 ;		Array to process.
 ;
 ;	s:	Array of sorted subscripts.  If given, these subscripts
@@ -32,10 +33,16 @@
 ;  INPUT:
 ;	nosort:	If set, the input array is not sorted.
 ;
+;	desort:	If set, the output array is returned in original order.
+;
 ;  OUTPUT: 
 ;	reverse_indices:			
 ;		Array of subscripts mapping the output elements to their
 ;		original positions in the input array.
+;
+;	subscripts:			
+;		Array of subscripts giving the elements of array that were
+;               returned.
 ;
 ;
 ; RETURN:
@@ -51,12 +58,11 @@
 ;	
 ;-
 ;=============================================================================
-function unique, _x, ss, nosort=nosort, reverse_indices=iii
+function unique, _x, ss, nosort=nosort, desort=desort, reverse_indices=iii, subscripts=subscripts
 
  reverse = arg_present(iii)
 
  n = n_elements(_x)
-
  if(keyword_set(nosort)) then x = _x $
  else $
   begin
@@ -79,6 +85,16 @@ function unique, _x, ss, nosort=nosort, reverse_indices=iii
    if(defined(sss)) then iii = uuu[sss]
   end
 
- return, x[uu]
+ subscripts = ss[uu]
+ result = x[uu]
+
+ if(keyword_set(desort)) then $
+  begin
+   qq = sort(subscripts)
+   subscripts = subscripts[qq]
+   result = result[qq]
+  end
+
+ return, result
 end
 ;================================================================================

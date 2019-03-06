@@ -7,7 +7,8 @@
 ; PURPOSE:
 ;	Attempts to detect the type of the file (or header) associated with the
 ;	given data descriptor by calling the detectors in the filetype detectors 
-;	table.
+;	table.  Detectors that crash are ignored and a warning is issued.  This
+;	behavior is disabled if $NV_DEBUG is set.
 ;
 ;
 ; CATEGORY:
@@ -20,16 +21,21 @@
 ;
 ; ARGUMENTS:
 ;  INPUT:
-;	dd:		Data descriptor containing filename to test.
+;	dd:		Data descriptor containing filename or header to test.
 ;
 ;  OUTPUT: NONE
 ;
 ;
 ; KEYWORDS:
 ;  INPUT: 
+;	filename:	Filename to test.  If not given, it is taken from the
+;			data descriptor.
+;
+;	header:		Header to test.  If not given, it is taken from the
+;			data descriptor.
+;
 ;	default:	If set, the 'DEFAULT' filetype is returned.
-;			The default filetype is the first item in the table
-;			whose action is not 'IGNORE'.
+;			The default filetype is the first item in the table.
 ;
 ;	all:		If set, all filetypes in the table are returned.
 ;
@@ -55,7 +61,8 @@
 ;	
 ;-
 ;=============================================================================
-function dat_detect_filetype, dd, default=default, all=all, action=action
+function dat_detect_filetype, dd, filename=filename, header=header, $
+                                                default=default, all=all
 @nv_block.common
 @core.include
 
@@ -74,17 +81,11 @@ function dat_detect_filetype, dd, default=default, all=all, action=action
             'Without this table, OMINAS cannot read input data.']
 
  table = *nv_state.ftp_table_p
- actions = strupcase(table[*,2])
 
  ;=====================================================
- ; default type is the first entry that is not ignored
+ ; default type is the first entry 
  ;=====================================================
- if(keyword_set(default)) then $
-  begin
-   w = where(actions NE 'IGNORE')
-   if(w[0] EQ -1) then return, ''
-   return, table[w[0],1] 
-  end
+ if(keyword_set(default)) then return, table[0,1] 
 
 
  ;=====================================================
@@ -93,22 +94,36 @@ function dat_detect_filetype, dd, default=default, all=all, action=action
  if(keyword_set(all)) then return, table[*,1] 
 
 
- ;=====================================================
- ; call filetype detectors until true is returned
- ;=====================================================
+ ;======================================================================
+ ; Call filetype detectors until true is returned
+ ; 
+ ; Crashes in the detects are handled by issuing a warning and 
+ ; contnuing to the next detector.
+ ;======================================================================
+ if(keyword_set(dd)) then $
+  begin
+   if(NOT keyword_set(filename)) then filename = dat_filename(dd)
+   if(NOT keyword_set(header)) then header = dat_header(dd)
+  end
+
+ catch_errors = NOT keyword_set(getenv('NV_DEBUG'))
  s = size(table)
  n_ftp = s[1]
  for i=0, n_ftp-1 do $
   begin
-   detect_fn = table[i,0]
-   if(call_function(detect_fn, dd)) then $
-    begin
-     filetype = table[i,1]
-     action = actions[i]
-     return, filetype
-    end
-  end
+   fn = table[i,0]
+   filetype = table[i,1]
 
+   if(NOT catch_errors) then err = 0 $
+   else catch, err
+   if(err EQ 0) then $
+           status = call_function(fn, filename=filename, header=header) $
+   else nv_message, /warning, $
+                'File type detector ' + strupcase(fn) + ' crashed; ignoring.'
+   catch, /cancel
+
+   if(status) then return, filetype
+  end
 
  return, ''
 end

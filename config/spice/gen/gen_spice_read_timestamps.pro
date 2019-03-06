@@ -66,7 +66,7 @@ function gen_spice_read_timestamps, path, filenames
  ; Generate template filename(s)
  ; replace / with _
  ;--------------------------------
- fix_path = strjoin(strsplit(path,'/',/extract),'_')
+ fix_path = strjoin(strsplit(path,path_sep(),/extract),'_')
  tsfile = '~/.ominas/timestamps/' + fix_path
 
  ts_files = file_search(tsfile + '.json')

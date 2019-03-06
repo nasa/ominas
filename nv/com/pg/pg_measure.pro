@@ -87,6 +87,9 @@
 ;	Ring photometry is not yet implemented.
 ;
 ;
+; SEE ALSO: pg_cursor
+;
+;
 ; MODIFICATION HISTORY:
 ; 	Written by:	Spitale, 3/2002
 ;	

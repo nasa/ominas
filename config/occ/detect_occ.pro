@@ -2,10 +2,8 @@
 ; detect_occ.pro
 ;
 ;===========================================================================
-function detect_occ, dd
+function detect_occ, filename=filename, header=header
 
- filename = dat_filename(dd)
- header = dat_header(dd)
  status = 0
 
  ;===============================================
@@ -16,6 +14,7 @@ function detect_occ, dd
   begin
    openr, unit, filename, /get_lun, error=error
    if(error NE 0) then return, 0
+   if((fstat(unit)).size LT 20) then return, 0
    record = assoc(unit, bytarr(20,/nozero))
    s = string(record[0])
    close, unit
@@ -23,10 +22,10 @@ function detect_occ, dd
   end
 
 
-
  ;===================================
  ; check for vicar label 
  ;===================================
+ if ~isa(s,'string') then return,0
  if(strpos(s[0], 'LBLSIZE') EQ 0) then status = 1
 
  ;==============================================
@@ -34,8 +33,8 @@ function detect_occ, dd
  ;==============================================
  if(status EQ 1) then $
   begin
-   xx = read_vicar(filename, label, /nodata, /silent)
-   xx = vicgetpar(label, 'OCCFILE', stat=stat)
+   xx = read_vicar(filename, header, /nodata, /silent)
+   xx = vicgetpar(header, 'OCCFILE', stat=stat)
    if(keyword_set(stat)) then status = 0
   end
 

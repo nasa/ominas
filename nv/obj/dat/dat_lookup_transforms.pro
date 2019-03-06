@@ -48,13 +48,12 @@
 ;-
 ;=============================================================================
 pro dat_lookup_transforms, instrument, $
-       input_transforms, output_transforms, $
+       input_transforms, output_transforms, keyvals, $
         tab_transforms=tab_transforms
 @nv_block.common
 @core.include
 
 
- marker='-'
  input_transforms = ''
  output_transforms = ''
 
@@ -80,44 +79,8 @@ pro dat_lookup_transforms, instrument, $
  ;==============================================================
  ; lookup the instrument string
  ;==============================================================
- input_transform = ''
- output_transform = ''
-
- instruments = table[*,0]
- w0 = (where(instruments EQ instrument))[0]
-
-
- ;================================================================
- ; extract all given transforms 
- ;================================================================
- if(w0 NE -1) then $
-  begin
-   w1 = w0
-   wn = where(instruments[w0:*] NE marker)
-   wc = where(instruments[w0:*] EQ marker)
-   if(wc[0] NE -1) then $
-    begin
-     if(n_elements(wn) GT 1) then w1 = w0 + wn[1]-1 $
-     else w1 = w0 + n_elements(wc)
-    end
-
-   input_transforms = table[w0:w1,1]
-   output_transforms = table[w0:w1,2]
-  end $
- else return
- 
-
- ;================================
- ; filter out any place markers
- ;================================
- w = where(input_transforms NE marker)
- if(w[0] EQ -1) then input_transforms = '' $
- else input_transforms = input_transforms[w]
-
- w = where(output_transforms NE marker)
- if(w[0] EQ -1) then output_transforms = '' $
- else output_transforms = output_transforms[w]
-
+ status = dat_tf_table_extract(table, instrument, $
+                          input_transforms, output_transforms, keyvals)
 
 end
 ;===========================================================================

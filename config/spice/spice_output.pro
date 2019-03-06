@@ -91,8 +91,8 @@
 ;-
 ;=============================================================================
 pro spice_output, dd, keyword, value, prefix, inst, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
  status=0
@@ -103,16 +103,16 @@ pro spice_output, dd, keyword, value, prefix, inst, status=status, $
  ;-----------------------------------------------
  ; translator arguments
  ;-----------------------------------------------
- ref = tr_keyword_value(dd, 'ref')
+ ref = dat_keyword_value(dd, 'ref')
  if(NOT keyword__set(ref)) then ref = 'j2000'
 
- j2000 = tr_keyword_value(dd, 'j2000')
+ j2000 = dat_keyword_value(dd, 'j2000')
  if(keyword__set(j2000)) then ref = 'j2000'
 
- b1950 = tr_keyword_value(dd, 'b1950')
+ b1950 = dat_keyword_value(dd, 'b1950')
  if(keyword__set(b1950)) then ref = 'b1950'
 
- ck_file = tr_keyword_value(dd, 'ck_out')
+ ck_file = dat_keyword_value(dd, 'ck_out')
  if(NOT keyword__set(ck_file)) then $
   begin
    nv_message, verb=0.9, $
@@ -123,10 +123,10 @@ pro spice_output, dd, keyword, value, prefix, inst, status=status, $
  ck_dir = (file_search(file_dirname(ck_file)))[0]
  ck_name = file_basename(ck_file)
  if(strupcase(ck_name) EQ 'AUTO') then ck_name = cor_name(dd) + '.bc'
- ck_file = ck_dir + '/' + ck_name
+ ck_file = ck_dir + path_sep() + ck_name
 
 
- reload = tr_keyword_value(dd, 'reload')
+ reload = dat_keyword_value(dd, 'reload')
 
 
 

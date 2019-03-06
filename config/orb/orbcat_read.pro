@@ -106,8 +106,8 @@ function orbcat_read, filename
   begin
    dat[w].epoch = jed_to_ret(dat[w].epoch_jed)
    dat[w].epoch_defined = 1
-   nv_message, /con, $
-      'WARNING: using raw ephemeris times for: ' + str_comma_list(dat[w].name)
+   nv_message, /warning, $
+      'Using raw ephemeris times for: ' + str_comma_list(dat[w].name)
   end
 
  w = where(dat.ppt_jed_defined)
@@ -115,8 +115,8 @@ function orbcat_read, filename
   begin
    dat[w].ppt = jed_to_ret(dat[w].ppt_jed)
    dat[w].ppt_defined = 1
-   nv_message, /con, $
-      'WARNING: using raw periapse times for: ' + str_comma_list(dat[w].name)
+   nv_message, /warning, $
+      'Using raw periapse times for: ' + str_comma_list(dat[w].name)
   end
 
  return, dat

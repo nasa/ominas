@@ -3,7 +3,8 @@
 ;
 ;
 ;==============================================================================
-pro png_image, filename, wnum=wnum, mono=mono, quantize=quantize, order=order, channel=channel
+pro png_image, filename, wnum=wnum, mono=mono, quantize=quantize, order=order, channel=channel, $
+       verbose=verbose
 
  if(defined(wnum)) then wset, wnum
 
@@ -35,6 +36,7 @@ pro png_image, filename, wnum=wnum, mono=mono, quantize=quantize, order=order, c
   end
 
 
+ if(keyword_set(verbose)) then print, 'Writing ' + filename
  write_png, filename, xx, r, g, b
 
 

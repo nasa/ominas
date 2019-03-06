@@ -25,7 +25,10 @@
 ;
 ;
 ; KEYWORDS:
-;  INPUT: NONE
+;  INPUT: 
+;	instrument:
+;               Instrument stsring to use instead of that contained in the 
+;               data descriptor.
 ;
 ;  OUTPUT: NONE
 ;
@@ -46,17 +49,18 @@
 ;	
 ;-
 ;=============================================================================
-function dat_header_info, dd, noevent=noevent
+function dat_header_info, dd, instrument=instrument, noevent=noevent
 @core.include
  nv_notify, dd, type = 1, noevent=noevent
 
  _dd = cor_dereference(dd)
 
- instrument = dat_instrument(_dd, noevent=noevent)
+ if(NOT keyword_set(instrument)) then $
+                            instrument = dat_instrument(_dd, noevent=noevent)
  htype = dat_htype(_dd, noevent=noevent)
 
  fn = strlowcase(instrument) + '_' + strlowcase(htype) + '_' + 'header_info'
- 
+
  if(NOT routine_exists(fn)) then return, 0
  return, call_function(fn, dd)
 end

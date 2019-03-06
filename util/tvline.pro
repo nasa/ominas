@@ -5,7 +5,7 @@
 ;
 ;
 ; PURPOSE:
-;	Returns device coordinates of the beginning and end points of a user
+;	Returns device coordinates of the beginning and end points of a user-
 ;	selected line.
 ;
 ;

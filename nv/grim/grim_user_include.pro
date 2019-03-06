@@ -15,6 +15,7 @@ pro grim_user_ptd_struct__define
 	shade_threshold	:	0d, $
 	fn_graphics	:	3, $
 	xgraphics	:	0b, $
+	xradius		:	0b, $
 	symsize		:	0. $
     }
 
@@ -30,8 +31,10 @@ end
 ;=============================================================================
 pro grim_add_user_points, grn=grn, user_ptd, tag, update=update, $
                   color=color, fn_color=fn_color, fn_shade=fn_shade, psym=psym, thick=thick, line=line, symsize=symsize, $
-                  shade_threshold=shade_threshold, fn_graphics=fn_graphics, xgraphics=xgraphics, nodraw=nodraw, inactive=inactive, $
-                  no_refresh=no_refresh, plane=plane
+                  shade_threshold=shade_threshold, $
+                  fn_graphics=fn_graphics, xgraphics=xgraphics, xradius=xradius, $
+                  nodraw=nodraw, inactive=inactive, $
+                  no_refresh=no_refresh, plane=plane, lock=lock
 
  if(NOT keyword_set(tag)) then tag = 'no_name'
  if(NOT keyword_set(symsize)) then symsize = 1
@@ -51,6 +54,7 @@ pro grim_add_user_points, grn=grn, user_ptd, tag, update=update, $
 
  if(NOT keyword_set(fn_graphics)) then fn_graphics = grim_data.default_user_fn_graphics
  if(NOT keyword_set(xgraphics)) then xgraphics = 0
+ if(NOT keyword_set(xradius)) then xradius = 0
  if(NOT keyword_set(psym)) then psym = grim_data.default_user_psym
  if(NOT keyword_set(thick)) then thick = grim_data.default_user_thick
  if(NOT keyword_set(line)) then line = grim_data.default_user_line
@@ -63,19 +67,21 @@ pro grim_add_user_points, grn=grn, user_ptd, tag, update=update, $
  user_struct.shade_threshold = shade_threshold
  user_struct.fn_graphics = fn_graphics
  user_struct.xgraphics = xgraphics
+ user_struct.xradius = xradius
  user_struct.thick = thick
  user_struct.line = line
  user_struct.symsize = symsize
 
  cor_set_udata, user_ptd, 'GRIM_USER_STRUCT', user_struct, /noevent
 
+ if(keyword_set(lock)) then $
+              cor_set_udata, user_ptd, 'GRIM_SELECT_LOCK', 1, /noevent
+
  tlp = plane.user_ptd_tlp
  if(keyword_set(update)) then $
               if((tag_list_match(tlp, tag))[0] EQ -1) then return
 
  tag_list_set, tlp, tag, user_ptd, new=new, index=index
- plane.user_ptd_tlp = tlp
- grim_set_plane, grim_data, plane, pn=pn
 
  if(NOT keyword_set(inactive)) then grim_activate_user_overlay, plane, user_ptd
 
@@ -129,7 +135,7 @@ pro grim_rm_user_points, grim_data, tag, plane=plane, grn=grn
  if(NOT keyword_set(plane.user_ptd_tlp)) then return
  if(NOT ptr_valid(plane.user_ptd_tlp)) then return
 
- for i=0, n_elements(tag)-1 do tag_list_rm, plane.user_ptd_tlp, tag[i]
+ for i=0, n_elements(tag)-1 do tag_list_rm, /nofree, plane.user_ptd_tlp, tag[i]
 
 
 end
@@ -175,7 +181,7 @@ function grim_get_user_ptd, plane=plane, grn=grn, tag, prefix=prefix, $
  if(NOT keyword_set(plane.user_ptd_tlp)) then return, 0
  if(NOT ptr_valid(plane.user_ptd_tlp)) then return, 0
 
- if(NOT keyword_set(tag)) then tag = (*plane.user_ptd_tlp).name
+ if(NOT keyword_set(tag)) then tag = tag_list_names(plane.user_ptd_tlp)
 
  n = n_elements(tag)
 
@@ -234,8 +240,11 @@ pro grim_user_notify, grim_data, plane=plane
 
  if(NOT keyword_set(plane.user_ptd_tlp)) then return
  if(NOT ptr_valid(plane.user_ptd_tlp)) then return
+ if(NOT keyword_set(*plane.user_ptd_tlp)) then return
 
  ptd = grim_get_user_ptd(plane=plane)
+ if(NOT keyword_set(ptd)) then return
+
  cd = grim_xd(plane, /cd)
 
  nv_suspend_events
@@ -288,14 +297,15 @@ end
 ; grim_activate_user_overlay
 ;
 ;=============================================================================
-pro grim_activate_user_overlay, plane, ptd
+pro grim_activate_user_overlay, plane, ptd, deactivate=deactivate
 
  if(NOT keyword_set(ptd)) then return
 
  ;--------------------------------------------------------------------
  ; activate overlays
  ;--------------------------------------------------------------------
- cor_set_udata, ptd, 'GRIM_ACTIVE_FLAG', 1, /all, /noevent
+ flag = keyword_set(deactivate) ? 0 : 1
+ cor_set_udata, ptd, 'GRIM_ACTIVE_FLAG', flag, /all, /noevent
 
 
 end
@@ -354,6 +364,28 @@ pro grim_invert_active_user_overlays, grim_data, plane
  ptd = grim_get_user_ptd(plane=plane)
  grim_invert_active_overlays, grim_data, plane, ptd
  
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_set_udata
+;
+;=============================================================================
+pro grim_set_udata, grim_data, name, udata
+ cor_set_udata, grim_data.crd, name, udata
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_udata
+;
+;=============================================================================
+function grim_udata, grim_data, name
+ return, cor_udata(grim_data.crd, name)
 end
 ;=============================================================================
 

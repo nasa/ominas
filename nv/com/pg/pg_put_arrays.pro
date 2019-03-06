@@ -72,7 +72,7 @@
 ;=============================================================================
 pro pg_put_arrays, dd, trs, ard=_ard, ods=ods, $
 @arr__keywords_tree.include
-@nv_trs_keywords_include.pro
+@dat_trs_keywords_include.pro
 		end_keywords
 
 
@@ -94,7 +94,7 @@ end_keywords
  ; put descriptor
  ;-------------------------------
  dat_put_value, dd, 'STR_DESCRIPTORS', ard, trs=trs, $
-@nv_trs_keywords_include.pro
+@dat_trs_keywords_include.pro
                              end_keywords
 
 

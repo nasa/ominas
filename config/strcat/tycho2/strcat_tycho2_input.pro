@@ -12,9 +12,6 @@
 ;
 ;      -   strcat_tycho2_input     -       /j2000    # or /b1950 if desired 
 ; 
-; For the star catalog translator system to work properly, only one type
-; of catalog may be used at a time for a particular instrument.
-;
 ; The version of the TYCHO-2 catalog which is expected by this translator
 ; can be obtained from the `CDS Strasbourg database <ftp://cdsarc.u-strasbg.fr/pub/cats/I/259/>`.
 ; The twenty individual catalog files should be concatenated into a single
@@ -59,8 +56,8 @@
 ; :Hidden:
 ;-
 ;===============================================================================
-function tycho2_get_regions, ra1, ra2, dec1, dec2, path_tycho2=path_tycho2
-  return, path_tycho2 + '/index.dat'
+function tycho2_get_regions, parm
+  return, parm.path + '/index.dat'
 end
 ;===============================================================================
 
@@ -111,17 +108,21 @@ end
 ;      be seconds past 2000, unless keyword /b1950 is set
 ;-
 ;===============================================================================
-function tycho2_get_stars, dd, filename, $
-         b1950=b1950, ra1=ra1, ra2=ra2, dec1=dec1, dec2=dec2, $
-         faint=faint, bright=bright, nbright=nbright, $
-         names=names, mag=mag, jtime=jtime
+function tycho2_get_stars, dd, filename, parm
 
- ;---------------------------------------------------------
- ; check whether catalog falls within brightness limits
- ;---------------------------------------------------------
- if(keyword_set(faint)) then if(faint LT -1.5) then return, ''
- if(keyword_set(bright)) then if(bright GT 12) then return, ''
+ ;-----------------------------------------------------------------
+ ; Decide whether to proceed based on FOV, magnitude constraints
+ ;-----------------------------------------------------------------
+ status = strcat_check(2.5d6, [0,2*!dpi], [-1,1]*!dpi/2, 12, -1.5, parm)
+ if(keyword_set(status)) then $
+  begin
+   nv_message, verb=0.2, 'Skipping catalog.'
+   return, ''
+  end
 
+ ;-----------------------------------------------------------------
+ ; Search for index file
+ ;-----------------------------------------------------------------
  ndx_f = file_search(filename)
  if(ndx_f[0] eq '') then $
   begin
@@ -145,9 +146,15 @@ function tycho2_get_stars, dd, filename, $
  ;---------------------------------------------------------
  ; Find the tycho regions that the scene occupies
  ;---------------------------------------------------------
- reg = strcat_radec_regions([ra1, ra2]*!dpi/180d, [dec1, dec2]*!dpi/180d, $
+ reg = strcat_radec_regions([parm.ra1, parm.ra2]*!dpi/180d, [parm.dec1, parm.dec2]*!dpi/180d, $
 	  index.RAmin*!dpi/180d, index.RAmax*!dpi/180d, $
 	  index.DEmin*!dpi/180d, index.DEmax*!dpi/180d)
+; if(n_elements(regions) GT ...) then $
+;  begin
+;   nv_message, '...'
+;   return, ''
+;  end
+
 
  ;---------------------------------------------------------
  ; Open the catalog file, known bug: will break if 
@@ -155,10 +162,7 @@ function tycho2_get_stars, dd, filename, $
  ;---------------------------------------------------------
  cat_fname = getenv('NV_TYCHO2_DATA') + '/tyc2.dat'
  f = file_search(cat_fname)
- if(f[0] eq '') then $
-  begin
-   nv_message, 'File does not exist - ' + cat_fname
-  end
+ if(f[0] EQ '') then nv_message, 'File does not exist - ' + cat_fname
  
  ;---------------------------------------------------------
  ; Organize the regions to be read from the file 
@@ -204,154 +208,9 @@ function tycho2_get_stars, dd, filename, $
  ;---------------------------------------------------------
  ; Convert catalog data format to standardized format
  ;---------------------------------------------------------
- nstars = n_elements(recs)
- stars = replicate({tycho2_star}, nstars)
- stars.ra = recs.mRAdeg                     ; mean j2000 ra in deg
- stars.dec = recs.mDEdeg                    ; mean j2000 dec in deg
- stars.rapm = recs.pmRA / 3600000d          ; mas/yr -> deg/yr
- stars.decpm = recs.pmDE / 3600000d         ; mas/yr -> deg/yr
- stars.mag = recs.VT                        ; approximately equivalent to visual mag.
- stars.px = 0                               ; parallax is not known
- stars.num = strtrim(string(recs.tyc1), 2)+'-'+strtrim(string(recs.tyc2), 2)+'-'+strtrim(string(recs.tyc3), 2)
- stars.epochra = recs.mepRA
- stars.epochdec = recs.mepDE
+ stars = strcat_tycho2_values(recs)
 
- ;---------------------------------------------------------
- ; apply brightness thresholds
- ;---------------------------------------------------------
- if(keyword_set(faint)) then $
-  begin
-   w = where(stars.mag LE faint)
-   if(w[0] EQ -1) then return, ''
-   stars = stars[w]
-  end
- if(keyword_set(bright)) then $
-  begin
-   w = where(stars.mag GE bright)
-   if(w[0] EQ -1) then return, ''
-   stars = stars[w]
-  end
-
- ;---------------------------------------------------------
- ; Select explicitly named stars
- ;---------------------------------------------------------
- name = 'TYC ' + stars.num
- if(keyword_set(names)) then $
-  begin
-   w = where(names EQ name)
-   if(w[0] NE -1) then _stars = stars[w]
-   if(NOT keyword__set(_stars)) then return, ''
-   stars = _stars
-   name = name[w]
-  end
-
- ;---------------------------------------------------------
- ; If limits are defined, remove stars that fall outside
- ; the limits. 
- ;---------------------------------------------------------
- w = strcat_radec_select([ra1, ra2]*!dpi/180d, [dec1, dec2]*!dpi/180d, $
-	                             stars.ra*!dpi/180d, stars.dec*!dpi/180d)
- if(w[0] EQ -1) then return, ''
- stars = stars[w]
- name = name[w]
-
- ;--------------------------------------------------------
- ; Apply proper motion to stars
- ; jtime = years past 2000.0
- ; rapm and decpm = degrees per year
- ;--------------------------------------------------------
- stars.ra = stars.ra + stars.rapm * jtime
- stars.dec = stars.dec + stars.decpm * jtime
-
- ;---------------------------------------------------------
- ; Work in radians now
- ;---------------------------------------------------------
- stars.ra = stars.ra * !dpi/180d
- stars.dec = stars.dec * !dpi/180d
- stars.rapm = stars.rapm * !dpi/180d
- stars.decpm = stars.decpm * !dpi/180d
-
- ;---------------------------------------------------------
- ; If desired, select only nbright brightest stars
- ;---------------------------------------------------------
- if(keyword_set(nbright)) then $
-  begin
-   mag = stars.mag
-   w = strcat_nbright(mag, nbright)
-   stars = stars[w]
-   name = name[w]
-  end
-
- n = n_elements(stars)
- print, 'Total of ',n,' stars.'
- if(n eq 0) then return, ''
-
- ;---------------------------------------------------------
- ; Calculate "dummy" properties
- ;---------------------------------------------------------
- orient = make_array(3,3,n)
- _orient = [ [1d,0d,0d], [0d,1d,0d], [0d,0d,1d] ]
- for j = 0 , n-1 do orient[*,*,j] = _orient
- avel = make_array(1,3,n,value=0d)
- vel = make_array(1,3,n,value=0d)
- time = make_array(n,value=0d)
- radii = make_array(3,n,value=0d)
- lora = make_array(n, value=0d)
-
-
- ;---------------------------------------------------------
- ; Calculate position vector, use a very large distance 
- ; since parallax is not known for this catalog.
- ;---------------------------------------------------------
- ; 3 orders of magnitude larger than the diameter of the milky way in km
- dist = make_array(n,val=1d21)
- radec = transpose([transpose([stars.ra]), transpose([stars.dec]), transpose([dist])])
- pos = transpose(bod_radec_to_body(bod_inertial(), radec))
-
-
- ;---------------------------------------------------------
- ; Compute skyplane velocity from proper motion 
- ;---------------------------------------------------------
- radec_vel = transpose([transpose([stars.rapm]/86400d/365.25d), transpose([stars.decpm]/86400d/365.25d), dblarr(1,n)])
- vel = bod_radec_to_body_vel(bod_inertial(), radec, radec_vel)
-
- ;---------------------------------------------------------
- ; Precess J2000 to B1950 if desired
- ;---------------------------------------------------------
- if(keyword_set(b1950)) then pos = $
-  transpose(b1950_to_j2000(transpose(pos),/reverse))
- pos = reform(pos,1,3,n)
-
- if(keyword_set(b1950)) then vel = $
-  transpose(b1950_to_j2000(transpose(vel),/reverse))
- vel = reform(vel,1,3,n)
-
- ;---------------------------------------------------------
- ; Calculate "luminosity" from visual Magnitude using the 
- ; Sun as a model. If distance is unknown, lum will be 
- ; incorrect, but the magnitudes will work out.
- ;---------------------------------------------------------
- pc = const_get('parsec')
- Lsun = const_get('Lsun')
- m = stars.mag - 5d*alog10(dist/pc) + 5d
- lum = Lsun * 10.d^( (4.83d0-m)/2.5d )
-
- _sd = str_create_descriptors(n, $
-        gd=make_array(n, val=dd), $
-        name=name, $
-        orient=orient, $
-        avel=avel, $
-        pos=pos, $
-        vel=vel, $
-        time=time, $
-        radii=radii, $
-        lora=lora, $
-        lum=lum, $
-        sp=sp )
-
- mag = stars.mag
-
- return, _sd
+ return, stars
 end
 ;===============================================================================
 
@@ -365,14 +224,14 @@ end
 ;-
 ;===============================================================================
 function strcat_tycho2_input, dd, keyword, n_obj=n_obj, dim=dim, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
 
  return, strcat_input(dd, keyword, 'tycho2', n_obj=n_obj, dim=dim, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords )
 
 end

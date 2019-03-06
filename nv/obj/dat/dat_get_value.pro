@@ -6,7 +6,9 @@
 ;
 ; PURPOSE:
 ;	Calls input translators, supplying the given keyword, and builds 
-;	a list of returned descriptors.
+;	a list of returned descriptors.  Translators that crash are ignored 
+;	and a warning is issued.  This behavior is disabled if $NV_DEBUG is 
+;	set (e.g., +NV_DEBUG=1 from the shell prompt).
 ;
 ;
 ; CATEGORY:
@@ -60,7 +62,7 @@
 ;	Array of descriptors returned from all successful translator calls.
 ;	Descriptors are returned in the same order that the corresponding 
 ;	translators were called.  Each translator may produce multiple 
-;	descriptors.
+;	descriptors.  0 if no result.
 ;
 ;
 ; STATUS:
@@ -74,13 +76,11 @@
 ;-
 ;=============================================================================
 function dat_get_value, dd, keyword, status=status, trs=trs, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
                              end_keywords
 @core.include
 
-; on_error, 1
- _dd = cor_dereference(dd)
  ndd = n_elements(dd)
 
  status = -1
@@ -91,12 +91,15 @@ function dat_get_value, dd, keyword, status=status, trs=trs, $
  ;--------------------------------------------
  ; record any transient keyvals
  ;--------------------------------------------
- _dd = dat_add_transient_keyvals(_dd, trs)
+ nv_message, verb=0.9, 'Adding transient keywords: ' + trs
+ dat_add_tr_transient_keyvals, dd, trs
 
 
  ;--------------------------------------------
  ; build translators list
  ;--------------------------------------------
+ _dd = cor_dereference(dd)
+
 ; need to group dd based on instrument...
  if(NOT keyword_set(tr_override)) then $
   begin
@@ -115,6 +118,7 @@ function dat_get_value, dd, keyword, status=status, trs=trs, $
  ;----------------------------------------------------------------
  ; call all translators, building a list of returned values
  ;----------------------------------------------------------------
+ catch_errors = NOT keyword_set(getenv('NV_DEBUG'))
  nv_suspend_events
  nv_message, verb=0.9, 'Data descriptors ' + str_comma_list(cor_name(dd))
  nv_message, verb=0.9, 'Keyword ' + keyword
@@ -123,21 +127,31 @@ function dat_get_value, dd, keyword, status=status, trs=trs, $
   begin
    nv_message, verb=0.9, 'Calling translator ' + translators[i]
 
-   _dd.last_translator = [i,0]#make_array(ndd, val=1)
-   cor_rereference, dd, _dd
+   stat = -1
+   if(keyword_set(translators[i])) then $
+    begin
+     if(NOT catch_errors) then err = 0 $
+     else catch, err
 
-   xd = call_function(translators[i], dd, keyword, values=xds, stat=stat, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+     if(err NE 0) then $
+          nv_message, /warning, $
+            'Translator ' + strupcase(translators[i]) + ' crashed; ignoring.' $
+     else $
+       xd = call_function(translators[i], dd, keyword, values=xds, stat=stat, $
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 		    end_keywords)
+
+     catch, /cancel
+    end
 
    ;--------------------------------------
    ; add values to list
    ;--------------------------------------
    if(stat EQ 0) then $
     begin
-     nv_message, verb=1.5, 'Returned descriptors: ' + $
-                                                 str_comma_list([cor_name(xd)])
+     nv_message, verb=0.9, $
+                    'Returned descriptors: ' + str_comma_list([cor_name(xd)])
 
      if(keyword_set(xd)) then $
       begin 
@@ -198,7 +212,7 @@ function dat_get_value, dd, keyword, status=status, trs=trs, $
     else result = xds
   end
 
- nv_message, verb=1.5, 'Output descriptors: ' + str_comma_list([cor_name(result)])
+ nv_message, verb=0.9, 'Output descriptors: ' + str_comma_list([cor_name(result)])
 
  nv_resume_events
  return, result

@@ -20,7 +20,7 @@
 ;		  name in an unambiguous way.
 ;
 ;	In this modified program, cw__pdmenu, the name given for the event
-;	handler for each button widget is used as the X resource anme as well.
+;	handler for each button widget is used as the X resource name as well.
 ;	
 ;
 ;
@@ -203,7 +203,7 @@
 ;			and menu descriptor strings.
 ;	2 July 1995, AB, Added HELP keyword.
 ;	3 September 1996, LP, Added button-less end of current level
-;	May 2004, JNS, Renamed cw__pdmenu and added X resource names.
+;	May 2004, JNS, Renamed CW__PDMENU and added X resource names.
 ;
 ; NOTICES:
 ;	Portions ©2017 Exelis Visual Information Solutions, Inc., provided 

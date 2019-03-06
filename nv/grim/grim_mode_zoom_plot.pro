@@ -94,7 +94,7 @@ end
 pro grim_mode_zoom_plot_mode, grim_data, data_p
 
  device, cursor_standard = 144
- grim_print, grim_data, 'ZOOM -- LEFT: Increase; RIGHT: Decrease'
+ grim_print, grim_data, 'ZOOM -- L:Increase R:Decrease'
 
 end
 ;=============================================================================

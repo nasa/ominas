@@ -43,6 +43,10 @@
 ;       print:		If set, any arrays with this many elements or fewer
 ;			are printed out.  Default is 100.
 ;
+;	tables:		If set, and if the input object is a data descriptor,
+;			then the I/O, translators, and transforms tables
+;			for that object are printed.
+;
 ;  OUTPUT: 
 ;       capture:	If present, the output in returned in this
 ;			keyword instead of being printed.
@@ -94,9 +98,10 @@ end
 ; nv_sep
 ;
 ;===========================================================================
-pro nv_help_sep
+pro nv_help_sep, capture=capture
 
- nv_help_print, '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -'
+ nv_help_print, capture=capture, $
+   '-------------------------------------------------------------------------------'
 
 end
 ;===========================================================================
@@ -338,8 +343,8 @@ pro nv_help_event, capture=capture
  ;-------------------------------------
  ; dump handler list
  ;-------------------------------------
- nv_help_print, capture=capture, $
-  '-------------------------------- Event Registry --------------------------------'
+ nv_help_print, capture=capture, 'Event Registry:'
+ nv_help_sep, capture=capture
  nv_help_dump_events, capture=capture, list
 
  nv_help_print, capture=capture, ''
@@ -347,8 +352,8 @@ pro nv_help_event, capture=capture
  ;-------------------------------------
  ; dump event buffer
  ;-------------------------------------
- nv_help_print, capture=capture, $
-  '--------------------------------- Event Buffer ---------------------------------'
+ nv_help_print, capture=capture, 'Event Buffer:'
+ nv_help_sep, capture=capture
  nv_help_dump_events, capture=capture, buf
 
  
@@ -495,7 +500,7 @@ pro __nv_help_doc, iname, capture=capture
        w = max(where(strtrim(doc_lines, 2) NE ''))
        if(w[0] NE -1) then doc_lines = doc_lines[0:w[0]]
 
-;       nv_help_sep
+;       nv_help_sep, capture=capture
        nv_help_print, tr(doc_lines), capture=capture
        return
       end
@@ -511,12 +516,43 @@ end
 
 
 ;===========================================================================
+; nv_help_tables
+;
+;===========================================================================
+pro nv_help_tables, dp, capture=capture
+
+ nv_help_print, capture=capture, 'I/O table:'
+ nv_help_sep, capture=capture
+ nv_help_print, transpose(dat_table(dp, /io, indent=2)), capture=capture
+ nv_help_print, '', capture=capture
+ nv_help_print, '', capture=capture
+
+ nv_help_print, capture=capture, 'Translators table:'
+ nv_help_sep, capture=capture
+ nv_help_print, transpose(dat_table(dp, /translators, indent=2)), capture=capture
+ nv_help_print, '', capture=capture
+ nv_help_print, '', capture=capture
+
+ nv_help_print, capture=capture, 'Transforms table:'
+ nv_help_sep, capture=capture
+ nv_help_print, transpose(dat_table(dp, /transforms, indent=2)), capture=capture
+ nv_help_print, '', capture=capture
+ nv_help_print, '', capture=capture
+
+end
+;===========================================================================
+
+
+
+;===========================================================================
 ; nv_help
 ;
 ;===========================================================================
-pro nv_help, dp, capture=capture, print=print, event=event
+pro nv_help, dp, capture=capture, print=print, event=event, tables=tables
 
  if(keyword_set(print)) then if(print EQ 1) then print = 100
+ nv_help_print, '', capture=capture
+
 
  ;--------------------------------------------
  ; show event info if /event
@@ -536,10 +572,23 @@ pro nv_help, dp, capture=capture, print=print, event=event
    return
   end
 
+ ;---------------------------------------------------------
+ ; print tables if /tables and object is data descriptor
+ ;---------------------------------------------------------
+ if(keyword_set(tables)) then $
+  begin
+   if(cor_class(dp) NE 'DATA') then $
+                  nv_message, '/tables keyword only applies to data objects.'
+
+   nv_help_tables, dp, capture=capture
+   return
+  end
+
+
  ;----------------------------------------------------
  ; otherwise describe the object
  ;----------------------------------------------------
-; nv_help_sep
+; nv_help_sep, capture=capture
  if(keyword_set(dp)) then nv_help_descend, dp, 0, capture=capture, print=print $
  else nv_help_state, capture=capture
 

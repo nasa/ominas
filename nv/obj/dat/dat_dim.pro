@@ -29,6 +29,12 @@
 ;	true:	If set, the dimension function is not called and the true
 ;	 	dimensions of the dat are returned.
 ;
+;	ndim: 	If set, the result will have this number of dimensions.  If 
+;		there are fewer dimensions in the data set, then dimensions
+;		of length one are appended.  If there are more dimensions
+;		in the data set, then the extra dimensions are collapsed into
+;		the highest desired dimension.
+;
 ;  OUTPUT: NONE
 ;
 ;
@@ -46,7 +52,7 @@
 ;	
 ;-
 ;=============================================================================
-function dat_dim, dd, true=true, noevent=noevent
+function dat_dim, dd, true=true, ndim=ndim, noevent=noevent
 @core.include
  nv_notify, dd, type = 1, noevent=noevent
  _dd = cor_dereference(dd)

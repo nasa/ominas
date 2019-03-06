@@ -314,7 +314,7 @@ end
 pro grim_mode_readout_mode, grim_data, data_p
 
  grim_mode_readout_cursor, swap=swap
- grim_print, grim_data, 'READOUT -- LEFT: Pixel Data; RIGHT: Measure'
+ grim_print, grim_data, 'READOUT -- L:Pixel Data R:Measure'
 
 end
 ;=============================================================================

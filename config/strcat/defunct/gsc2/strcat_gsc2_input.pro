@@ -374,14 +374,14 @@ end
 ;-
 ;=============================================================================
 function strcat_gsc2_input, dd, keyword, n_obj=n_obj, dim=dim, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
 
  return, strcat_input('gsc2', dd, keyword, n_obj=n_obj, dim=dim, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords )
 
 end

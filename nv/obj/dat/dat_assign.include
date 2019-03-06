@@ -23,12 +23,15 @@
  if(defined(instrument)) then dat_set_instrument, _xd, instrument, /noevent
  if(defined(input_fn)) then dat_set_input_fn, _xd, input_fn, /noevent
  if(defined(output_fn)) then dat_set_output_fn, _xd, output_fn, /noevent
+ if(defined(io_keyvals)) then dat_set_io_keyvals, _xd, io_keyvals, /noevent
  if(defined(keyword_fn)) then dat_set_keyword_fn, _xd, keyword_fn, /noevent
  if(defined(input_transforms)) then dat_set_input_transforms, _xd, input_transforms, /noevent
  if(defined(output_transforms)) then dat_set_output_transforms, _xd, output_transforms, /noevent
+ if(defined(tf_keyvals)) then dat_set_tf_keyvals, _xd, tf_keyvals, /noevent
  if(defined(input_translators)) then dat_set_input_translators, _xd, input_translators, /noevent
  if(defined(output_translators)) then dat_set_output_translators, _xd, output_translators, /noevent
- if(defined(input_keyvals)) then dat_set_input_keyvals, _xd, input_keyvals, /noevent
- if(defined(output_keyvals)) then dat_set_output_keyvals, _xd, output_keyvals, /noevent
+ if(defined(tr_keyvals)) then dat_set_tr_keyvals, _xd, tr_keyvals, /noevent
+ if(defined(label_data)) then dat_set_label_data, _xd, label_data, /noevent
+ if(defined(label_abscissa)) then dat_set_label_abscissa, _xd, label_abscissa, /noevent
 
 @cor_assign.include

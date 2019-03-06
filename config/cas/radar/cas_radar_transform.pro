@@ -4,9 +4,12 @@
 ; based on documentation at https://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/CORADR_0045/DOCUMENT/
 ;
 ;==============================================================================
-function cas_radar_transform, ima, label, force=force
+pro cas_radar_transform, dd, force=force
   compile_opt idl2,logical_predicate
- 
+
+  ima = dat_data(dd, /true)
+  label = dat_header(dd)
+
   missing=label[where(stregex(label,'MISSING_CONSTANT',/bool))]
   misval=(stregex(missing,'=[[:space:]]*"?16#([[:xdigit:]]+)#',/extract,/subexpr))[-1]
   ;dat_header_value,dd,'MISSING_CONSTANT',get=missing
@@ -23,6 +26,6 @@ function cas_radar_transform, ima, label, force=force
   if count then ima[w]=!values.d_nan
   ima=rotate(ima,1)
  
- return, ima
+  dat_set_data, dd, ima
 end
 ;==============================================================================

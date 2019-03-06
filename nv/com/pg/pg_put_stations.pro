@@ -72,7 +72,7 @@
 ;=============================================================================
 pro pg_put_stations, dd, trs, std=_std, ods=ods, $
 @stn__keywords_tree.include
-@nv_trs_keywords_include.pro
+@dat_trs_keywords_include.pro
 		end_keywords
 
  if(NOT keyword_set(_std)) then return
@@ -93,7 +93,7 @@ end_keywords
  ; put descriptor
  ;-------------------------------
  dat_put_value, dd, 'STR_DESCRIPTORS', std, trs=trs, $
-@nv_trs_keywords_include.pro
+@dat_trs_keywords_include.pro
                              end_keywords
 
 

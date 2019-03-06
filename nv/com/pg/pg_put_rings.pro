@@ -72,7 +72,7 @@
 ;=============================================================================
 pro pg_put_rings, dd, trs, rd=_rd, ods=ods, $
 @rng__keywords_tree.include
-@nv_trs_keywords_include.pro
+@dat_trs_keywords_include.pro
 		end_keywords
 
 
@@ -94,7 +94,7 @@ end_keywords
  ; put descriptor
  ;-------------------------------
  dat_put_value, dd, 'RNG_DESCRIPTORS', rd, trs=trs, $
-@nv_trs_keywords_include.pro
+@dat_trs_keywords_include.pro
                              end_keywords
 
  nv_free, rd

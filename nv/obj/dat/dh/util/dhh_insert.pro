@@ -7,6 +7,7 @@ pro dhh_insert, dh, dh_section, dh_history=dh_history
  new_dh = dh_history
 
  dhh_separate, dh, _dh_history, dh_sections=dh_sections
+ if(NOT keyword_set(dh_sections)) then return
 
  n = n_elements(dh_sections)
 

@@ -372,7 +372,7 @@ pg_draw, outline_ptd, col=ctgreen()
 ;    outline_ptd = pg_ring_sector(gd=gd)
 ;    pg_draw, outline_ptd, col=ctgreen()
 ;
-;         .. image:: graphics/saturn_sector_1.jpeg
+;  .. image:: graphics/saturn_sector_1.jpeg
 ;
 ;-    
 ;-------------------------------------------------------------------------
@@ -394,20 +394,20 @@ pg_draw, outline_ptd, col=ctgreen()
 ;  Radial scan::
 ;
 ;    dd_prof = pg_profile_ring(dd, gd=gd, outline_ptd, $
-;                                            dsk_pts=dsk_pts, profile=profile)
+;     dsk_pts=dsk_pts, profile=profile)
 ;    window, /free, xs=500, ys=300
 ;    plot, dsk_pts[*,0], profile
 ;
-;     .. image:: graphics/saturn_sector_2.jpeg
+;  .. image:: graphics/saturn_sector_2.jpeg
 ;
 ;
 ;  Azimuthal scan::
 ;    dd_prof = pg_profile_ring(dd, gd=gd, outline_ptd, /azimuthal, $
-;                                            dsk_pts=dsk_pts, profile=profile)
+;     dsk_pts=dsk_pts, profile=profile)
 ;    window, /free, xs=500, ys=300
 ;    plot, dsk_pts[*,1], profile, /yno
 ;
-;     .. image:: graphics/saturn_sector_3.jpeg
+;  .. image:: graphics/saturn_sector_3.jpeg
 ;
 ;-     
 ;-------------------------------------------------------------------------

@@ -2,9 +2,8 @@
 ; detect_dh.pro
 ;
 ;===========================================================================
-function detect_dh, dd, udata
+function detect_dh, filename=filename, header=header, udata
 
- filename = dat_filename(dd)
  status = 0
 
  ;==============================

@@ -28,7 +28,9 @@ function ctuser, i
  case visual of
   1		 : return, 1
   8		 : return, !d.table_size - 9 - i 
-  24		 : return, _ctuser_r[i] + 256*_ctuser_g[i] + 65536*_ctuser_b[i]
+  24		 : return, long(_ctuser_r[i]) + $
+                              256l*long(_ctuser_g[i]) + $
+                                   65536l*long(_ctuser_b[i])
   else		 : return, 0
  endcase
 end

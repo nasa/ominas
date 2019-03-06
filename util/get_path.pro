@@ -68,7 +68,7 @@ function get_path, path, extesion=extesion, file=file
    result = ''
    for i=0, n_elements(dirs)-1 do $
     begin
-     ff = findfile(dirs[i] + '/' + match)
+     ff = findfile(dirs[i] + path_sep() + match)
      if(keyword_set(ff[0])) then result = append_array(result, dirs[i])
     end
   end

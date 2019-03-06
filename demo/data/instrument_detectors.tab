@@ -12,3 +12,5 @@
   detect_vgr_rss		VICAR
   detect_cas_vims               ISIS
   detect_juno_epo_cam           PNG
+  detect_cas_cirs		PDSCIRSTABLE
+  detect_cas_cirscube		PDS

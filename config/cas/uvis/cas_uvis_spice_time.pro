@@ -30,7 +30,8 @@ function cas_uvis_spice_time, dd, dt=dt, string=string, status=status, exposure=
  dt = -0.5d*exposure
  nv_message,verb=0.91,'UVIS START_TIME='+strtrim(start_time,2)
  if(keyword_set(string)) then return, close_time
- return, spice_str2et(start_time)+ dt
+ ret=spice_str2et(start_time)+ (-0d0)*dt
+ return, ret
 ;===========================================================================
 end
 

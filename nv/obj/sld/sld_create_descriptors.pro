@@ -53,7 +53,7 @@
 ;
 ; RETURN:
 ;	Newly created or or freshly initialized solid descriptors, depending
-;	on the presence of the bd keyword.
+;	on the presence of the sld keyword.
 ;
 ;
 ; STATUS:

@@ -25,7 +25,7 @@
 ;
 ;
 ; RESTRICTIONS:
-;	See bat_description.txt
+;	See ominas_description.txt
 ;
 ;
 ; EXAMPLE:
@@ -54,12 +54,13 @@
 ;-
 ;=============================================================================
 !quiet = 1
-___argv = bat_argv()
 
-___argv = bat_parse_argv(___argv, ___keys, ___val_ps, spec=___spec)
-___filespecs = bat_expand(___argv, ___spec)
-if(keyword_set(___filespecs)) then ___files = findfiles(___filespecs)
+___argv = bat_parse_argv(___keys, ___val_ps, $
+                           list=___list, path=___path, samp=___samp, sel=___sel)
+___filespecs = bat_expand(___argv, ___list, ___path, ___samp, ___sel)
+if(keyword_set(___filespecs)) then ___files = findfiles(___filespecs, /tolerant)
 
 call_procedure,'rim',___files,_extra=pp_build_extra(___keys,___val_ps)
 
 exit
+;=============================================================================

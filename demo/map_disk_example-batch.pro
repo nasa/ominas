@@ -13,7 +13,7 @@
 ;-------------------------------
 ; load image
 ;-------------------------------
-file = './data/N1460072467_1.IMG.cal'
+file = './data/N1460072467_1.IMG'
 dd = dat_read(file, im, ext='.cal')
 ctmod
 tvim, im, zoom=0.5, /order, /new

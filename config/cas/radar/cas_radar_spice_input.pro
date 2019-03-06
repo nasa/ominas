@@ -101,23 +101,6 @@ end
 
 
 ;===========================================================================
-; cas_radar_spice_label_struct__define
-;
-;===========================================================================
-pro cas_radar_spice_label_struct__define
-
- struct = {cas_radar_spice_label_struct, $
-		dt: 0d, $
-		time: 0d, $
-		stime: '', $
-		target: '' $
-           }
-end
-;===========================================================================
-
-
-
-;===========================================================================
 ; cas_radar_spice_parse_labels
 ;
 ;===========================================================================
@@ -220,16 +203,16 @@ end
 ;
 ;===========================================================================
 function cas_radar_spice_input, dd, keyword, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
  if(keyword EQ 'MAP_DESCRIPTORS') then return, cas_radar_spice_maps(dd, status=status)
 
  return, spice_input(dd, keyword, 'cas', 'radar', values=values, status=status, $
 ; return, spice_input(dd, keyword, 'cas', values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords)
 
 end

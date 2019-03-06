@@ -595,7 +595,7 @@ common tvgr_block, tvd, tvgr_top
    float_bin, xarr, yarr, bin=bin
    if(keyword_set(bin)) then $
     if(NOT keyword_set(silent)) then $
-     message, /con, 'WARNING: binning data by a factor of ' + strtrim(bin,2) + ' to correct IDL plot bug.'
+     message, /warning, 'binning data by a factor of ' + strtrim(bin,2) + ' to correct IDL plot bug.'
   end
 
 

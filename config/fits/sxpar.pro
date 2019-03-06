@@ -209,7 +209,7 @@ function SXPAR, hdr, name, abort, COUNT=matches
 ;
 	    	value2 = strtrim( strmid(line(i),30,20), 2) ;Imaginary part
                 if value2 EQ '' then goto, NOT_COMPLEX
-		if strpos( strmid( line(i),10,40), '/') GE 0 then $
+		if strpos( strmid( line(i),10,40), path_sep()) GE 0 then $  ; Spitale
                        goto,NOT_COMPLEX
 		On_ioerror, NOT_COMPLEX
 	   	value2 = float(value2)

@@ -767,7 +767,22 @@ cat ${OMINAS_DIR}/config/bashcomments.txt >> ~/.ominas/ominas
 #head -1 ${idlbin} > ~/.ominas/ominas
 asetting=`eval echo ${setting}`
 echo ". ${asetting}" >> ~/.ominas/ominas
-echo "if [ "\$#" -eq 0 ]; then args=\"\${OMINAS_DIR}/util/printver.pro\"; else args=("\$@"); fi" >> ~/.ominas/ominas
+
+#echo "if [ "\$#" -eq 0 ]; then args=\"\${OMINAS_DIR}/util/printver.pro\"; else args=("\$@"); fi" >> ~/.ominas/ominas
+echo "if [ \$# -eq 0 ]; then args=\"\${OMINAS_DIR}/util/printver.pro\"" >> ~/.ominas/ominas
+echo "else" >> ~/.ominas/ominas
+echo " for arg in \$@; do" >> ~/.ominas/ominas
+echo "  if [[ \$arg == --* ]] ; then _args+=(\$arg)" >> ~/.ominas/ominas
+echo "  elif [[ \$arg == *==* ]] ; then _args+=(\$arg)" >> ~/.ominas/ominas
+echo "  elif [[ \$arg == +* ]] ; then export \${arg:1:127}" >> ~/.ominas/ominas
+echo "  else args+=(\$arg)" >> ~/.ominas/ominas
+echo "  fi" >> ~/.ominas/ominas
+echo " done" >> ~/.ominas/ominas
+echo "fi" >> ~/.ominas/ominas
+echo "args+=(\\-args)" >> ~/.ominas/ominas
+echo "args+=(\${_args[*]})" >> ~/.ominas/ominas
+
+
 if [ -e "/opt/X11/lib/flat_namespace/" ]; then
   cat <<LDCMD >> ~/.ominas/ominas
     if [ "\${DYLD_LIBRARY_PATH}" = "" ]; then
@@ -1049,8 +1064,9 @@ else
 fi
 echo "Icy: ${ominas_icytest}"
 export ominas_icyst
-
-OMINAS_TMP=`$idlbin -e "print,filepath('_${USER}_ominas',/tmp)" 2> /dev/null`
+echo $idlbin
+OMINAS_TMP=`$idlbin -e "print,filepath('_${USER}_ominas',/tmp)" | tail -1  2> /dev/null`
+echo $OMINAS_TMP
 #OMINAS_TMP="${OMINAS_RC}/tmp"
 if [ ! -w "${OMINAS_TMP}" ]; then
   mkdir -p ${OMINAS_TMP}

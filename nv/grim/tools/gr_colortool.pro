@@ -172,6 +172,7 @@ end
 pro grct_plot, data
 
  grim_data = grim_get_data(/primary)
+ if(NOT keyword_set(grim_data)) then return
  plane = grim_get_plane(grim_data)
 
  n_colors = plane.cmd.n_colors
@@ -292,6 +293,7 @@ end
 pro gr_colortool_event, event
 
  grim_data = grim_get_data(/primary)
+ if(NOT keyword_set(grim_data)) then return
  plane = grim_get_plane(grim_data)
 
  widget_control, event.top, get_uvalue=data, /hourglass
@@ -380,6 +382,7 @@ end
 pro gr_colortool_change, base
 
  grim_data = grim_get_data(/primary)
+ if(NOT keyword_set(grim_data)) then return
  plane = grim_get_plane(grim_data)
 
  widget_control, base, get_uvalue=data
@@ -401,6 +404,7 @@ end
 pro grct_primary_notify, data_p
 
  grim_data = grim_get_data(/primary)
+ if(NOT keyword_set(grim_data)) then return
  plane = grim_get_plane(grim_data)
 
  if(grim_data.type EQ 'PLOT') then return
@@ -421,6 +425,7 @@ pro gr_colortool
 common gr_colortool_block, base
 
  grim_data = grim_get_data(/primary)
+ if(NOT keyword_set(grim_data)) then return
  plane = grim_get_plane(grim_data)
 
  if(xregistered('gr_colortool')) then $

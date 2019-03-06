@@ -112,8 +112,8 @@ function pg_profile_image, dd, cd=cd, gd=gd, outline_ptd, distance=distance, $
  dat_set_header, dd_prof[1], dat_header(dd)
 
  image_ptd = pnt_create_descriptors(points=image_pts)
- cor_set_udata, dd_prof[0], 'IMAGE_PS', image_ptd
- cor_set_udata, dd_prof[1], 'IMAGE_PS', image_ptd
+ cor_set_udata, dd_prof[0], 'IMAGE_PTD', image_ptd
+ cor_set_udata, dd_prof[1], 'IMAGE_PTD', image_ptd
 
  return, dd_prof
 end
