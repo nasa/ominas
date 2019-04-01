@@ -36,7 +36,8 @@ pro grim_rc_settings, rcfile=rcfile, keyvals=keyvals, $
         delay_overlays=delay_overlays, auto_stretch=auto_stretch, lights=lights, $
         render_rgb=render_rgb, render_current=render_current, render_spawn=render_spawn, render_auto=render_auto, render_sky=render_sky, $
 	guideline=guideline, integer_zoom=integer_zoom, exclude_overlays=exclude_overlays, $
-	settings_overlays=settings_overlays
+	no_outline=no_outline, no_target=no_target, no_optic=no_optic, no_center=no_center, $
+	settings_overlays=settings_overlays, split=split
 
 
  ;----------------------------------------------------
@@ -395,6 +396,11 @@ pro grim_rc_settings, rcfile=rcfile, keyvals=keyvals, $
                       _settings_overlays = extra_value(kv, 'SETTINGS_OVERLAYS') $
  else _settings_overlays = settings_overlays
  if(keyword_set(_settings_overlays)) then settings_overlays = _settings_overlays
+
+ if(n_elements(split) EQ 0) then $
+                      _split = extra_value(kv, 'SPLIT') $
+ else _split = split
+ if(keyword_set(_split)) then split = _split
 
 
  ;-----------------------------------------------------------------

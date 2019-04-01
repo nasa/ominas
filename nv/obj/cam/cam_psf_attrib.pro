@@ -45,6 +45,39 @@
 ;=============================================================================
 pro cam_psf_attrib, cd, fwhm=fwhm
 @core.include
+
+ psf = cam_psf(cd)
+ if(NOT keyword_set(psf)) then return
+
+
+ ;------------------------------------
+ ; extract subimage around peak
+ ;------------------------------------
+ max = max(psf, w)
+ p0 = w_to_xy(psf, w)
+
+ w = where(psf GT 0.01*max)
+ area = n_elements(w)
+ r = sqrt(area/!dpi) > 10
+
+ sub = subimage(psf, p0[0], p0[1], r, r)
+
+
+ ;------------------------------------
+ ; fit to gaussian and compute fwhm
+ ;------------------------------------
+ fit = gauss2dfit(sub, coeff)
+ width = mean(coeff[2:3])
+ fwhm = 2*width*sqrt(alog(2))
+
+end
+;===========================================================================
+
+
+
+;=============================================================================
+pro ___cam_psf_attrib, cd, fwhm=fwhm
+@core.include
  zz = 10.
 
  psf = cam_psf(cd)

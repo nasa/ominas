@@ -86,6 +86,9 @@ pro tvpan_draw, data, xarr, yarr, pixmap, win_num
  device, copy=[edge[0],edge[2], $
              !d.x_size-(edge[0]+edge[1]),!d.y_size-(edge[2]+edge[3]), edge[0],edge[2], pm]
 
+ if(keyword_set(data.callback)) then $
+                call_procedure, data.callback, data.cb_data, xarr, yarr
+
 end
 ;=============================================================================
 
@@ -114,13 +117,17 @@ end
 pro tvpan, image, wnum=wnum, new=new, erase=erase, p0=p0, cursor=cursor, $
                    hourglass_id=hourglass_id, noplot=noplot, $
                    output_wnum=output_wnum, color=color, edge=edge, $
-                   notvim=notvim, doffset=doffset, pixmap=_pixmap, xor_graphics=xor_graphics
+                   notvim=notvim, doffset=doffset, pixmap=_pixmap, $
+                   xor_graphics=xor_graphics, $
+                   callback=callback, cb_data=cb_data, dxy=dxy
 
  xor_graphics = keyword_set(xor_graphics)
  if(NOT keyword_set(gr)) then gr = 3
  if(n_elements(edge) EQ 1) then edge = make_array(4, val=edge) $
  else if(NOT keyword_set(edge)) then edge = lonarr(4)
  if(n_elements(wnum) NE 0) then wset, wnum
+ if(NOT keyword_set(callback)) then callback = ''
+ if(NOT keyword_set(callback_data)) then callback_data = ''
 
  ;-------------------------------
  ; setup pixmap
@@ -133,13 +140,14 @@ pro tvpan, image, wnum=wnum, new=new, erase=erase, p0=p0, cursor=cursor, $
  ;-------------------------------
  ; get offset by dragging image
  ;-------------------------------
- tvcursor, /set, cursor=cursor
+ if(keyword_set(cursor)) then tvcursor, /set, cursor=cursor
  if(xor_graphics) then device, set_graphics=6 
  ln = tvline(wnum, /restore, p0=p0, color=color, /nodraw, pixmap=_pixmap, $
                fn_draw='tvpan_draw', fn_erase='tvpan_erase', $
-                      fn_data={pm:pixmap, edge:edge, xor_graphics:xor_graphics})
+                      fn_data={pm:pixmap, edge:edge, xor_graphics:xor_graphics, $
+                               callback:callback, cb_data:cb_data})
  if(xor_graphics) then device, set_graphics=3 
- tvcursor, /restore
+ if(keyword_set(cursor)) then tvcursor, /restore
  if(keyword_set(hourglass_id)) then widget_control, hourglass_id, /hourglass
 
  ;---------------------------------
@@ -152,17 +160,17 @@ pro tvpan, image, wnum=wnum, new=new, erase=erase, p0=p0, cursor=cursor, $
  ;---------------------------------
  ; derive tvim parameters
  ;---------------------------------
- doffset = [dx,dy]
+ dxy = [dx,dy]
 
  ;---------------------------------
  ; display moved image
  ;---------------------------------
  if(keyword_set(output_wnum)) then wset, output_wnum
  if(NOT keyword_set(notvim)) then $
-    tvim, image, /silent, doffset=doffset, /inherit, new=new, erase=erase, noplot=noplot, $
+  if((dxy[0] NE 0) OR (dxy[1] NE 0)) then $
+    tvim, image, /silent, doffset=dxy, /inherit, new=new, erase=erase, noplot=noplot, $
                                                    xsize=!d.x_size, ysize=!d.y_size
 
  wdelete, pixmap
-
 end
 ;=====================================================================================

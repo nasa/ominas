@@ -4,7 +4,7 @@
 ;  
 ;
 ;==============================================================================
-function radec_grid, cd, n=n, np=np
+pro radec_grid, cd, n=n, np=np, color=color, label=label
 
  if(NOT keyword_set(n)) then n = 15
  if(NOT keyword_set(np)) then np = 150
@@ -55,6 +55,7 @@ function radec_grid, cd, n=n, np=np
 
 ; plots, image_pts[*,*,0], psym=1
 
- return, grid_pts
+ plots, grid_pts, psym=3, color=color
+
 end
 ;==============================================================================

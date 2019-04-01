@@ -91,6 +91,12 @@
 ;			large blank areas, this may speed up the projection
 ;			greatly.
 ;
+;	float:	If set, the output mapis floating point instead of adopting
+;		the data tpe of the input image.
+;
+;	double:	If set, the output mapis double-precision floating point instead 
+;		of adopting the data tpe of the input image.
+;
 ;
 ;  OUTPUT:
 ;	map:	For convenience, the generated map is returned here as
@@ -122,7 +128,8 @@ function pg_map, dd, md=md, cd=cd, bx=bx, gbx=_gbx, dkx=dkx, ltd=ltd, gd=gd, $
                    aux_names=aux_names, pc_xsize=pc_xsize, pc_ysize=pc_ysize, $ 
                    bounds=bounds, interp=interp, arg_interp=arg_interp, $
                    offset=offset, edge=edge, shear_fn=shear_fn, shear_data=shear_data, $
-                   smooth=smooth, roi=roi, test_factor=test_factor
+                   smooth=smooth, roi=roi, test_factor=test_factor, $
+                   float=float, double=double
 
  ;-----------------------------------------------
  ; dereference the generic descriptor if given
@@ -181,6 +188,9 @@ function pg_map, dd, md=md, cd=cd, bx=bx, gbx=_gbx, dkx=dkx, ltd=ltd, gd=gd, $
    if(nn LT naux) then image = image[*,*,0:nn+1]
   end $
  else image = dat_data(dd)
+
+ if(keyword_set(float)) then image = float(image)
+ if(keyword_set(double)) then image = float(double)
 
 
  ;---------------------------------------

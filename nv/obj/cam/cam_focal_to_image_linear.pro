@@ -71,7 +71,7 @@ function cam_focal_to_image_linear, cd, v
  oaxis[0,*,*] = [_cd.oaxis[0,*,*]]##MM
  oaxis[1,*,*] = [_cd.oaxis[1,*,*]]##MM
 
- return, reform(vv/scale + oaxis, 2,nv,nt, /over)
+ return, reform(reform(vv/scale + oaxis, 2,nv,nt, /over), /over)
 end
 ;===========================================================================
 

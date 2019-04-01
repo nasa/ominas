@@ -53,7 +53,7 @@
 ;-
 ;=============================================================================
 function get_image_border_pts, cd, corners=corners, center=center, crop=crop, $
-                sample=sample, aperture=aperture
+                sample=sample, aperture=aperture, viewport=viewport
 
  if(NOT keyword_set(crop)) then crop = 0
  if(NOT keyword_set(center)) then center = cam_oaxis(cd)
@@ -63,8 +63,21 @@ function get_image_border_pts, cd, corners=corners, center=center, crop=crop, $
  nx = cam_size[0]/sample & ny = double(cam_size[1])/sample
  
  if(NOT keyword_set(corners)) then $
-   corners = tr([tr([0d,0]), tr([nx-1,0]), tr([nx-1,ny-1]), tr([0,ny-1])]) + 0.5
-
+  begin
+   if(NOT keyword_set(viewport)) then $
+     corners = transpose([tr([0d,0]), $
+               transpose([nx-1,0]), $
+               transpose([nx-1,ny-1]), $
+               transpose([0,ny-1])]) + 0.5 $
+   else $
+    begin
+     corners_device = transpose([tr([0d,0]), $
+                  transpose([!d.x_size-1,0]), $
+                  transpose([!d.x_size-1,!d.y_size-1]), $
+                  transpose([0,!d.y_size-1])]) + 0.5
+     corners = (convert_coord(/device, /to_data, corners_device))[0:1,*]
+    end
+  end
  corners = double(corners) + (center - cam_oaxis(cd))#make_array(4, val=1d)
 
  xmin = min(corners[0,*]) + crop

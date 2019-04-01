@@ -39,7 +39,10 @@
 ;
 ;	all:	If set, all planes are used.
 ;
-;	active:	If set, only active memebrs of the selected objects are
+;	visible:
+;		If set, all visible planes are used.
+;
+;	active:	If set, only active members of the selected objects are
 ;		returned.
 ;
 ;	grn:	Id of GRIM window to access.
@@ -54,8 +57,8 @@
 ;
 ;	<xd>:	Any descriptor maintained by GRIM.
 ;
-;	<xdx>:	Returnds all descriptors containing the given class, e.g., 
-;		bx, gbx, dkx.   Not implemented.
+;	<xdx>:	Returns all descriptors containing the given class, e.g., 
+;		bx, gbx, dkx.
 ;
 ;	<overlay>_ptd:
 ;		POINT object giving the points for the overlay of type <overlay>.
@@ -93,7 +96,7 @@
 ;	
 ;-
 ;=============================================================================
-pro grift, arg, plane=planes, pn=pn, all=all, active=active, grn=grn, tag=tag, $
+pro grift, arg, plane=planes, pn=pn, all=all, active=active, visible=visible, grn=grn, tag=tag, $
          gd=gd, $
          dd=dd, $
          cd=cd, $
@@ -106,7 +109,7 @@ pro grift, arg, plane=planes, pn=pn, all=all, active=active, grn=grn, tag=tag, $
          ltd=ltd, $
          od=od, $
          bx=bx, $
-         bbx=bbx, $
+         gbx=gbx, $
          dkx=dkx, $
          limb_ptd=limb_ptd, $
          ring_ptd=ring_ptd, $
@@ -177,10 +180,11 @@ _ref_extra=ex
  if(NOT keyword_set(planes)) then $
   begin
    if(keyword_set(all)) then planes = grim_get_plane(grim_data, /all) $
-   else planes = grim_get_plane(grim_data)
+   else if(keyword_set(visible)) then planes = grim_get_plane(grim_data, /visible) $
+   else planes = grim_get_plane(grim_data, pn=pn)
   end
  nplanes = n_elements(planes)
-
+ pn = planes.pn
 
  ;----------------------------------------------------------------
  ; build outputs
@@ -204,6 +208,9 @@ _ref_extra=ex
      sd = append_array(active_sd, (sdi=grim_xd(plane, /star, /active)))
      std = append_array(active_std, (stdi=grim_xd(plane, /station, /active)))
      ard = append_array(active_ard, (ardi=grim_xd(plane, /array, /active)))
+     bx = append_array(active_bx, (bxi=grim_xd(plane, /body, /active)))
+     gbx = append_array(active_gbx, (gbxi=grim_xd(plane, /globe, /active)))
+     dkx = append_array(active_dkx, (dkxi=grim_xd(plane, /disk, /active)))
 
      limb_ptd = append_array(limb_ptd, grim_ptd(plane, /limb, /active))
      ring_ptd = append_array(ring_ptd, grim_ptd(plane, /ring, /active))
@@ -232,6 +239,9 @@ _ref_extra=ex
      ard = cor_cull(append_array(ard, (ardi=grim_xd(plane, /ard))))
      ltd = cor_cull(append_array(ltd, (ltdi=grim_xd(plane, /ltd))))
      od = cor_cull(append_array(od, (odi=grim_xd(plane, /od))))
+     bx = cor_cull(append_array(bx, (bxi=grim_xd(plane, /bx))))
+     gbx = cor_cull(append_array(gbx, (gbxi=grim_xd(plane, /gbx))))
+     dkx = cor_cull(append_array(dkx, (dkxi=grim_xd(plane, /dkx))))
 
      limb_ptd = append_array(limb_ptd, grim_ptd(plane, /limb))
      ring_ptd = append_array(ring_ptd, grim_ptd(plane, /ring))

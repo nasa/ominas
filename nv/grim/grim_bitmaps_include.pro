@@ -377,8 +377,7 @@ end
 function grim_unselect_bitmap
 
 
- if(idl_v_chrono(!version.release) LT idl_v_chrono('6.1')) then $
-        return, [                               $
+ return, [                               $
                 [255B, 255B],                   $
                 [255B, 255B],                   $
                 [255B, 255B],                   $
@@ -396,11 +395,6 @@ function grim_unselect_bitmap
                 [255B, 255B],                   $
                 [255B, 255B]                    $
                 ]
-
- bm = bytarr(16,16,3)
- bm[*,*,*] = 128
-
- return, bm
 end
 ;=============================================================================
 
@@ -412,8 +406,7 @@ end
 ;=============================================================================
 function grim_select_bitmap
 
- if(idl_v_chrono(!version.release) LT idl_v_chrono('6.1')) then $
-       return,  [                               $
+ return,  [                               $
                 [255B, 255B],                   $
                 [127B, 254B],                   $
                 [127B, 254B],                   $
@@ -431,12 +424,6 @@ function grim_select_bitmap
                 [127B, 254B],                   $
                 [255B, 255B]                    $
                 ]
-
-
- bm = bytarr(16,16,3)
- bm[*,*,0] = 255
-
- return, bm
 end
 ;=============================================================================
 
@@ -909,10 +896,10 @@ end
 
 
 ;=============================================================================
-; grim_grid_bitmap
+; grim_radec_grid_bitmap
 ;
 ;=============================================================================
-function grim_grid_bitmap
+function grim_radec_grid_bitmap
 
  return, [                               $
                 [123B, 239B],                   $
@@ -1126,10 +1113,10 @@ end
 
 
 ;=============================================================================
-; grim_settings_bitmap
+; grim_overlay_settings_bitmap
 ;
 ;=============================================================================
-function grim_settings_bitmap
+function grim_overlay_settings_bitmap
 
  return, [                               $
                 [255B, 255B],                   $
@@ -1157,10 +1144,10 @@ end
 
 
 ;=============================================================================
-; grim_pixel_grid_bitmap
+; grim_viewport_grid_bitmap
 ;
 ;=============================================================================
-function grim_pixel_grid_bitmap
+function grim_viewport_grid_bitmap
 
  return, [                               $
                 [221B, 221B],                   $
@@ -1179,6 +1166,37 @@ function grim_pixel_grid_bitmap
                 [034B, 034B],                   $
                 [221B, 221B],                   $
                 [221B, 221B]                    $
+               ]
+
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_pixel_grid_bitmap
+;
+;=============================================================================
+function grim_pixel_grid_bitmap
+
+ return, [                               $
+                [001B, 000B],                   $
+                [109B, 091B],                   $
+                [001B, 000B],                   $
+                [109B, 091B],                   $
+                [109B, 091B],                   $
+                [001B, 000B],                   $
+                [109B, 091B],                   $
+                [109B, 091B],                   $
+                [001B, 000B],                   $
+                [109B, 091B],                   $
+                [109B, 091B],                   $
+                [001B, 000B],                   $
+                [109B, 091B],                   $
+                [109B, 091B],                   $
+                [001B, 000B],                   $
+                [255B, 255B]                    $
                ]
 
 

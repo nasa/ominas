@@ -24,7 +24,9 @@
 ;
 ;
 ; KEYWORDS:
-;  INPUT:  NONE
+;  INPUT:  
+;	superclass:	Returns the object's direct superclass instead of 
+;			its class.
 ;
 ;  OUTPUT: NONE
 ;
@@ -43,12 +45,12 @@
 ;	
 ;-
 ;=============================================================================
-function cor_class, xd
+function cor_class, xd, superclass=superclass
  if(NOT keyword_set(xd)) then return, ''
  dim = size([xd], /dim)
  n = n_elements(xd)
  class = strarr(dim)
- for i=0, n-1 do class[i] = strmid(obj_class(xd[i]), 7, 128)
+ for i=0, n-1 do class[i] = strmid(obj_class(xd[i], superclass=superclass), 7, 128)
  if(n EQ 1) then class = class[0]
  return, class
 end

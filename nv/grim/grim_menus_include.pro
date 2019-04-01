@@ -238,39 +238,25 @@ pro grim_load_files, grim_data, filenames, load_path=load_path, norefresh=norefr
  ;------------------------------------
  ; load each file onto a new plane
  ;------------------------------------
- nfiles = n_elements(filenames)
-
- first = 1
- for i=0, nfiles-1 do $
-  begin
-   dd = dat_read(filenames[i], nhist=grim_data.nhist, $
+ dd = dat_read(filenames, nhist=grim_data.nhist, $
             maintain=grim_data.maintain, compress=grim_data.compress, extensions=grim_data.extensions)
-   if(keyword_set(dd)) then $
-    begin
-     grim_add_planes, grim_data, dd, pn=pn, filter=filter
+ if(NOT keyword_set(dd)) then return
 
-     if(first) then $
-      begin
-       first = 0
-       grim_data.pn = pn[0]
-      end
+ grim_add_planes, grim_data, dd, pn=pn, filter=filter
+ grim_data.pn = pn[0]
+ plane = grim_get_plane(grim_data, pn=pn)
+ plane.load_path = load_path
+ grim_set_plane, grim_data, plane, pn=pn
 
-     plane = grim_get_plane(grim_data, pn=pn)
-     plane.load_path = load_path
-
-     grim_set_plane, grim_data, plane, pn=pn
-
-     nv_notify_register, dd, 'grim_descriptor_notify', scalar_data=grim_data.base
-   end
-  end
-
+ nv_notify_register, dd, 'grim_descriptor_notify', scalar_data=grim_data.base
 
  grim_set_data, grim_data, grim_data.base
+
 
  ;------------------------------------
  ; set initial zoom and display image
  ;------------------------------------
- dim = dat_dim(dd)
+ dim = dat_dim(dd[0])
  geom = widget_info(grim_data.draw, /geom)
 
  zoom = double(geom.xsize) / double(dim[0])
@@ -886,6 +872,7 @@ pro grim_render, grim_data, plane=plane
  image_pts = reform(image_pts, 2, !d.x_size,!d.y_size, /over)
 
  dat_set_sampling_data, new_plane.dd, image_pts
+
  grim_set_plane, grim_data, new_plane
  grim_set_data, grim_data, grim_data.base
 
@@ -1013,7 +1000,7 @@ pro grim_menu_file_load_event, event
  ;--------------------------
  if(keyword__set(plane.load_path)) then path = plane.load_path
  filenames = pickfiles(get_path=get_path, path=path, $
-                        filter=plane.filter, title='Select images to load')
+                        filter=plane.filter, title='Select file to load')
  if(NOT keyword__set(filenames[0])) then return
 
  ;----------------------------------
@@ -2324,7 +2311,7 @@ end
 ;=============================================================================
 ;+
 ; NAME:
-;	grim_select_event
+;	grim_menu_select_event
 ;
 ;
 ; PURPOSE:
@@ -2349,28 +2336,15 @@ end
 ;	
 ;-
 ;=============================================================================
-pro grim_select_help_event, event
+pro grim_menu_select_help_event, event
  text = ''
- nv_help, 'grim_select_help_event', cap=text
+ nv_help, 'grim_menu_select_help_event', cap=text
  if(keyword_set(text)) then grim_help, grim_get_data(event.top), text
 end
 ;----------------------------------------------------------------------------
-pro grim_select_event, event
+pro grim_menu_select_event, event
 
  grim_data = grim_get_data(event.top)
-
- ;---------------------------------------------------------
- ; if tracking event, just print usage info
- ;---------------------------------------------------------
- struct = tag_names(event, /struct)
- if(struct EQ 'WIDGET_TRACKING') then $
-  begin
-   if(event.enter) then $
-       grim_print, grim_data, 'Select/Deselect this grim window'
-   return
-  end $
- else if(NOT grim_test_motion_event(event)) then $
-                                               grim_set_primary, grim_data.base
 
  grim_select, grim_data
  grim_set_data, grim_data, event.top
@@ -2383,7 +2357,7 @@ end
 ;=============================================================================
 ;+
 ; NAME:
-;	grim_identify_event
+;	grim_menu_identify_event
 ;
 ;
 ; PURPOSE:
@@ -2405,29 +2379,15 @@ end
 ;	
 ;-
 ;=============================================================================
-pro grim_identify_help_event, event
+pro grim_menu_identify_help_event, event
  text = ''
- nv_help, 'grim_identify_help_event', cap=text
+ nv_help, 'grim_menu_identify_help_event', cap=text
  if(keyword_set(text)) then grim_help, grim_get_data(event.top), text
 end
 ;----------------------------------------------------------------------------
-pro grim_identify_event, event
+pro grim_menu_identify_event, event
 
  grim_data = grim_get_data(event.top)
-
- ;---------------------------------------------------------
- ; if tracking event, just print usage info
- ;---------------------------------------------------------
- struct = tag_names(event, /struct)
- if(struct EQ 'WIDGET_TRACKING') then $
-  begin
-   if(event.enter) then $
-       grim_print, grim_data, 'Identify this grim window'
-   return
-  end $
- else if(NOT grim_test_motion_event(event)) then $
-                                               grim_set_primary, grim_data.base
-
  grim_identify, grim_data
 
 end
@@ -2465,6 +2425,41 @@ pro grim_menu_file_close_event, event
 
  grim_data = grim_get_data(event.top)
  grim_rm_plane, grim_data, grim_data.pn
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
+;+
+; NAME:
+;	grim_menu_settings_event
+;
+;
+; PURPOSE:
+;	Open the miscellaeous settings dialog. 
+;
+;
+; CATEGORY:
+;	NV/GR
+;
+;
+; MODIFICATION HISTORY:
+; 	Written by:	Spitale, 7/2019
+;	
+;-
+;=============================================================================
+pro grim_menu_settings_help_event, event
+ text = ''
+ nv_help, 'grim_menu_settings_help_event', cap=text
+ if(keyword_set(text)) then grim_help, grim_get_data(event.top), text
+end
+;----------------------------------------------------------------------------
+pro grim_menu_settings_event, event
+
+ grim_data = grim_get_data(event.top)
+ grim_settings, grim_data
 
 end
 ;=============================================================================
@@ -7041,7 +7036,7 @@ end
 ;=============================================================================
 ;+
 ; NAME:
-;	grim_menu_points_settings_event
+;	grim_menu_overlay_settings_event
 ;
 ;
 ; PURPOSE:
@@ -7057,13 +7052,13 @@ end
 ;	
 ;-
 ;=============================================================================
-pro grim_menu_points_settings_help_event, event
+pro grim_menu_overlay_settings_help_event, event
  text = ''
- nv_help, 'grim_menu_points_settings_help_event', cap=text
+ nv_help, 'grim_menu_overlay_settings_help_event', cap=text
  if(keyword_set(text)) then grim_help, grim_get_data(event.top), text
 end
 ;----------------------------------------------------------------------------
-pro grim_menu_points_settings_event, event
+pro grim_menu_overlay_settings_event, event
 @grim_block.include
 
  grim_data = grim_get_data(event.top)

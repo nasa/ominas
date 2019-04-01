@@ -566,7 +566,7 @@ function grim_get_planets, grim_data, plane=plane, names=names
  ;- - - - - - - - - - - - - - - - - - - - - - - -
  grim_print, grim_data, 'Getting planet descriptors...'
  pd = pg_get_planets(plane.dd, od=cd, sd=ltd, $
-      name=names, plane.plt_trs, fov=fov, cov=cov, _extra=*grim_data.keyvals_p)
+         name=names, plane.plt_trs, fov=fov, cov=cov, _extra=*grim_data.keyvals_p)
 
  ;- - - - - - - - - - - - - - - - - - - - - - - -
  ; get planets that require primary descriptors

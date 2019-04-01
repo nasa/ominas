@@ -226,8 +226,7 @@ end
 ;=============================================================================
 pro wpf_call_ok, data
 
- if(NOT data.one) then files = *data.sel_p $
- else widget_control, data.sel_list, get_value=files
+ widget_control, data.sel_list, get_value=files
 
  if(data.one AND data.must_exist) then $
   begin
@@ -253,39 +252,8 @@ pro wpf_sel_text_event, event
  base = widget_info(event.top, find_by_uname='pickfiles_base')
  widget_control, base, get_uvalue=data
 
- widget_control, data.sel_list, get_value=file
- *data.sel_p = file
 
  wpf_call_ok, data
-end
-;=============================================================================
-
-
-
-;=============================================================================
-; wpf_sel_list_event
-;
-;=============================================================================
-pro wpf_sel_list_event, event
-
- base = widget_info(event.top, find_by_uname='pickfiles_base')
- widget_control, base, get_uvalue=data
-
-
- ;----------------------------------
- ; get selected indices
- ;----------------------------------
- w = widget_info(data.sel_list, /list_select)
- if(w[0] EQ -1) then return
-
- files = rm_list_item(*data.sel_p, w, only='')
-
- ;----------------------------------
- ; set selections list
- ;----------------------------------
- widget_control, data.sel_list, set_value=files
- *data.sel_p = files
-
 end
 ;=============================================================================
 
@@ -322,8 +290,11 @@ pro wpf_file_list_event, event
  ; set selections list
  ;----------------------------------
  if(keyword_set(data.sel_list)) then $
-                   widget_control, data.sel_list, set_value=files
- *data.sel_p = files
+  begin
+   widget_control, data.sel_list, get_value=current_files
+   widget_control, data.sel_list, $
+                set_value=unique(str_cull(append_array(current_files, files)))
+  end
 
 end
 ;=============================================================================
@@ -438,7 +409,7 @@ function widget_pickfiles, parent, path=_path, one=one, filter=filter, $
   end
 
  if(NOT keyword_set(path)) then path = ''
- sel = path + sep
+ sel = ''
  if(keyword_set(default)) then sel = default
 
  one = keyword__set(one)
@@ -477,15 +448,7 @@ function widget_pickfiles, parent, path=_path, one=one, filter=filter, $
  sel_list = 0
 
  sel_label = widget_label(base, value='File Name:', /align_left)
- if(one) then $
-    sel_list = widget_text(base, ysize=1, /editable, $
-                                          event_pro='wpf_sel_text_event') $
- else $
-    sel_list = widget_text(base, ysize=5, /editable, $
-                                          event_pro='wpf_sel_text_event')
-; else $
-;    sel_list = widget_list(base, ysize=5, multi=multi, $
-;                                           event_pro='wpf_sel_list_event')
+ sel_list = widget_text(base, ysize=one?1:5, /editable)
 
 
 
@@ -520,7 +483,6 @@ function widget_pickfiles, parent, path=_path, one=one, filter=filter, $
 	;---------------
 		must_exist	:	must_exist, $
 		one		:	one, $
-		sel_p		:	nv_ptr_new(sel), $
 		dirs_p		:	nv_ptr_new(0), $
 		files_p		:	nv_ptr_new(0), $
 		path		:	path $

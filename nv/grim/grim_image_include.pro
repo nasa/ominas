@@ -1019,7 +1019,7 @@ end
 ;
 ;=============================================================================
 pro grim_refresh, grim_data, wnum=wnum, plane=plane, $
- no_image=no_image, no_objects=no_objects, no_axes=no_axes, $
+ no_image=no_image, no_objects=no_objects, no_axes=no_axes, no_grid=no_grid, $
  no_title=no_title, home=home, xrange=xrange, yrange=yrange, $
  doffset=doffset, no_erase=no_erase, zoom=zoom, rotate=rotate, order=order, $
  default=default, previous=previous, flip=flip, restore=restore, $
@@ -1113,9 +1113,18 @@ pro grim_refresh, grim_data, wnum=wnum, plane=plane, $
 
 
  ;------------------------------------
+ ; redisplay viewport overlays
+ ;------------------------------------
+ if(NOT keyword_set(no_grid)) then $
+       if(NOT grim_data.hidden) then $
+           grim_draw_vp_overlays, grim_data, plane=plane, no_wset=no_wset
+
+
+ ;------------------------------------
  ; redisplay grids
  ;------------------------------------
  if(NOT keyword_set(no_axes)) then $
+       if(NOT grim_data.hidden) then $
            grim_draw_grids, grim_data, plane=plane, no_wset=no_wset
 
 
@@ -1131,6 +1140,7 @@ pro grim_refresh, grim_data, wnum=wnum, plane=plane, $
  ; redisplay axes
  ;------------------------------------
  if(NOT keyword_set(no_axes)) then $
+       if(NOT grim_data.hidden) then $
 	   grim_draw_axes, grim_data, data, plane=plane, $
 				   no_context=no_context, no_wset=no_wset
 

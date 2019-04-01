@@ -30,7 +30,7 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
            visibility=visibility, channel=channel, title=title, slave_overlays=slave_overlays, $
            render_rgb=render_rgb, render_current=render_current, render_spawn=render_spawn, render_minimum=render_minimum, $
            render_auto=render_auto, render_sky=render_sky, render_numbra=render_numbra, render_sampling=render_sampling, $
-           overlays=overlays, activate=activate
+           overlays=overlays, activate=activate, no_outline=no_outline, no_target=no_target, no_optic=no_optic, no_center=no_center
 @grim_block.include
 
   if(NOT keyword_set(keyvals)) then keyvals = ''
@@ -40,6 +40,11 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
 
   beta = keyword_set(beta)
   activate = keyword_set(activate)
+
+  no_target = keyword_set(no_target)
+  no_optic = keyword_set(no_optic)
+  no_center = keyword_set(no_center)
+  no_outline = keyword_set(no_outline)
 
   if(NOT keyword_set(user_psym)) then user_psym = 3
   if(NOT keyword_set(user_fn_graphics)) then user_fn_graphics = 3
@@ -93,6 +98,9 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
   if(NOT keyword_set(ytitle)) then ytitle = ''
 
   if(NOT keyword_set(tag)) then tag = ''
+
+  pointer_xy = dat_dim(dd[0])/2
+  if(NOT keyword_set(pointer_xy)) then pointer_xy = [0,0]
  
   crd = cor_create_descriptors()
 
@@ -117,7 +125,7 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
 		shortcuts_base8		: 0l, $
 		shortcuts_base9		: 0l, $
 		color_button		: 0l, $
-		settings_button		: 0l, $
+		overlay_settings_button	: 0l, $
 		crop_button		: 0l, $
 		fastforward_button	: 0l, $
 		next_button		: 0l, $
@@ -141,8 +149,9 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
 		deactivate_all_button	: 0l, $
 		guideline_button	: 0l, $
 		identify_button		: 0l, $
+		viewport_grid_button	: 0l, $
 		pixel_grid_button	: 0l, $
-		grid_button		: 0l, $
+		radec_grid_button	: 0l, $
 		remove_xd_button	: 0l, $
 		axes_button		: 0l, $
 		header_button		: 0l, $
@@ -185,6 +194,11 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
 		base_xsize		: 0l, $
 		base_ysize		: 0l, $
 
+		no_outline 		: no_outline, $
+		no_target		: no_target, $
+		no_optic		: no_optic, $
+		no_center		: no_center, $
+		pointer_xy		: pointer_xy, $
 		activate		: activate, $
 		beta			: beta, $
 		npoints			: npoints, $
@@ -201,6 +215,7 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
 		mode			: '', $
 		mode_data_p		: ptr_new(0), $
 		grid_flag		: 0, $
+		viewport_grid_flag	: 0, $
 		pixel_grid_flag		: 0, $
 		guideline_flag		: guideline_flag, $
 		guideline_pixmaps	: [0l,0l], $
@@ -261,6 +276,8 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
 
 		crd			: crd, $
 
+		settings_p		: ptr_new(0), $
+
 	;---------------
 	; planes
 	;---------------
@@ -285,8 +302,8 @@ function grim_init, dd, dd0=dd0, zoom=zoom, wnum=wnum, grn=grn, tag=tag, filter=
 		def_save_path	: save_path, $
 		def_filter	: filter, $
 
-		def_fov		: fov, $
-		def_clip	: clip, $
+		fov		: fov, $
+		clip		: clip, $
 		def_hide	: hide, $
 
 		def_color	: color[0], $
@@ -487,24 +504,33 @@ pro grim_set_primary, top
  if(old_primary EQ top) then return
 
  _primary = top
-
- ;-----------------------------------
- ; erase old primary frame
- ;-----------------------------------
-; if(widget_info(old_primary, /valid_id)) then $
- if(widget_info(old_primary, /managed)) then $
-  begin
-   grim_data = grim_get_data(old_primary)
-   grim_refresh, /use_pixmap, /no_objects, /no_image, grim_data, /noglass
-  end
-
- ;-----------------------------------
- ; set new primary and draw frame
- ;-----------------------------------
  grim_data = grim_get_data(_primary)
- _top = _primary
- grim_set_ct, grim_data
- grim_refresh, /no_image, /no_objects, grim_data, /noglass
+
+; ;-----------------------------------
+; ; erase old primary frame
+; ;-----------------------------------
+; if(widget_info(old_primary, /managed)) then $
+;  begin
+;   grim_data = grim_get_data(old_primary)
+;   grim_refresh, /use_pixmap, /no_objects, /no_image, grim_data, /noglass
+;  end
+
+; ;-----------------------------------
+; ; set new primary and draw frame
+; ;-----------------------------------
+; grim_data = grim_get_data(_primary)
+; _top = _primary
+; grim_set_ct, grim_data
+; grim_refresh, /no_image, /no_objects, grim_data, /noglass
+
+
+ ;-----------------------------------
+ ; desensitize all but primary
+ ;-----------------------------------
+ for i=0, n_elements(_all_tops)-1 do $
+                 if(widget_info(_all_tops[i], /valid_id)) then $
+                                   widget_control, _all_tops[i], sensitive=0
+ widget_control, _primary, sensitive=1
 
 
  ;-----------------------------------

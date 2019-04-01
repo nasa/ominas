@@ -32,7 +32,8 @@ end
 ; grim_xd
 ;
 ;=============================================================================
-function grim_xd, plane, class=_class, active=active, inactive=inactive, _ref_extra=keys
+function grim_xd, plane, class=_class, $
+       active=active, inactive=inactive, visible=visible, _ref_extra=keys
 
 ;** return, cor_dereference_gd(*plane.gd_p, _ref_extra=keys)
 
@@ -75,6 +76,23 @@ function grim_xd, plane, class=_class, active=active, inactive=inactive, _ref_ex
  if((where(keys EQ 'STD'))[0] NE -1) then xds = append_array(xds, *plane.std_p)
  if((where(keys EQ 'ARD'))[0] NE -1) then xds = append_array(xds, *plane.ard_p)
  if((where(keys EQ 'LTD'))[0] NE -1) then xds = append_array(xds, *plane.ltd_p)
+ if((where(keys EQ 'BX'))[0] NE -1) then $
+  begin
+   xds = append_array(xds, *plane.pd_p)
+   xds = append_array(xds, *plane.rd_p)
+   xds = append_array(xds, *plane.sd_p)
+   xds = append_array(xds, *plane.ltd_p)
+  end
+ if((where(keys EQ 'GBX'))[0] NE -1) then $
+  begin
+   xds = append_array(xds, *plane.pd_p)
+   xds = append_array(xds, *plane.sd_p)
+   xds = append_array(xds, *plane.ltd_p)		;;;;;;
+  end
+ if((where(keys EQ 'DKX'))[0] NE -1) then $
+  begin
+   xds = append_array(xds, *plane.rd_p)
+  end
 
  if((where(keys EQ 'SKY'))[0] NE -1) then xds = append_array(xds, *plane.skd_p)
  if((where(keys EQ 'CAMERA'))[0] NE -1) then xds = append_array(xds, *plane.cd_p)
@@ -86,6 +104,23 @@ function grim_xd, plane, class=_class, active=active, inactive=inactive, _ref_ex
  if((where(keys EQ 'STATION'))[0] NE -1) then xds = append_array(xds, *plane.std_p)
  if((where(keys EQ 'ARRAY'))[0] NE -1) then xds = append_array(xds, *plane.ard_p)
  if((where(keys EQ 'LIGHT'))[0] NE -1) then xds = append_array(xds, *plane.ltd_p)
+ if((where(keys EQ 'BODY'))[0] NE -1) then $
+  begin
+   xds = append_array(xds, *plane.pd_p)
+   xds = append_array(xds, *plane.rd_p)
+   xds = append_array(xds, *plane.sd_p)
+   xds = append_array(xds, *plane.ltd_p)
+  end
+ if((where(keys EQ 'GLOBE'))[0] NE -1) then $
+  begin
+   xds = append_array(xds, *plane.pd_p)
+   xds = append_array(xds, *plane.sd_p)
+   xds = append_array(xds, *plane.ltd_p)		; not necessarily a globe
+  end
+ if((where(keys EQ 'DISK'))[0] NE -1) then $
+  begin
+   xds = append_array(xds, *plane.rd_p)
+  end
 
  return, grim_select_active(xds, active=active, inactive=inactive)
 end

@@ -62,27 +62,26 @@
 ;=============================================================================
 pro dsk_image_bounds, cd, dkx, slop=slop, border_pts_im=border_pts_im, $
    radmin=radmin, radmax=radmax, lonmin=lonmin, lonmax=lonmax, np=npp, $
-   plane=plane, status=status, crop=crop
+   plane=plane, status=status, crop=crop, corners=corners, viewport=viewport
 
  status = -1
 
  if(NOT keyword_set(np)) then npp = 1000
- if(NOT keyword_set(slop)) then slop = 1
 
  ;-----------------------------------
  ; compute image border points
  ;-----------------------------------
  if(NOT keyword_set(border_pts_im)) then $
-                            border_pts_im = get_image_border_pts(cd, crop=crop)
+      border_pts_im = get_image_border_pts(cd, crop=crop, corners=corners, viewport=viewport)
  np = n_elements(border_pts_im)/2
+
+ if(keyword_set(slop)) then corners = !null $
+ else slop = 1
 
 
  ;-----------------------------------
  ; compute ring intersections
  ;-----------------------------------
- r = bod_inertial_to_body(dkx, image_to_inertial(cd, border_pts_im))
- v = bod_inertial_to_body_pos(dkx, bod_pos(cd) ## make_array(np, val=1d))
-
  nv_suspend_events
  sma0 = dsk_sma(dkx)
  if(keyword_set(plane)) then $
@@ -92,7 +91,7 @@ pro dsk_image_bounds, cd, dkx, slop=slop, border_pts_im=border_pts_im, $
    dsk_set_sma, dkx, sma
   end
 
- int_pts_body = dsk_intersect(dkx, v, r, hit=hit)
+ border_pts_disk = image_to_disk(cd, dkx, border_pts_im, hit=hit, body_pts=int_pts_body)
 
  dsk_set_sma, dkx, sma0
  nv_resume_events
@@ -118,7 +117,7 @@ pro dsk_image_bounds, cd, dkx, slop=slop, border_pts_im=border_pts_im, $
  disk_image_pts1 = reform(inertial_to_image_pos(cd, disk_inertial_pts1))
  disk_image_pts = tr([tr(disk_image_pts0), tr(disk_image_pts1)])
 
- w = in_image(cd, disk_image_pts, slop=slop)
+ w = in_image(cd, disk_image_pts, slop=slop, corners=corners)
  if(w[0] NE -1) then all_pts = append_array(all_pts, disk_inertial_pts[w,*])
 
  if(NOT keyword_set(all_pts)) then return

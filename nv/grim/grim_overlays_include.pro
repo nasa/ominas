@@ -710,11 +710,55 @@ end
 
 
 ;=============================================================================
+; grim_draw_vp_overlays
+;
+;=============================================================================
+pro grim_draw_vp_overlays, grim_data, plane=plane, no_wset=no_wset
+@grim_block.include
+
+ ;--------------------------------------------
+ ; image
+ ;--------------------------------------------
+ if(grim_data.type NE 'PLOT') then $
+  begin
+
+   ;----------------------------
+   ; viewport grid
+   ;----------------------------
+   if(grim_data.viewport_grid_flag) then $
+     viewport_grid, wnum=grim_data.wnum, col=ctgray(0.75)
+
+   ;----------------------------
+   ; viewport center 
+   ;----------------------------
+   if(NOT keyword_set(grim_data.no_center)) then $
+     plots, /device, 0.5*[!d.x_size,!d.y_size], psym=7, symsize=4, col=ctwhite()
+
+
+  end $
+ ;--------------------------------------------
+ ; plot
+ ;--------------------------------------------
+ else $
+  begin
+
+  end
+
+
+ 
+end
+;=============================================================================
+
+
+
+;=============================================================================
 ; grim_draw_grids
 ;
 ;=============================================================================
 pro grim_draw_grids, grim_data, plane=plane, no_wset=no_wset
 @grim_block.include
+
+ cd = grim_xd(plane, /cd)
 
  ;--------------------------------------------
  ; image
@@ -726,15 +770,17 @@ pro grim_draw_grids, grim_data, plane=plane, no_wset=no_wset
    ; RA/DEC grid
    ;----------------------------
    if(grim_data.grid_flag) then $
-    begin
-     cd = grim_xd(plane, /cd)
-     if(keyword_set(cd)) then plots, radec_grid(cd), psym=3, col=ctblue()
-    end
+    if(keyword_set(cd)) then $
+     if(cor_class(cd) EQ 'CAMERA') then radec_grid, cd, col=ctblue(0.75)
+
    ;----------------------------
-   ; pixel grid
+   ; image grid
    ;----------------------------
    if(grim_data.pixel_grid_flag) then $
-               plots, pixel_grid(wnum=grim_data.wnum), psym=3, col=ctpurple()
+    begin
+     dim = dat_dim(plane.dd)
+     pixel_grid, /label, wnum=grim_data.wnum, dim[0], dim[1], col=ctgreen(0.5)
+    end
 
   end $
  ;--------------------------------------------
@@ -769,32 +815,43 @@ pro grim_draw_axes, grim_data, data, plane=plane, $
 ;   plot, [0], [0], /noerase, /data, pos=[mg,mg, 1.0-mg,1.0-mg]
 
    cd = grim_xd(plane, /cd)
-
-
-   ;----------------------------
-   ; main window image outline
-   ;----------------------------
    if(keyword_set(cd)) then dim = image_size(cd) $
    else dim = dat_dim(plane.dd)
-
    xsize = dim[0]
    ysize = dim[1]
 
-   plots, [-0.5,xsize-0.5,xsize-0.5,-0.5,-0.5], $
-          [-0.5,-0.5,ysize-0.5,ysize-0.5,-0.5], line=1
+
+   ;----------------------------
+   ; viewport outline
+   ;----------------------------
+   if(NOT keyword_set(grim_data.no_outline)) then $
+       plots, [-0.5,xsize-0.5,xsize-0.5,-0.5,-0.5], $
+              [-0.5,-0.5,ysize-0.5,ysize-0.5,-0.5], line=1
 
 
    ;----------------------------
    ; optic axis 
    ;----------------------------
-   if(keyword_set(cd)) then $
-    if(cor_class(cd) EQ 'CAMERA') then $
-     begin
-      oaxis = cam_oaxis(cd)
- 
-      plots, oaxis, psym=1, symsize=4, col=ctred()
-     end
+   if(NOT keyword_set(grim_data.no_optic)) then $
+    if(keyword_set(cd)) then $
+     if(cor_class(cd) EQ 'CAMERA') then $
+      begin
+       oaxis = cam_oaxis(cd)
+       plots, oaxis, psym=6, symsize=3, col=ctgreen()
+       plots, oaxis, psym=1, symsize=4, col=ctgreen()
+      end
 
+
+   ;----------------------------
+   ; target pointer 
+   ;----------------------------
+   if(NOT keyword_set(grim_data.no_target)) then $
+    begin
+     plotsym, 0
+     plots, grim_data.pointer_xy, psym=8, symsize=2, col=ctred()
+     plots, grim_data.pointer_xy, psym=8, symsize=4, col=ctred()
+     plots, grim_data.pointer_xy, psym=1, symsize=6, col=ctred()
+    end
 
 
 
@@ -848,12 +905,12 @@ pro grim_draw_axes, grim_data, data, plane=plane, $
  ;-----------------------------------------------
  ; primary window indicator outline
  ;-----------------------------------------------
- color = 0
- if(NOT widget_info(_primary, /valid)) then _primary = grim_data.base
- if(grim_data.base EQ _primary) then color = ctred() 
- if(NOT keyword__set(no_wset)) then grim_wset, grim_data, grim_data.wnum
- plots, [0,!d.x_size-1,!d.x_size-1,0,0], [0,0,!d.y_size-1,!d.y_size-1,0], $
-           th=5, /device, color=color
+; color = 0
+; if(NOT widget_info(_primary, /valid)) then _primary = grim_data.base
+; if(grim_data.base EQ _primary) then color = ctred() 
+; if(NOT keyword__set(no_wset)) then grim_wset, grim_data, grim_data.wnum
+; plots, [0,!d.x_size-1,!d.x_size-1,0,0], [0,0,!d.y_size-1,!d.y_size-1,0], $
+;           th=5, /device, color=color
 
 
  ;-----------------------------------------------
@@ -2716,6 +2773,31 @@ pro grim_trim_overlays, grim_data, plane=plane, region
    if(keyword_set(ptd)) then pg_trim, 0, pnt_cull(ptd, /nofree), region
   end
 
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_get_pointer
+;
+;=============================================================================
+function grim_get_pointer, grim_data
+ if(NOT keyword_set(grim_data)) then grim_data = grim_get_data()
+ return, grim_data.pointer_xy
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_set_pointer
+;
+;=============================================================================
+pro grim_set_pointer, grim_data, p0
+ p = (convert_coord(p0[0], p0[1], /device, /to_data))[0:1]
+ grim_data.pointer_xy = p
+ grim_set_data, grim_data, grim_data.base
 end
 ;=============================================================================
 

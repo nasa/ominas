@@ -156,6 +156,6 @@ common pickfiles_block, files, base, out_path, options_dl, options_i
 
  options_dl = 0
 
- return, files
+ return, str_cull(files)
 end
 ;=============================================================================

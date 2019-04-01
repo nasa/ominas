@@ -551,8 +551,8 @@ pro grim_add_planes, grim_data, dd, pns=pns, filter=filter, fov=fov, clip=clip, 
   if(NOT defined(render_sky)) then render_sky = 0
   if(NOT defined(render_auto)) then render_auto = 0
 
-  if(NOT keyword_set(fov)) then fov = grim_data.def_fov
-  if(NOT keyword_set(clip)) then clip = grim_data.def_clip
+  if(NOT keyword_set(fov)) then fov = grim_data.fov
+  if(NOT keyword_set(clip)) then clip = grim_data.clip
   if(NOT keyword_set(hide)) then hide = grim_data.def_hide
   if(NOT keyword_set(filter)) then filter = grim_data.def_filter
   if(NOT keyword_set(visibility)) then visibility = 0

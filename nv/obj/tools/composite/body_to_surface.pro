@@ -55,10 +55,8 @@ function body_to_surface, bx, p
  ii_bx = rm_list_item(lindgen(nt), [ii_gbx, ii_dkx], only=-1)
 
  if(keyword_set(gbx)) then $
-;            result[*,*,ii_gbx] = glb_body_to_globe(gbx[ii_gbx], p[*,*,ii_gbx])
             result[*,*,ii_gbx] = glb_body_to_globe(gbx, p[*,*,ii_gbx])
  if(keyword_set(dkx)) then $
-;            result[*,*,ii_dkx] = dsk_body_to_disk(dkx[ii_dkx], p[*,*,ii_dkx])
             result[*,*,ii_dkx] = dsk_body_to_disk(dkx, p[*,*,ii_dkx])
  if(ii_bx[0] NE -1) then $
             result[*,*,ii_bx] = bod_body_to_radec(bx[ii_bx], p[*,*,ii_bx])

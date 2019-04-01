@@ -43,16 +43,17 @@
 ;	
 ;-
 ;=============================================================================
-function cor_tree, od
+function cor_tree, _od
 @core.include
 
+ od = _od
  class = cor_class(od)
  repeat $
   begin
    super = cor_class(od, /super)
    classes = append_array(classes, class)
    if(class EQ 'CORE') then return, classes
-   od = obj_new(super[0],1)
+   od = obj_new('OMINAS_' + super[0],1)
    class = super
   endrep until(0)
 

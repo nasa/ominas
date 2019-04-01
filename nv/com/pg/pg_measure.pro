@@ -115,11 +115,12 @@ end
 ;=============================================================================
 function _pgm_xy, p, dd, xd, gd=gd, format=format, label=label, inertial_pt=inertial_pt, surface_pt=surface_pt
 
- label = ['dX', 'dY', 'DIAG']
- format = ['(d20.10)', '(d20.10)', '(d20.10)']
+ label = ['dX', 'dY', 'DIAG', 'ANGLE(deg)']
+ format = ['(d20.10)', '(d20.10)', '(d20.10)', '(d20.10)']
 
  dp = p[*,1]-p[*,0]
- return, [dp, p_mag(dp)]
+ theta = atan(dp[1],dp[0]) *180d/!dpi
+ return, [dp, p_mag(dp), theta]
 end
 ;=============================================================================
 
@@ -232,7 +233,7 @@ function _pgm_radec, p, dd, xd, gd=gd, format=format, label=label, inertial_pt=i
 
  cd = cor_dereference_gd(gd, /cd)
 
- label = ['dRA', 'dDEC', 'ANGLE']
+ label = ['dRA', 'dDEC', 'ANGLE(deg)']
  format = ['(1d10.5)', '(1d10.5)', '(1d10.5)']
 
  radec = transpose(image_to_radec(cd, p))
@@ -295,13 +296,13 @@ end
 ;=============================================================================
 function _pgm_globe, p, dd, xd, gd=gd, format=format, label=label, inertial_pt=inertial_pt, surface_pt=surface_pt
 
- format = ['(1g10.5)', '(1g10.5)'];, '(1g10.5)']
+ format = ['(d20.10)', '(d20.10)'];, '(d20.10)']
  label = ''
 
  v = surface_pt[0,*,1] - surface_pt[0,*,0]
  v[0:1] = v[0:1] *180d/!dpi
 
- label = ['dLAT', 'dLON'];, 'dRAD']
+ label = ['dLAT(deg)', 'dLON(deg)'];, 'dRAD']
 
  return, v[0:1]
 end
@@ -465,7 +466,7 @@ function _pgm_map, p, dd, xd, gd=gd, format=format, label=label, inertial_pt=ine
 
  cd = cor_dereference_gd(gd, /cd)
 
- format = ['(1g10.5)', '(1g10.5)']
+ format = ['(d20.10)', '(d20.10)']
  label = ''
 
  nt = n_elements(name)
@@ -476,7 +477,7 @@ function _pgm_map, p, dd, xd, gd=gd, format=format, label=label, inertial_pt=ine
  
  v = v[*,valid] * 180d/!dpi
 
- label = ['dLAT', 'dLON']
+ label = ['dLAT(deg)', 'dLON(deg)']
 
  return, v 
 end

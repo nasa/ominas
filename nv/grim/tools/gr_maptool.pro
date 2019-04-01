@@ -30,38 +30,106 @@
 ; LAYOUT:
 ;	The gr_maptool layout consists of the following items:
 ;
-;	 Map projection control:
-;		A map projection is selected using the droplist and 
-;		the map parameters are input using the text widgets below.
-;		Angles are in radians.
+;	 'Projection':
+;		Controls which map projection to use.
 ;
-;	'Ok' button:
+;	 'Size':
+;		Sets the size of the map in pixels.
+;
+;	 'Center':
+;		Sets the center of the map in map units (e.g. radians for 
+;		GLOBEs).  If empty, the center is computed from the GRIM pointer.
+;
+;	 'Uniform Scale':
+;		If set, the length scale at the map center is uniform in 
+;		both directions.
+;
+;	 'Full Range':
+;		If set, the full range is used for the map instead of computing;
+;		a narrower map based on the current viewport.
+;
+;	 'Ok':
 ;		Creates the map projection described by the current widget
 ;		settings and exits.
 ;
-;	'Apply' button:
+;	 'Apply':
 ;		Creates the map projection described by the current widget
 ;		settings without exiting.
 ;
-;	'Cancel' button
+;	 'Cancel' button
 ;		Exits with no map projection.		
 ;
+; OPERATION
+;	The target is selected using the GRIM pointer.  Any active objects
+;	are used for hiding.  
 ;
 ;
-; OPERATION:
-;	gr_ maptool allows the user to create map projections of images
-;	using a simple graphical interface.  It is most easily run from within
-;	GRIM, but may be run directly from the command line as well.
-;
-;
-; STATUS:
-;	Incomplete.
+; STATUS
+;	Incomplete:
+;	- grmt_compute_globe is not complete
+;	- Uniform scaling not imlpemented for globe maps
+;	- Should be extended to project from a map
+;	- Project all visible planes and transfer plane settings
 ;
 ;
 ; MODIFICATION HISTORY:
 ; 	Written by:	Spitale 7/2002
+;	Reworked:	Spitale 2/2019
 ;	
 ;-
+;=============================================================================
+
+
+
+;=============================================================================
+; grmt_get_target
+;
+;=============================================================================
+function grmt_get_target, cd, bx
+
+ raytrace, grim_get_pointer(), cd=cd, bx=bx, hit_indices=hits
+ if(hits[0] EQ -1) then return, 0
+ return, bx[hits[0]]
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grmt_get_descriptors
+;
+;=============================================================================
+function grmt_get_descriptors, dd=dd, cd=cd, ltd=ltd, pd=pd, rd=rd, bx=bx
+
+ ;----------------------------------------
+ ; get scene
+ ;----------------------------------------
+ grift, dd=dd, cd=cd, ltd=ltd, bx=all_bx
+ if(cor_class(cd) NE 'CAMERA') then $
+  begin
+   grim_message, 'Input must ba a CAMERA image.'
+   return, 0
+  end
+
+ grift, /active, pd=pd, rd=rd
+
+ ;----------------------------------------
+ ; determine object to project
+ ;----------------------------------------
+ bx = grmt_get_target(cd, all_bx)
+
+ ;----------------------------------------
+ ; make gd
+ ;----------------------------------------
+ gd = {dd:	dd, $
+       cd:	cd, $
+       ltd:	keyword_set(ltd) ? ltd:0, $
+       pd:	keyword_set(pd) ? pd:0, $
+       rd:	keyword_set(rd) ? rd:0, $
+       bx:	bx}
+
+ return, gd
+end
 ;=============================================================================
 
 
@@ -83,106 +151,15 @@ end
 
 
 ;=============================================================================
-; grmt_create_map
+; grmt_query_setting
 ;
 ;=============================================================================
-pro grmt_create_map, data, md
+function grmt_query_setting, ids, tags, tag
 
- grift, dd=dd, cd=cd, ltd=ltd, pd=all_pd
- grift, /active, pd=pd, rd=rd
- class = cor_udata(md, 'CLASS')
- 
- if(NOT keyword__set(cd)) then $
-  begin
-   grim_message, 'No camera descriptor.'
-   return
-  end
+ i = (where(tags EQ tag))[0]
+ widget_control, ids[i], get_value=value
 
- if(NOT keyword__set(ltd)) then $
-  begin
-   grim_message, 'No light descriptor.'
-   return
-  end
-
-
- ;-----------------------------------
- ; project map
- ;-----------------------------------
- widget_control, /hourglass
-
- case class of
-  'GLOBE' : $
-	begin
-	 if(keyword_set(rd)) then $
-	  begin
-	   hide_fn = 'pm_hide_ring'
-           hide_bx = rd
-	  end
-
-	 if(keyword_set(pd)) then $
-          begin
-           cor_set_name, md, cor_name(pd[0])
-           gbx = pd[0]
-	   map_pd = pd[0]
-          end $
-;         else cor_set_name, md, cor_name(cd)
-         else $
-          begin
-           grim_message, 'No planet descriptor.'
-           return
-          end
-
-	 aux= ['EMM']
-
-	 dd_map = pg_map(dd, $
-                    md=md, $
-                    cd=cd, $
-                    ltd=ltd, $
-                    gbx=gbx, aux=['EMM'], $
-                    hide_fn=hide_fn, hide_bx=hide_bx)
-	end
-
-  'DISK' : $
-	begin
-; need to sort out the map units...
- grim_message, 'Not complete.'
- return
-
-	 if(NOT keyword_set(rd)) then $
-	  begin
-	   grim_message, 'No active ring descriptor.'
-	   return
-	  end
-	 if(NOT keyword_set(all_pd)) then $
-	  begin
-	   grim_message, 'No globe descriptor.'
-	   return
-	  end
-
-	 cor_set_name, md, cor_name(rd[0])
-
-	 dd_map = pg_map(dd, bx=rd[0], $
-                    md=md, $
-                    cd=cd, $
-                    ltd=ltd, $
-                    gbx=all_pd, $
-                    hide_fn=hide_fn, hide_bx=hide_bx)
-
-	 map_rd = rd[0]
-	end
-
- endcase
-
-
- ;-----------------------------------
- ; open map in grim
- ;-----------------------------------
- if(cor_class(cd) NE 'MAP') then od = cd
- grim, /new, dd_map, cd=md, od=od, ltd=ltd, pd=map_pd, rd=map_rd, $
-              /tiepoint_sync, /curve_sync, order=1-data.order, $
-              title=map_projection(md) + ' ' + cor_name(dd)
-
-
+ return, value
 end
 ;=============================================================================
 
@@ -236,14 +213,10 @@ function grmt_form_to_md, data, projection=projection
                grmt_parse_entry(data.ids, data.tags, 'CLASS', /drop)])
 
  size = long(grmt_parse_entry(data.ids, data.tags, 'SIZE'))
- scale = double(grmt_parse_entry(data.ids, data.tags, 'SCALE'))
- origin = double(grmt_parse_entry(data.ids, data.tags, 'ORIGIN'))
 
- units = double(grmt_parse_entry(data.ids, data.tags, 'UNITS'))
- center = double(grmt_parse_entry(data.ids, data.tags, 'CENTER'))
-
- if(class EQ 'DISK') then center[1] = center[1] * !dpi/180d $
- else center = center * !dpi/180d
+ center = grmt_parse_entry(data.ids, data.tags, 'CENTER')
+ if(NOT keyword_set(center[0])) then center = [!values.d_nan, !values.d_nan] $
+ else center = double(center)
 
  if(NOT keyword__set(projection)) then $
   begin
@@ -253,11 +226,9 @@ function grmt_form_to_md, data, projection=projection
 
  md = map_create_descriptors(1, $
 		projection=projection, $
+		center=center, $
 		size=size, $
-		scale=scale, $
-		origin=origin, $
-		units=units, $
-		center=center)
+                origin=size/2d)
 
  cor_set_udata, md, 'CLASS', class
 
@@ -274,16 +245,11 @@ end
 pro grmt_md_to_form, data, md
 
  grmt_set_entry, data.ids, data.tags, 'SIZE', map_size(md)
- grmt_set_entry, data.ids, data.tags, 'SCALE', map_scale(md)
 
- origin = strtrim(map_origin(md), 2)
- grmt_set_entry, data.ids, data.tags, 'ORIGIN', strmid(origin, 0, 6)
-
- units = strtrim(map_units(md), 2)
- grmt_set_entry, data.ids, data.tags, 'UNITS', strmid(units, 0, 6)
-
- center = strtrim(map_center(md) * 180d/!dpi, 2)
- grmt_set_entry, data.ids, data.tags, 'CENTER', strmid(center, 0, 6)
+ center = map_center(md)
+ w = where(finite(center))
+ if(w[0] EQ -1) then center = ''
+ grmt_set_entry, data.ids, data.tags, 'CENTER', center
 
  projection_index = (where(strupcase(data.projections) EQ map_projection(md)))[0]
  grmt_set_entry, data.ids, data.tags, 'PROJECTION', projection_index, /drop
@@ -291,6 +257,170 @@ pro grmt_md_to_form, data, md
  data.last_projection = data.projections[projection_index]
  widget_control, data.base, set_uvalue=data
 
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grmt_compute_globe
+;
+;=============================================================================
+function grmt_compute_globe, data, md
+
+ ;----------------------------------------
+ ; get settings
+ ;----------------------------------------
+ gd = grmt_get_descriptors(dd=dd, cd=cd, bx=pd)
+ uniform = grmt_query_setting(data.ids, data.tags, 'UNIFORM')
+ full = grmt_query_setting(data.ids, data.tags, 'FULL')
+
+
+ ;----------------------------------------
+ ; get map center
+ ;----------------------------------------
+ center = map_center(md)
+ w = where(finite(center))
+ if(w[0] EQ -1) then $
+  begin
+   center_image = grim_get_pointer()
+   center_globe = image_to_globe(cd, pd, center_image)
+  end $
+ else center_globe = double(center)
+
+
+ ;----------------------------------------
+ ; get map scale
+ ;----------------------------------------
+ size = map_size(md)
+ glb_image_bounds, cd, pd, $
+    latmin=latmin, latmax=latmax, lonmin=lonmin, lonmax=lonmax, /viewport
+ reslat = 1.1*abs(latmax-latmin)/size[1]
+ reslon = 1.1*abs(lonmax-lonmin)/size[0]
+
+
+; ;----------------------------------------
+; ; correction for uniform scaling
+; ;----------------------------------------
+; if(uniform) then $
+;  begin
+;  end
+
+
+ ;----------------------------------------
+ ; implement full map
+ ;----------------------------------------
+ if(full) then $
+  begin
+   center_globe = [0d,0d]
+   reslat = !dpi/size[1]
+   reslon = 2d*!dpi/size[0]
+  end
+
+
+ ;----------------------------------------
+ ; update map descriptor
+ ;----------------------------------------
+ map_assign, md, $
+      center=center_globe[0:1]
+
+ return, md
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grmt_compute_disk
+;
+;=============================================================================
+function grmt_compute_disk, data, md
+
+ ;----------------------------------------
+ ; get settings
+ ;----------------------------------------
+ gd = grmt_get_descriptors(dd=dd, cd=cd, bx=rd)
+ uniform = grmt_query_setting(data.ids, data.tags, 'UNIFORM')
+ full = grmt_query_setting(data.ids, data.tags, 'FULL')
+
+
+ ;----------------------------------------
+ ; get map center
+ ;----------------------------------------
+ center = map_center(md)
+ w = where(finite(center))
+ if(w[0] EQ -1) then $
+  begin
+   center_device = 0.5*[!d.x_size, !d.y_size]
+   center_image = (convert_coord(/device, /to_data, center_device))[0:1]
+   center_disk = image_to_disk(cd, rd, center_image)
+  end $
+ else center_disk = double(center)
+
+
+ ;----------------------------------------
+ ; get map scale
+ ;----------------------------------------
+ size = map_size(md)
+ dsk_image_bounds, cd, rd, $
+    radmin=radmin, radmax=radmax, lonmin=lonmin, lonmax=lonmax, /viewport
+ resrad = 1.1*abs(radmax-radmin)/size[1]
+ reslon = 1.1*abs(lonmax-lonmin)/size[0]
+
+
+ ;----------------------------------------
+ ; correction for uniform scaling
+ ;----------------------------------------
+ if(uniform) then $
+  begin
+   urad = reslon*center_disk[0]
+   ulon = resrad/center_disk[0]
+   if(urad GT ulon) then resrad = urad $
+   else reslon = ulon
+  end
+
+
+ ;----------------------------------------
+ ; implement full map
+ ;----------------------------------------
+ if(full) then $
+  begin
+   sma = (dsk_sma(rd))[0,*]
+   center_disk = [mean(sma),0d]
+   resrad = (sma[1]-sma[0])/size[1]
+   reslon = 2d*!dpi/size[0]
+  end
+
+
+ ;----------------------------------------
+ ; update map descriptor
+ ;----------------------------------------
+ map_assign, md, $
+      center=center_disk[0:1], $
+      units=map_units_disk(md, resrad=resrad, reslon=reslon)
+
+ return, md
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grmt_compute
+;
+;=============================================================================
+function grmt_compute, data, bx
+
+ md = grmt_form_to_md(data)
+
+ classes = cor_tree(bx)
+ for i=0, n_elements(classes)-1 do $
+  begin
+   fn = 'grmt_compute_' + strlowcase(classes[i])
+   if(routine_exists(fn)) then return, call_function(fn, data, md)
+  end
+
+ return, !null
 end
 ;=============================================================================
 
@@ -317,7 +447,7 @@ end
 ;=============================================================================
 pro grmt_refresh_callback, data_p
  @grim_block.include
-
+return
 
  if(NOT ptr_valid(data_p)) then return
  
@@ -328,8 +458,7 @@ pro grmt_refresh_callback, data_p
  if(NOT widget_info(data.ids[w1], /valid_id)) then return
  if(NOT widget_info(data.ids[w2], /valid_id)) then return
 
- grift, dd=dd, cd=cd, ltd=ltd
- grift, /active, pd=pd, rd=rd
+ gd = grmt_get_descriptors(dd=dd, cd=cd, ltd=ltd, pd=pd, rd=rd)
 
  if((NOT keyword__set(cd)) OR $
     (NOT keyword__set(pd)) OR $
@@ -344,6 +473,146 @@ pro grmt_refresh_callback, data_p
 ;   widget_control, data.ids[w2], sensitive=1
   end
 
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grmt_project_globe
+;
+;=============================================================================
+function grmt_project_globe, gd, md, map_pd=map_pd, map_rd=map_rd
+
+ if(keyword_set(gd.rd)) then $
+  begin
+   hide_bx = gd.rd
+   hide_fn = make_array(n_elements(gd.rd), val='pm_hide_ring')
+  end
+
+ cor_set_name, md, cor_name(gd.bx)
+ map_pd = gd.bx
+
+ aux= ['EMM']
+
+ dd_map = pg_map(gd.dd, /float, $
+            md=md, $
+            cd=gd.cd, $
+            ltd=gd.ltd, $
+            gbx=gd.bx, aux=['EMM'], $
+            hide_fn=hide_fn, hide_bx=hide_bx)
+
+ return, dd_map
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grmt_project_disk
+;
+;=============================================================================
+function grmt_project_disk, gd, md, map_pd=map_pd, map_rd=map_rd
+
+ if(keyword_set(gd.pd)) then $
+  begin
+   hide_bx = gd.pd
+   hide_fn = make_array(n_elements(gd.pd), val='pm_hide_globe')
+  end
+
+ cor_set_name, md, cor_name(gd.bx)
+
+ dd_map = pg_map(gd.dd, bx=gd.bx, /float, $
+            md=md, $
+            cd=gd.cd, $
+            ltd=gd.ltd, $
+            gbx=gd.pd, $
+            hide_fn=hide_fn, hide_bx=hide_bx)
+
+ map_rd = gd.bx
+
+ return, dd_map
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grmt_project
+;
+;=============================================================================
+function grmt_project, gd, md, map_pd=map_pd, map_rd=map_rd
+
+ classes = cor_tree(gd.bx)
+ for i=0, n_elements(classes)-1 do $
+  begin
+   fn = 'grmt_project_' + strlowcase(classes[i])
+   if(routine_exists(fn)) then $
+                 return, call_function(fn, gd, md, map_pd=map_pd, map_rd=map_rd)
+  end
+
+ return, !null
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grmt_create_map
+;
+;=============================================================================
+pro grmt_create_map, data, md
+
+ ;-----------------------------------
+ ; get scene descriptors
+ ;-----------------------------------
+ gd = grmt_get_descriptors(dd=dd, cd=cd, ltd=ltd, pd=pd, rd=rd, bx=bx)
+ if(NOT keyword_set(gd)) then return
+
+ if(NOT keyword__set(bx)) then $
+  begin
+   grim_message, 'No target under the pointer.'
+   return
+  end
+ 
+ if(NOT keyword__set(cd)) then $
+  begin
+   grim_message, 'No camera descriptor.'
+   return
+  end
+
+ if(NOT keyword__set(ltd)) then $
+  begin
+   grim_message, 'No light descriptor.'
+   return
+  end
+
+
+ ;-----------------------------------
+ ; compute map descriptor
+ ;-----------------------------------
+ md = grmt_compute(data, bx)
+
+
+ ;-----------------------------------
+ ; project map
+ ;-----------------------------------
+ widget_control, /hourglass
+; grift, pn=pn, /visible
+; for i=0, n_elements(pn)-1 do $
+;   dd_map = append_array(dd_map, grmt_project(gd, md, map_pd=map_pd, map_rd=map_rd))
+
+ dd_map = grmt_project(gd, md, map_pd=map_pd, map_rd=map_rd)
+
+
+ ;-----------------------------------
+ ; open map in grim
+ ;-----------------------------------
+ if(cor_class(cd) NE 'MAP') then od = cd
+ grim, /new, /no_primary, dd_map, cd=md, od=od, ltd=ltd, pd=map_pd, rd=map_rd, $
+              /tiepoint_sync, /curve_sync, order=1-data.order, $
+              title=map_projection(md) + ' ' + cor_name(dd)
 
 end
 ;=============================================================================
@@ -376,45 +645,6 @@ pro gr_maptool_event, event
 
  case event.tag of
   ;---------------------------------------------------------
-  ; 'Class' button --
-  ;---------------------------------------------------------
-  'CLASS' :  
-
-  ;---------------------------------------------------------
-  ; 'Auto' button --
-  ;  Compute optimal map params based on current grim view.
-  ;---------------------------------------------------------
-  'AUTO' : $
-	begin
-	 md = grmt_form_to_md(data)
-	 class = cor_udata(md, 'CLASS')
-	 case class of
-	  'GLOBE' : $
-	 	begin
-;		 md = grmt_form_to_md(data)
-;		 md = map_optimize(md=md, $
-;		       lon=[lonmin,lonmax], $
-;		       lat=[latmin,latmax])
-
-
-
-;		 md = map_create_descriptors(1, $
-;;			projection=projection, $
-;;			size=size, $
-;			scale=scale, $
-;;			origin=origin, $
-;			units=units, $
-;			center=center)
-;	         grmt_md_to_form, data, md
-;		 widget_control, base, set_uvalue=data
-		end
-	  'DISK' : $
-		begin
-		end
-	 endcase
-	end
-
-  ;---------------------------------------------------------
   ; 'Close' button --
   ;  Just destroy the form and forget about it
   ;---------------------------------------------------------
@@ -444,7 +674,7 @@ pro gr_maptool_event, event
 
   ;---------------------------------------------------------------
   ; Projection --
-  ;  Save the current setting in the appropriate map descriptor
+  ;  Save the current settings in the appropriate map descriptor
   ;  and restore the displayed settings to those of the new map 
   ;  descriptor.
   ;---------------------------------------------------------------
@@ -459,18 +689,6 @@ pro gr_maptool_event, event
 
 	 widget_control, base, set_uvalue=data
 	end
-
-  ;---------------------------------------------------------
-  ; 'Size' value --
-  ;  Automatically change map origin
-  ;---------------------------------------------------------
-  'SIZE' : $
-	begin
-	 md = grmt_form_to_md(data)
-	 map_set_origin, md, double(map_size(md))/2d
-         grmt_md_to_form, data, md
-	end
-
   else:
  endcase
 
@@ -484,8 +702,15 @@ end
 ;=============================================================================
 ; gr_maptool
 ;
+;  - remove parameter entry and auto button
+;  - always compute md based on current view
+;  - remove globe/disk droplist, determine based on active xd.
+;
 ;=============================================================================
 pro gr_maptool, order=order
+
+; need to desensitize projetions that don't apply to disks
+
 
  if(xregistered('gr_maptool')) then return
 
@@ -514,18 +739,16 @@ pro gr_maptool, order=order
 
  desc = [ $
 	'1, BASE,, COLUMN, FRAME', $
-	  '0, DROPLIST,' + dl_classes + ',SET_VALUE=0' + $
-	           ',LABEL_LEFT=Class            :, TAG=class', $
 	  '0, DROPLIST,' + dl_projections + ',SET_VALUE=0' + $
 	           ',LABEL_LEFT=Projection       :, TAG=projection', $
 	  '0, TEXT,, LABEL_LEFT=Size             :   , WIDTH=20, TAG=size', $
-	    '1, BASE,, ROW, FRAME', $
-	    '2, BUTTON, Auto,, TAG=auto', $
-;	    '2, BUTTON, Select,, TAG=select', $
-	  '0, TEXT,, LABEL_LEFT=  Origin         :   , WIDTH=20, TAG=origin', $
-	  '0, TEXT,, LABEL_LEFT=  Scale          :   , WIDTH=20, TAG=scale', $
-	  '0, TEXT,, LABEL_LEFT=  Center(deg)    :   , WIDTH=20, TAG=center', $
-	  '0, TEXT,, LABEL_LEFT=  Units(rad/unit):   , WIDTH=20, TAG=units', $
+	  '0, TEXT,, LABEL_LEFT=Center           :   , WIDTH=20, TAG=center', $
+	  '1, BASE,, ROW', $
+	   '0, LABEL,           Uniform Scale    :, LEFT', $
+	   '2, BUTTON, Off|On, EXCLUSIVE , ROW, SET_VALUE=0, TAG=uniform', $
+	  '1, BASE,, ROW', $
+	   '0, LABEL,           Full Range       :, LEFT', $
+	   '2, BUTTON, Off|On, EXCLUSIVE , ROW, SET_VALUE=0, TAG=full', $
 	'1, BASE,, ROW, FRAME', $
 	  '0, BUTTON, Ok, QUIT, TAG=ok', $
 	  '0, BUTTON, Project,, TAG=project', $
@@ -559,24 +782,31 @@ pro gr_maptool, order=order
 	;-----------------------------
 		mds 		:	[ map_create_descriptors(1,$
 					   projection='RECTANGULAR', $
+					   center = [!values.d_nan, !values.d_nan], $
 					   size = [800,400]), $
 					  map_create_descriptors(1,$
 					   projection='MERCATOR', $
+					   center = [!values.d_nan, !values.d_nan], $
 					   size = [800,400]), $
 					  map_create_descriptors(1,$
 					   projection='ORTHOGRAPHIC', $
+					   center = [!values.d_nan, !values.d_nan], $
 					   size = [400,400]), $
 					  map_create_descriptors(1,$
 					   projection='STEREOGRAPHIC', $
+					   center = [!values.d_nan, !values.d_nan], $
 					   size = [400,400])   ]$;, $
 ;					  map_create_descriptors(1,$
 ;					   projection='SINUSOIDAL', $
+;					   center = [!values.d_nan, !values.d_nan], $
 ;					   size = [800,400]), $
 ;					  map_create_descriptors(1,$
 ;					   projection='MOLLWEIDE', $
+;					   center = [!values.d_nan, !values.d_nan], $
 ;					   size = [800,400]), $
 ;					  map_create_descriptors(1,$
 ;					   projection='OBLIQUE_DISK', $
+;					   center = [!values.d_nan, !values.d_nan], $
 ;					   size = [400,400]) ] $ 
 	     }
 

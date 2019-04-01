@@ -59,24 +59,20 @@
 ;=============================================================================
 pro glb_image_bounds, cd, pd, slop=slop, border_pts_im=border_pts_im, $
        corners=corners, center=center, $
-       latmin=latmin, latmax=latmax, lonmin=lonmin, lonmax=lonmax, status=status
+       latmin=latmin, latmax=latmax, lonmin=lonmin, lonmax=lonmax, status=status, $
+       viewport=viewport
 
  status = -1
 
  ;-----------------------------------
  ; compute image border points
  ;-----------------------------------
- if(keyword_set(corners)) then $
-  begin
-   xmin = min(corners[0,*])
-   ymin = min(corners[1,*])
-   xmax = max(corners[0,*])
-   ymax = max(corners[1,*])
-  end
-
  if(NOT keyword_set(border_pts_im)) then $
-         border_pts_im = get_image_border_pts(cd, corners=corners, center=center)
+         border_pts_im = get_image_border_pts(cd, corners=corners, center=center, viewport=viewport)
  np = n_elements(border_pts_im)/2
+
+ if(keyword_set(slop)) then corners = !null $
+ else slop = 1
 
  ;-----------------------------------
  ; compute globe intersections
@@ -108,7 +104,7 @@ pro glb_image_bounds, cd, pd, slop=slop, border_pts_im=border_pts_im, $
  ;----------------------------------------------
  image_pts = body_to_image_pos(cd, pd, body_pts)
 
- w = in_image(cd, image_pts, slop=slop, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
+ w = in_image(cd, image_pts, slop=slop, corners=corners)
  if(w[0] EQ -1) then return $
  else body_pts = body_pts[w,*]
 
@@ -148,7 +144,7 @@ pro glb_image_bounds, cd, pd, slop=slop, border_pts_im=border_pts_im, $
  pole_pts_image = $
           surface_to_image(cd, pd, pole_pts_surf, body_pts=pole_pts_body)
 
- w = in_image(cd, pole_pts_image, slop=slop, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
+ w = in_image(cd, pole_pts_image, slop=slop, corners=corners)
  ww = glb_hide_points_limb(pd, $
              bod_inertial_to_body_pos(pd, bod_pos(cd)), pole_pts_body)
 

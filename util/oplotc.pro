@@ -3,9 +3,10 @@
 ;
 ;==================================================================================
 pro oplotc, x, y, colors=_colors, polar=polar, psyms=psyms, $
-               solid=solid, symsize=symsize, pixmap=pixmap
+               solid=solid, symsize=symsize, thick=thick, pixmap=pixmap
 
  if(NOT keyword_set(symsize)) then symsize = 1 
+ if(NOT keyword_set(thick)) then thick = 1 
 
  if(NOT keyword_set(_colors)) then _colors = !p.color
 
@@ -44,7 +45,7 @@ pro oplotc, x, y, colors=_colors, polar=polar, psyms=psyms, $
      ww = where(psyms[w] EQ sym[j])
      for k=0, nk-1 do $
       oplot, x[w[ww]], y[w[ww]], psym=sym[j], col=col[i], polar=polar, $
-            symsize=float((nk-k))/nk * symsize
+            symsize=float((nk-k))/nk * symsize, thick=thick
     end
 
    if(defined(pixmap)) then $
