@@ -14,7 +14,7 @@ function vgr_cd_bin_path
  add = ''
 
 
- return, nv_vgr_cd+'/bin/'+platform+add+'/'
+ return, nv_vgr_cd+sep+'bin'+sep+platform+add+sep
 
 end
 ;===========================================================================

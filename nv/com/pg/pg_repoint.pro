@@ -33,7 +33,7 @@
 ;
 ;			Array of new pointing vectors (1,3,nt).
 ;
-;	dtheta:		Array (nt) specfying the rotation angle in radians.
+;	dtheta:		Array (nt) specifying the rotation angle in radians.
 ;
 ;  OUTPUT: NONE
 ;

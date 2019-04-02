@@ -30,7 +30,7 @@
 ;	data:	 Data to store.  If multiple crx supplied, then the trailing 
 ;		 dimension must match the number of descriptors unless /all.
 ;
-;	all:	 If set, the data array applied to every descriptor.
+;	all:	 If set, the data array is applied to every descriptor.
 ;
 ;  OUTPUT: NONE
 ;

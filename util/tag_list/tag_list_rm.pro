@@ -88,9 +88,16 @@
 ;	
 ;-
 ;=============================================================================
-pro tag_list_rm, tlp, name
+pro tag_list_rm, tlp, name, nofree=nofree
 
  if(NOT ptr_valid(tlp)) then return
+ if(NOT keyword_set(*tlp)) then return
+
+ if(NOT keyword_set(name)) then $
+  begin
+   *tlp = {tag_list_struct}
+   return
+  end
 
  i = (where(name EQ (*tlp).name))[0]
  if(i EQ -1) then return
@@ -98,7 +105,8 @@ pro tag_list_rm, tlp, name
  nv_ptr_free, (*tlp)[i].data_p
  *tlp = rm_list_item(*tlp, i)
 
- if(NOT keyword_set((*tlp)[0])) then nv_ptr_free, tlp
+ if(NOT keyword_set((*tlp)[0])) then $
+                    if(NOT keyword_set(nofree)) then nv_ptr_free, tlp
 
 end
 ;=============================================================================

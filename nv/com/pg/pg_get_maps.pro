@@ -92,7 +92,7 @@ function pg_get_maps, arg1, arg2, md=_md, gbx=gbx, dkx=dkx, bx=bx, _extra=keyval
                         override=override, verbatim=verbatim, count=count, $
                               @map__keywords_tree.include
                               @dat__keywords.include
-                              @nv_trs_keywords_include.pro
+                              @dat_trs_keywords_include.pro
                               end_keywords
 
  count = 0
@@ -170,7 +170,7 @@ function pg_get_maps, arg1, arg2, md=_md, gbx=gbx, dkx=dkx, bx=bx, _extra=keyval
  else $
   begin
    md = dat_get_value(dd, 'MAP_DESCRIPTORS', key1=ods, key4=_md, key8=name, trs=trs, $
-                              @nv_trs_keywords_include.pro
+                              @dat_trs_keywords_include.pro
                               end_keywords)
 
    ;------------------------------------------------------------------------

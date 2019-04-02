@@ -18,7 +18,7 @@ function spice_get_kpath, env, klist
  n = n_elements(kpaths)
 
  for i=0, n-1 do $
-  if(file_test(kpaths[i]+'/'+klist)) then return, kpaths[i]
+  if(file_test(kpaths[i]+path_sep()+klist)) then return, kpaths[i]
 
  return, ''
 end

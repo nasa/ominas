@@ -31,10 +31,13 @@
 ;
 ; KEYWORDS:
 ;  INPUT:
-;	def:		If set, new items simply ust be defined instead of "set".
+;	def:		If set, new items simply must be defined instead of "set".
 ;
 ;	positive:	If set, a single value of -1 is taken as an undefined
 ;			array.
+;
+;	string:		If set, the null output wil be a null string instead
+;			of 0.
 ;
 ;  OUTPUT: NONE
 ;
@@ -53,14 +56,43 @@
 ;	
 ;-
 ;=============================================================================
-function append_array, array, item, def=def, positive=positive
+
+
+
+;=============================================================================
+; append_array_null
+;
+;=============================================================================
+function append_array_null, array
+ if(size(array, /type) EQ 7) then return, ''
+ return, 0
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; append_array
+;
+;=============================================================================
+function append_array, array, item, def=def, positive=positive, string=string
+
+ null = 0
+ if(defined(array)) then $
+  begin
+   if(size(array, /type) EQ 7) then null = ''
+  end $
+ else if(defined(item)) then if(size(item, /type) EQ 7) then null = ''
+
+ if(keyword_set(string)) then null = ''
+
 
  if(keyword_set(def)) then $
   begin
    if(NOT defined(item)) then $
     begin
      if(defined(array)) then return, array
-     return, 0
+     return, null
     end
 
    if(NOT defined(array)) then return, [item]
@@ -73,7 +105,7 @@ function append_array, array, item, def=def, positive=positive
    if(NOT defined(item)) then $
     begin
      if(defined(array)) then return, array
-     return, 0
+     return, null
     end
 
    if(NOT defined(array)) then return, [item]
@@ -85,7 +117,7 @@ function append_array, array, item, def=def, positive=positive
  if(NOT keyword__set(item)) then $
   begin
    if(keyword__set(array)) then return, array
-   return, 0
+   return, null
   end
 
  if(NOT keyword__set(array)) then return, [item]

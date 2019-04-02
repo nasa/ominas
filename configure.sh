@@ -140,8 +140,13 @@ fi
 
 
 if [ "$IDL_DIR" = "" ]; then
-        idl=`which idl | tail -1`
-        idlbin=$idl
+        ivers=( "idl87" "idl86" "idl85" "idl84" "idl83" "idl82" "idl" )
+        for idlbinv in "${ivers[@]}"; do
+          idl=`which ${idlbinv} | tail -1`
+          echo ${idlbinv}
+          idlbin=$idl
+          if [ "$idl" != "" ]; then break; fi
+        done
         if [ "$idl" = "" ]; then
           read -rp "IDL not found. Please enter the location of your IDL installation (such as /usr/local/exelis/idl85): " idldir
           IDL_DIR="$idldir"
@@ -150,6 +155,10 @@ if [ "$IDL_DIR" = "" ]; then
           idlbin=$IDL_DIR/bin/idl
         else
           printf "Using IDL at $idl\n"
+          IDL_DIR=`${idl} -e 'print,filepath("")' | tail -1`
+          printf "Setting IDL_DIR to ${IDL_DIR}\n"
+          export IDL_DIR
+          idlbin=$IDL_DIR/bin/idl
         fi
 else
         printf "IDL_DIR found, $IDL_DIR, using it\n"
@@ -209,7 +218,7 @@ else
      *) ans=n ;;
     esac
 fi
-for mis in  cas dawn gll vgr 
+for mis in  cas dawn gll vgr juno
 do
   if [ ! -e "$HOME/.ominas/config/ominas_env_$mis.sh" ]; then
     cp -avf config/$mis/ominas_env_$mis.sh $HOME/.ominas/config/
@@ -342,6 +351,10 @@ function ppkg()
 		"dawn")
 			kername="DAWN"
                         longname="Dawn"	;;
+                "juno")
+                        kername="JUNO"
+                        longname="Juno" ;;
+
 		*)
 	esac
 	pkins $script $kername $longname $1
@@ -754,7 +767,22 @@ cat ${OMINAS_DIR}/config/bashcomments.txt >> ~/.ominas/ominas
 #head -1 ${idlbin} > ~/.ominas/ominas
 asetting=`eval echo ${setting}`
 echo ". ${asetting}" >> ~/.ominas/ominas
-echo "if [ "\$#" -eq 0 ]; then args=\"\${OMINAS_DIR}/util/printver.pro\"; else args=("\$@"); fi" >> ~/.ominas/ominas
+
+#echo "if [ "\$#" -eq 0 ]; then args=\"\${OMINAS_DIR}/util/printver.pro\"; else args=("\$@"); fi" >> ~/.ominas/ominas
+echo "if [ \$# -eq 0 ]; then args=\"\${OMINAS_DIR}/util/printver.pro\"" >> ~/.ominas/ominas
+echo "else" >> ~/.ominas/ominas
+echo " for arg in \$@; do" >> ~/.ominas/ominas
+echo "  if [[ \$arg == --* ]] ; then _args+=(\$arg)" >> ~/.ominas/ominas
+echo "  elif [[ \$arg == *==* ]] ; then _args+=(\$arg)" >> ~/.ominas/ominas
+echo "  elif [[ \$arg == +* ]] ; then export \${arg:1:127}" >> ~/.ominas/ominas
+echo "  else args+=(\$arg)" >> ~/.ominas/ominas
+echo "  fi" >> ~/.ominas/ominas
+echo " done" >> ~/.ominas/ominas
+echo "fi" >> ~/.ominas/ominas
+echo "args+=(\\-args)" >> ~/.ominas/ominas
+echo "args+=(\${_args[*]})" >> ~/.ominas/ominas
+
+
 if [ -e "/opt/X11/lib/flat_namespace/" ]; then
   cat <<LDCMD >> ~/.ominas/ominas
     if [ "\${DYLD_LIBRARY_PATH}" = "" ]; then
@@ -816,7 +844,6 @@ function icy() {
 # copy. If NAIF kernels will not be used, then no action is taken.       #
 # Icy is installed based on auto-detection of the OS.                    #
 #------------------------------------------------------------------------#
-
 if [ ${ominas_icyst} == 1 ] && [ ${ominas_auto} == 0 ]; then
   echo "Icy appears to be already configured:"
   echo ${ominas_icytest}
@@ -851,7 +878,7 @@ if [ ${ominas_icyst} == 1 ] && [ ${ominas_auto} == 0 ]; then
         *) return 1;;
   esac
 else
-  if [ ${ominas_auto_u} == 1 ] ; then
+  if [ ${ominas_auto_u} == 1 ] && [ ${change_demo} == 0 ] ; then
     return 1
   fi
 fi
@@ -891,17 +918,22 @@ case $ans in
 				#ext "icy.tar.Z"
 				#ext "icy.tar"
                                 echo "Extracting Icy source files..."
-                                tar -xzf "${OMINAS_TMP}/icy.tar.Z"
-                                rm -f "${OMINAS_TMP}/icy.tar.Z"
+                                tar -xzf "${OMINAS_TMP}/icy.tar.Z" >& /dev/null
+                                #rm -vf "${OMINAS_TMP}/icy.tar.Z"
 				cd icy
-				icypath=$PWD
-                                echo "Compiling Icy..."
-                                if [ ${ominas_auto} == 1 ] ; then
-				  /bin/csh makeall.csh >& ~/.ominas/icy_make.log
+				icypath=${PWD}
+                                echo "Trying to use precompiled binaries..."
+                                if [ -e ./lib/._icy.dlm ]; then rm -vf ./lib/._icy.dlm; fi
+                                if [ -e ./lib/._icy.so ]; then rm -vf ./lib/._icy.so; fi
+                                binary_icytest=`$idlbin -IDL_DLM_PATH "<IDL_DEFAULT>:${icypath}/lib/" -e "!path+=':'+file_expand_path('${OMINAS_DIR}/util/downloader')+':${icypath}/lib/' & ominas_icy_test"  2> /dev/null`
+                                if [ $? == 0 ] ; then
+                                  echo "Success: ${binary_icytest}"
                                 else
-                                 /bin/csh makeall.csh >& ~/.ominas/icy_make.log
+                                  echo "Precompiled binary failed: ${binary_icytest}"
+                                  echo "Trying to build Icy..."
+				  /bin/csh makeall.csh >& ~/.ominas/icy_make.log
+                                  echo "Icy compiled. Log is at ~/.ominas/icy_make.log"
                                 fi
-                                echo "Icy compiled. Log is at ~/.ominas/icy_make.log"
 				cd $OMINAS_DIR	;;
 			*)
 				read -rp "Please enter the location of the Icy install directory [~/ominas_data/icy/]: " datapath
@@ -981,7 +1013,7 @@ if grep -q "export DFLAG=true" $setting; then
  DFLAG="true"
 fi
 
-declare -a mis=("cas" "gll" "vgr" "dawn")
+declare -a mis=("cas" "gll" "vgr" "juno")
 #declare -a Data=("Generic_kernels" "SEDR" "TYCHO2" "SAO" "GSC" "UCAC4")
 #declare -a Data=("Generic_kernels" "TYCHO2" "UCAC4" "SAO" "GSC" )
 declare -a Data=("Generic_kernels" "TYCHO2" "SAO" "MAPS" "UCAC4" "GSC" )
@@ -1032,8 +1064,9 @@ else
 fi
 echo "Icy: ${ominas_icytest}"
 export ominas_icyst
-
-OMINAS_TMP=`$idlbin -e "print,filepath('_${USER}_ominas',/tmp)" 2> /dev/null`
+echo $idlbin
+OMINAS_TMP=`$idlbin -e "print,filepath('_${USER}_ominas',/tmp)" | tail -1  2> /dev/null`
+echo $OMINAS_TMP
 #OMINAS_TMP="${OMINAS_RC}/tmp"
 if [ ! -w "${OMINAS_TMP}" ]; then
   mkdir -p ${OMINAS_TMP}
@@ -1079,8 +1112,10 @@ Mission Packages:
            About 833 MB as of Dec/2016
 	6) Voyager . . . . . . . . . . . . . . . . ${mstatus[2]}
            About 163 MB as of Dec/2016
+        7) Juno  . . . . . . . . . . . . . . . . . ${mstatus[3]}
+           Subsetted, about 22 GB as of Feb/2018
 Data:
-        8) NAIF Generic Kernels  . . . . . . . . .  ${dstatus[0]}
+        8) NAIF Generic Kernels  . . . . . . . . . ${dstatus[0]}
            About 22 GB as of Dec/2016
         9) Tycho2 star catalog . . . . . . . . . . ${dstatus[1]}
            About 161 MB download, 665 MB unpacked
@@ -1135,10 +1170,10 @@ Mission Packages:
            About 833 MB as of Dec/2016
         6) Voyager . . . . . . . . . . . . . . . . ${mstatus[2]}
            About 163 MB as of Dec/2016
-        7) Dawn  . . . . . . . . . . . . . . . . . ${mstatus[3]}
-           Subsetted, about 8 GB as of Jan/2017
+        7) Juno  . . . . . . . . . . . . . . . . . ${mstatus[3]}
+           Subsetted, about 9 GB as of Feb/2018
 Data:
-        8) NAIF Generic Kernels  . . . . . . . . .  ${dstatus[0]}
+        8) NAIF Generic Kernels  . . . . . . . . . ${dstatus[0]}
            About 22 GB as of Dec/2016
         9) Tycho2 star catalog . . . . . . . . . . ${dstatus[1]}
            About 161 MB download, 665 MB unpacked
@@ -1189,7 +1224,7 @@ AUTOP
   fi
   if [ ${ansy} == "y" ] || [ ${ansy} == "Y" ]; then
     ominas_auto=1
-    ans="1 2 3 4 5 6 8 9 10 11 12"
+    ans="1 2 3 4 5 6 7 8 9 10 11 12"
   else
     ans="all"
   fi
@@ -1216,7 +1251,7 @@ AUTOP
   fi
   if [ ${ansy} == "y" ] || [ ${ansy} == "Y" ]; then
     ominas_auto_u=1
-    ans="3 4 5 6 8 9 10 11 12 13 2 1"
+    ans="3 4 5 6 7 8 9 10 11 12 13 2 1"
   else
     ans="uall"
   fi
@@ -1244,8 +1279,19 @@ do
     fi
   fi
 done
+change_demo=0
 if [ "${ominas_nodel}" == "2" ]; then
-  ans="4 5 6 8 9 10 11 12 13"
+  for num in $ans
+  do
+    if [ $num == "3" ]; then
+      change_demo=1
+    fi
+  done
+  if [ $change_demo == "1" ]; then
+    ans="3 4 5 6 7 8 9 10 11 12 13"
+  else
+    ans="4 5 6 7 8 9 10 11 12 13"
+  fi
 fi
 for num in $ans
 do
@@ -1419,14 +1465,14 @@ fi
 if grep -q "[^#]*\. ~/.ominas/ominasrc" ${usersh} ; then
   echo "${usersh} already sets ominas alias"
 else
-  echo ". ~/.ominas/ominasrc" >> ${usersh}
+  echo "if [ -s ~/.ominas/ominasrc ]; then . ~/.ominas/ominasrc; fi" >> ${usersh}
 fi
 
 
 if grep -q "[^#]*\. ~/.ominas/ominasrc" ${psetting} ; then
   echo "${psetting} already sets ominas alias"
 else
-  echo ". ~/.ominas/ominasrc" >> ${psetting}
+  echo "if [ -s ~/.ominas/ominasrc ]; then . ~/.ominas/ominasrc; fi" >> ${psetting}
 fi
 
 #if grep -q "alias ominas=~/.ominas/ominas" ${usersh} ; then

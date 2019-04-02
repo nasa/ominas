@@ -136,7 +136,8 @@ common pickfiles_block, files, base, out_path, options_dl, options_i
  pf_base = widget_base(base)
  pf = widget_pickfiles(pf_base, ok_callback='pf_ok_callback', path=path, $
                        one=one, filter=filter, must_exist=must_exist, $
-                       button_base=button_base, default=default, ok_button=ok_button)
+                       button_base=button_base, default=default, ok_button=ok_button, $
+                       filename=filename)
 
  if(keyword_set(options)) then $
   begin

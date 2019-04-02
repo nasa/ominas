@@ -9,6 +9,8 @@ function dh_read_vicar, dd, label, dim, type, min, max, abscissa=abscissa, $
  if(keyword_set(sample)) then return, 0
  filename = dat_filename(dd)
 
+if(defined(abscissa)) then nv_message, /con, 'Abscissa not supported.'
+
  ;-----------------------------------------------------------------------
  ; min , max set to zero because no way to determine without reading
  ; entire data array
@@ -39,7 +41,7 @@ function dh_read_vicar, dd, label, dim, type, min, max, abscissa=abscissa, $
  data_offset[0] = nbb/elm_size
 
  gff = gff_create(filename[0], dim, type, $
-                 file_offset=file_offset, data_offset=data_offset)
+                     file_offset=file_offset, data_offset=data_offset)
 
 
  return, data

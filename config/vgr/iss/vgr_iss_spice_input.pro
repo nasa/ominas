@@ -81,28 +81,6 @@
 
 
 ;===========================================================================
-; vgr_iss_spice_label_struct__define
-;
-;===========================================================================
-pro vgr_iss_spice_label_struct__define
-
- struct = {vgr_iss_spice_label_struct, $
-		dt: 0d, $
-		time: 0d, $
-		stime: '', $
-		exposure: 0d, $
-		size: [0,0], $
-		filters: ['',''], $
-		scale: [0d,0d], $
-		target: '', $
-		oaxis: [0d,0d] $
-           }
-end
-;===========================================================================
-
-
-
-;===========================================================================
 ; vgr_iss_spice_parse_labels
 ;
 ;===========================================================================
@@ -224,14 +202,14 @@ end
 ;
 ;===========================================================================
 function vgr_iss_spice_input, dd, keyword, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
 
  return, spice_input(dd, keyword, 'vgr', 'iss', values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords)
 
 end

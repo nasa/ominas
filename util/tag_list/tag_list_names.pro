@@ -97,6 +97,7 @@
 function tag_list_names, tlp
 
  if(NOT ptr_valid(tlp)) then return, 0
+ if(NOT keyword_set(*tlp)) then return, 0
  return, (*tlp).name
 end
 ;=============================================================================

@@ -27,7 +27,9 @@
 ;
 ; KEYWORDS:
 ;  INPUT:
-;	append:	If set, the text will be appended if the file already exists.
+;	append:	 If set, the text will be appended if the file already exists.
+;
+;	verbose: If set, a message is printed.
 ;
 ;  OUTPUT: NONE
 ;
@@ -48,10 +50,11 @@
 ;	
 ;-
 ;=============================================================================
-pro write_txt_file, fname, text, append=append
+pro write_txt_file, fname, text, append=append, verbose=verbose
 
  openw, unit, fname, /get_lun, append=keyword__set(append)
 
+ if(keyword_set(verbose)) then print, 'Writing ' + fname
  printf, unit, tr(text)
 
  close, unit

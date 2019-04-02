@@ -55,8 +55,8 @@ pro gsc2_catalog_inputs, dd, cd=cd, n=n, m1=m1, m2=m2
  strcat_get_inputs, dd, 'NV_GSC2_DATA', 'path_gsc2', $
 	b1950=b1950, j2000=j2000, jtime=jtime, cam_vel=cam__vel, $
 	path=path_gsc2, ra1=ra1, ra2=ra2, dec1=dec1, dec2=dec2, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
  oa_ra = 180d/!dpi * 0.5d*(ra1 + ra2)

@@ -1,0 +1,81 @@
+s = 10				; test image size
+z = 40				; zoom
+d = 5				; border width in data pixels
+
+
+
+;-------------------------------------------------------------------------
+; construct a checkerboard image
+;-------------------------------------------------------------------------
+dim = [s,s]
+im = bytarr(dim)
+im[altgen(s)] = 1
+
+
+
+
+;-------------------------------------------------------------------------
+; Display pixel grid over zoomed image.  Each cross should plot in the 
+; center of a pixel
+;-------------------------------------------------------------------------
+size = (s+2*d)*z
+tvim, im, xsize=size, ysize=size, zoom=z, offset = -[d,d]
+grid = gridgen(dim)
+plots, grid, psym=1, color=ctred()
+
+
+
+;-------------------------------------------------------------------------
+; Test coordinate conversions.  With integer zoom, the steps between data
+; coordinates computed from a uniform device grid should be constant.
+;-------------------------------------------------------------------------
+
+;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Generate and plot device-coordinate grid.
+;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+pdev = gridgen([!d.x_size, !d.y_size])		; all device pixels
+device, set_graphics=6
+plots, /device, pdev, psym=3
+
+;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Convert device-coordinate grid to data coordinates and plot.
+;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+p = (convert_coord(/device, /to_data, pdev))[0:1,*]	; data coordinates
+							; of all device pixels
+plots, p, psym=3
+device, set_graphics=3
+
+;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Convert data coordinates to 1D samples and back, and plot.
+; The result is quantized by xy_to_w because samples are long ints.
+;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+samples = xy_to_w(dim, p, /unique, /clip)	; 1D data samples for all 
+						; device pixels
+pp = w_to_xy(dim, samples)			; back to data coordinates
+plots, pp, psym=6, col=ctred()
+
+
+
+
+
+stop
+
+
+p = p[*,w]
+
+print, p[*,0:100]
+window, /free
+
+px = reform(p[0,*])
+dpx = shift(px,1)-px
+plot, dpx[1:100], /yno
+
+stop
+
+pp = long(p)
+ppx = reform(pp[0,*])
+dppx = shift(ppx,1)-ppx
+plot, dppx[1:100]
+
+
+

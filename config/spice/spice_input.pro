@@ -437,50 +437,50 @@ pro si_manage_kernels, dd, prefix=prefix, inst=inst, pos=pos, reload=reload, $
  ;- - - - - - - - - - - - - - - - - - -
  ; /strict keywords
  ;- - - - - - - - - - - - - - - - - - -
- ck_strict = fix(tr_keyword_value(dd, 'ck_strict'))
- spk_strict = fix(tr_keyword_value(dd, 'spk_strict'))
- pck_strict = fix(tr_keyword_value(dd, 'pck_strict'))
- fk_strict = fix(tr_keyword_value(dd, 'fk_strict'))
- ik_strict = fix(tr_keyword_value(dd, 'ik_strict'))
- sck_strict = fix(tr_keyword_value(dd, 'sck_strict'))
- lsk_strict = fix(tr_keyword_value(dd, 'lsk_strict'))
- xk_strict = fix(tr_keyword_value(dd, 'xk_strict'))
+ ck_strict = fix(dat_keyword_value(dd, 'ck_strict'))
+ spk_strict = fix(dat_keyword_value(dd, 'spk_strict'))
+ pck_strict = fix(dat_keyword_value(dd, 'pck_strict'))
+ fk_strict = fix(dat_keyword_value(dd, 'fk_strict'))
+ ik_strict = fix(dat_keyword_value(dd, 'ik_strict'))
+ sck_strict = fix(dat_keyword_value(dd, 'sck_strict'))
+ lsk_strict = fix(dat_keyword_value(dd, 'lsk_strict'))
+ xk_strict = fix(dat_keyword_value(dd, 'xk_strict'))
 
  ;- - - - - - - - - - - - - - - - - - -
  ; /all keywords
  ;- - - - - - - - - - - - - - - - - - -
- ck_all = fix(tr_keyword_value(dd, 'ck_all'))
- spk_all = fix(tr_keyword_value(dd, 'spk_all'))
- pck_all = fix(tr_keyword_value(dd, 'pck_all'))
- fk_all = fix(tr_keyword_value(dd, 'fk_all'))
- ik_all = fix(tr_keyword_value(dd, 'ik_all'))
- sck_all = fix(tr_keyword_value(dd, 'sck_all'))
- lsk_all = fix(tr_keyword_value(dd, 'lsk_all'))
- xk_all = fix(tr_keyword_value(dd, 'xk_all'))
+ ck_all = fix(dat_keyword_value(dd, 'ck_all'))
+ spk_all = fix(dat_keyword_value(dd, 'spk_all'))
+ pck_all = fix(dat_keyword_value(dd, 'pck_all'))
+ fk_all = fix(dat_keyword_value(dd, 'fk_all'))
+ ik_all = fix(dat_keyword_value(dd, 'ik_all'))
+ sck_all = fix(dat_keyword_value(dd, 'sck_all'))
+ lsk_all = fix(dat_keyword_value(dd, 'lsk_all'))
+ xk_all = fix(dat_keyword_value(dd, 'xk_all'))
 
  ;- - - - - - - - - - - - - - - - - - -
  ; reverse keywords
  ;- - - - - - - - - - - - - - - - - - -
- reverse = fix(tr_keyword_value(dd, 'reverse'))
+ reverse = fix(dat_keyword_value(dd, 'reverse'))
 
- ck_reverse = fix(tr_keyword_value(dd, 'ck_reverse'))
- spk_reverse = fix(tr_keyword_value(dd, 'spk_reverse'))
- pck_reverse = fix(tr_keyword_value(dd, 'pck_reverse'))
- fk_reverse = fix(tr_keyword_value(dd, 'fk_reverse'))
- ik_reverse = fix(tr_keyword_value(dd, 'ik_reverse'))
- sck_reverse = fix(tr_keyword_value(dd, 'sck_reverse'))
- lsk_reverse = fix(tr_keyword_value(dd, 'lsk_reverse'))
- xk_reverse = fix(tr_keyword_value(dd, 'xk_reverse'))
+ ck_reverse = fix(dat_keyword_value(dd, 'ck_reverse'))
+ spk_reverse = fix(dat_keyword_value(dd, 'spk_reverse'))
+ pck_reverse = fix(dat_keyword_value(dd, 'pck_reverse'))
+ fk_reverse = fix(dat_keyword_value(dd, 'fk_reverse'))
+ ik_reverse = fix(dat_keyword_value(dd, 'ik_reverse'))
+ sck_reverse = fix(dat_keyword_value(dd, 'sck_reverse'))
+ lsk_reverse = fix(dat_keyword_value(dd, 'lsk_reverse'))
+ xk_reverse = fix(dat_keyword_value(dd, 'xk_reverse'))
 
  ;- - - - - - - - - - - - - - - - - - -
  ; strict_priority
  ;- - - - - - - - - - - - - - - - - - -
- strict_priority = fix(tr_keyword_value(dd, 'strict_priority'))
+ strict_priority = fix(dat_keyword_value(dd, 'strict_priority'))
 
  ;- - - - - - - - - - - - - - - - - - -
  ; protect keyword
  ;- - - - - - - - - - - - - - - - - - -
- protect = tr_keyword_value(dd, 'protect')
+ protect = dat_keyword_value(dd, 'protect')
 
 
  ;+++++++++++++++++++++++++++++++++++
@@ -501,12 +501,14 @@ pro si_manage_kernels, dd, prefix=prefix, inst=inst, pos=pos, reload=reload, $
  ;---------------------------------------------------------------------------
  ; get the kernel list file
  ;---------------------------------------------------------------------------
- klist = tr_keyword_value(dd, 'klist')
+ sep = path_sep()
+
+ klist = dat_keyword_value(dd, 'klist')
  if(keyword_set(klist)) then $
-  if(strpos(klist, '/') EQ -1) then $
+  if(strpos(klist, sep) EQ -1) then $
    begin
     kpath = spice_get_kpath('NV_SPICE_KER', klist)
-    klist = kpath + '/' + klist
+    klist = kpath + sep + klist
    end
 
  ;---------------------------------------------------------------------------
@@ -638,56 +640,56 @@ function si_get, dd, keyword, prefix, inst, od=od, time=__time, names=names, sta
  ;- - - - - - - - - - - - - - - - - - -
  ; obs
  ;- - - - - - - - - - - - - - - - - - -
- obs = tr_keyword_value(dd, 'obs')
+ obs = dat_keyword_value(dd, 'obs')
  if(str_isnum(obs) EQ 0) then obs = long(obs)
 
  ;- - - - - - - - - - - - - - - - - - -
  ; pos
  ;- - - - - - - - - - - - - - - - - - -
- pos = tr_keyword_value(dd, 'pos')
+ pos = dat_keyword_value(dd, 'pos')
 
  ;- - - - - - - - - - - - - - - - - - -
  ; ref
  ;- - - - - - - - - - - - - - - - - - -
- ref = tr_keyword_value(dd, 'ref')
+ ref = dat_keyword_value(dd, 'ref')
  if(NOT keyword_set(ref)) then ref = 'j2000'
 
  ;- - - - - - - - - - - - - - - - - - -
  ; j2000
  ;- - - - - - - - - - - - - - - - - - -
- j2000 = fix(tr_keyword_value(dd, 'j2000'))
+ j2000 = fix(dat_keyword_value(dd, 'j2000'))
  if(keyword_set(j2000)) then ref = 'j2000'
 
  ;- - - - - - - - - - - - - - - - - - -
  ; b1950
  ;- - - - - - - - - - - - - - - - - - -
- b1950 = fix(tr_keyword_value(dd, 'b1950'))
+ b1950 = fix(dat_keyword_value(dd, 'b1950'))
  if(keyword_set(b1950)) then ref = 'b1950'
 
  ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  ; reload
  ;  Force /reload if this call has a different prefix than the last one.
  ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- reload = fix(tr_keyword_value(dd, 'reload'))
+ reload = fix(dat_keyword_value(dd, 'reload'))
  if(keyword_set(last_prefix)) then if(prefix NE last_prefix) then reload = 1
  last_prefix = prefix
 
  ;- - - - - - - - - - - - - - - - - - -
  ; constants
  ;- - - - - - - - - - - - - - - - - - -
- constants = fix(tr_keyword_value(dd, 'constants'))
+ constants = fix(dat_keyword_value(dd, 'constants'))
  if(keyword_set(constants)) then time = -1		; this doesn't seem right
 
  ;- - - - - - - - - - - - - - - - - - -
  ; name
  ;- - - - - - - - - - - - - - - - - - -
- name = tr_keyword_value(dd, 'name')
+ name = dat_keyword_value(dd, 'name')
  if(keyword_set(name)) then names = name
 
  ;- - - - - - - - - - - - - - - - - - -
  ; time
  ;- - - - - - - - - - - - - - - - - - -
- _time = tr_keyword_value(dd, 'time')
+ _time = dat_keyword_value(dd, 'time')
  if(defined(_time)) then $
   begin
    if(keyword_set(_time)) then time = _time $
@@ -697,12 +699,12 @@ function si_get, dd, keyword, prefix, inst, od=od, time=__time, names=names, sta
  ;- - - - - - - - - - - - - - - - - - -
  ; nokernels
  ;- - - - - - - - - - - - - - - - - - -
- nokernels = fix(tr_keyword_value(dd, 'nokernels'))
+ nokernels = fix(dat_keyword_value(dd, 'nokernels'))
 
  ;- - - - - - - - - - - - - - - - - - -
  ; targets
  ;- - - - - - - - - - - - - - - - - - -
- targ_list = tr_keyword_value(dd, 'targets')
+ targ_list = dat_keyword_value(dd, 'targets')
  if(NOT keyword_set(targ_list)) then $
   begin
    var = strupcase(prefix) + '_SPICE_TARGETS'
@@ -820,8 +822,8 @@ end
 ;
 ;=============================================================================
 function spice_input, dd, keyword, prefix, inst, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 common spice_input_block, last_prefix
 

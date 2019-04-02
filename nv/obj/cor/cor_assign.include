@@ -3,6 +3,7 @@
 ;  lower-level calls
 
  if(defined(name)) then cor_set_name, _xd, name, /noevent
+ if(defined(notes)) then cor_set_notes, _xd, notes, /noevent
  if(defined(abbrev)) then cor_set_abbrev, _xd, abbrev, /noevent
  if(defined(user)) then cor_set_user, _xd, user, /noevent
  if(defined(gd)) then cor_set_gd, _xd, gd, /noevent

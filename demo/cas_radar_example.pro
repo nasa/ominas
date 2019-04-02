@@ -129,7 +129,10 @@ tvim,da<4.5,zoom=0.05,/order,/new
 ;
 ;   Visualize the result, now with grim::
 ; 
-;     grim,dd_map,cd=mdp;,overlays=['planet_grid']
+;     cd = pg_get_cameras(dd)
+;     pd = pg_get_planets(dd, od=cd)
+;     ltd = pg_get_stars(dd, od=cd, name='SUN')
+;     grim,dd_map,cd=mdp,od=cd,ltd=ltd,pd=pd[0],overlays=['planet_grid'],order=0
 ;   
 ;   .. image:: graphics/sar_ex2.png
 ;   
@@ -155,6 +158,6 @@ dd_map=pg_map(dd,md=mdp,cd=mdr,pc_xsize=800,pc_ysize=800)
 cd = pg_get_cameras(dd)
 pd = pg_get_planets(dd, od=cd)
 ltd = pg_get_stars(dd, od=cd, name='SUN')
-grim, dd_map, cd=mdp, od=cd, ltd=ltd, pd=pd[0], overlays=['planet_grid']
+grim,dd_map,cd=mdp,od=cd,ltd=ltd,pd=pd[0],overlays=['planet_grid'],order=0
 
 end

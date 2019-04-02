@@ -50,7 +50,6 @@ function body_to_surface, bx, p
  nt = n_elements(bx)
  result = dblarr(nv,3,nt)
 
-;if(counter() EQ 4) then stop
  gbx = cor_select(bx, 'GLOBE', /class, indices=ii_gbx)
  dkx = cor_select(bx, 'DISK', /class, indices=ii_dkx)
  ii_bx = rm_list_item(lindgen(nt), [ii_gbx, ii_dkx], only=-1)

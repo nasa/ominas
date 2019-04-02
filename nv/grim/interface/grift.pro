@@ -23,8 +23,8 @@
 ;
 ; ARGUMENTS:
 ;  INPUT:
-;	arg:	GRIM window number or GRIM data struture.  If not given, the 
-;		most recently accessed grim instance is used.
+;	arg:	GRIM window number, GRIM tag, or GRIM data struture.  If not 
+;		given, the most recently accessed grim instance is used.
 ;
 ;  OUTPUT: NONE
 ;
@@ -42,6 +42,11 @@
 ;	active:	If set, only active memebrs of the selected objects are
 ;		returned.
 ;
+;	grn:	Id of GRIM window to access.
+;
+;	tag:	Tag of GRIM window to access.
+;	
+;
 ;  OUTPUT:
 ;	gd:	Generic descriptor containing all of GRIM's descriptors.  
 ;		For multiple planes, a list is returned with each element
@@ -55,7 +60,7 @@
 ;	<overlay>_ptd:
 ;		POINT object giving the points for the overlay of type <overlay>.
 ;
-;	object_ptd:
+;	ptd:
 ;		POINT object giving all overlay points.
 ;
 ;	tie_ptd:
@@ -88,7 +93,8 @@
 ;	
 ;-
 ;=============================================================================
-pro grift, arg, plane=planes, pn=pn, all=all, active=active, grn=grn, gd=gd, $
+pro grift, arg, plane=planes, pn=pn, all=all, active=active, grn=grn, tag=tag, $
+         gd=gd, $
          dd=dd, $
          cd=cd, $
          md=md, $
@@ -112,7 +118,7 @@ pro grift, arg, plane=planes, pn=pn, all=all, active=active, grn=grn, gd=gd, $
          center_ptd=center_ptd, $
          shadow_ptd=shadow_ptd, $
          reflection_ptd=reflection_ptd, $
-         object_ptd=object_ptd, $
+         ptd=ptd, $
          tie_ptd=tie_ptd, $
          curve_ptd=curve_ptd, $
 _ref_extra=ex
@@ -143,7 +149,7 @@ _ref_extra=ex
  center_ptd = !null
  shadow_ptd = !null
  reflection_ptd = !null
- object_ptd = !null
+ ptd = !null
  tie_ptd = !null
  curve_ptd = !null
 
@@ -152,9 +158,12 @@ _ref_extra=ex
  ;----------------------------------------------------------------
  arg_type = size(arg, /type)
  if(arg_type EQ 8) then grim_data = arg $
+ else if(arg_type EQ 7) then tag = arg $
  else if(arg_type NE 0) then grn = arg
 
- if(defined(grn)) then grim_data = grim_get_data(grim_grn_to_top(grn)) $
+ if(defined(tag)) then grn = grim_tag_to_grn(tag)
+
+ if(defined(grn)) then grim_data = grim_get_data(grn=grn) $
  else grim_data = grim_get_data(/primary)
 
  if(NOT keyword_set(grim_data)) then grim_data = grim_get_data(planes[0])
@@ -206,7 +215,7 @@ _ref_extra=ex
      reflection_ptd = append_array(reflection_ptd, grim_ptd(plane, /reflection, /active))
      station_ptd = append_array(station_ptd, grim_ptd(plane, /station, /active))
      array_ptd = append_array(array_ptd, grim_ptd(plane, /array, /active))
-     object_ptd = append_array(object_ptd, grim_xd(plane, /active))
+     ptd = append_array(ptd, grim_xd(plane, /active))
     end $
    ;- - - - - - - - - - - - - - - - - - - - - - - - - - - -
    ; all objects
@@ -234,7 +243,7 @@ _ref_extra=ex
      reflection_ptd = append_array(reflection_ptd, grim_ptd(plane, /reflection)) 
      station_ptd = append_array(station_ptd, grim_ptd(plane, /station)) 
      array_ptd = append_array(array_ptd, grim_ptd(plane, /array)) 
-     object_ptd = append_array(object_ptd, grim_ptd(planes[i]))
+     ptd = append_array(ptd, grim_ptd(planes[i]))
     end
 
    ;- - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -40,27 +40,31 @@
 ;
 ;	2. Configuration of OMINAS should be performed using the configuration
 ;	script, configure.sh, which is located in the top-level ominas directory.
-;	This script can be run from the command line with::
+;	From that directory, run this script from the shell prompt with::
 ;
 ;	 source configure.sh
 ;
-;	3. A prompt will appear asking which packages should be installed. The
+;	A prompt will appear asking which packages should be installed. The
 ;	user should type the numbers of the desired packages separated by spaces.
-;	We recomend, at a minimum, setting up packages 1, 2 and 3 (OMINAS Core, Demo and Icy).
+;	We recommend, at a minimum, setting up packages 1, 2 and 3 (OMINAS Core, Demo and Icy).
 ;	To automatically download and setup all the packages, use the `all` option.
 ;
-;	4. When setting up an individual kernel or data package (selections 4-13),
+;	When setting up an individual kernel or data package (selections 4-13),
 ;	one can either provide a path for an existing directory containing the required files,
 ;	or tell the installer to download them.
 ;
-;	5. Test the install of OMINAS has been completed correctly by running the
-;	the following example scripts::
+;	3. Begin the installation by setting up packages 1 and 2, the Core and Demo scripts.
+;
+;	4. Verify that the installation of the basic OMINAS system has been completed correctly 
+;	by running the override example script from the demo/ directory (we recommend using a 
+;	different terminal window rather than swithcing back-and-forth between demos and the installer)::
 ;
 ;	 ominas override_example.pro
-;	 ominas pg_example.pro
 ;
-;	6. A successful Icy installation can be tested with the following IDL
-;	command from within an OMINAS IDL session::
+;	5. Assuming the override example worked properly, you can proceed to install package 3: ICY.
+;
+;	6. Test the ICY installation with the following IDL command from within an OMINAS IDL 
+;	session::
 ;
 ;	 help, 'icy', /dlm
 ;
@@ -71,6 +75,11 @@
 ;
 ;	The version of Icy should be printed. If both of these functions return
 ;	successfully, then Icy has been installed correctly.
+;
+;	7. The ICY installation should be further tested by running the PG example script from the 
+;	demo/ directory::
+;
+;	 ominas pg_example.pro
 ;
 ;
 ; Example installation walkthrough

@@ -43,6 +43,11 @@
 ;
 ; 	vectors: 	Vector arrays.
 ;
+;	comment:	Returns all lines starting with '#', which are 
+;			not otherwise parsed. 
+;
+;	notes:		Array notes.
+;
 ;
 ; RETURN:
 ; 	Normally, this routine returns a POINT containing
@@ -67,7 +72,7 @@
 ;
 ;=============================================================================
 function pnt_read_0, filename, visible=visible, $
-         name=name, desc=desc, flags=flags, points=points, vectors=vectors, $
+         name=name, desc=desc, flags=_flags, points=points, vectors=vectors, $
          comment=comment
 
  lines = read_txt_file(filename, /raw)
@@ -209,7 +214,7 @@ end
 ;
 ;=============================================================================
 function pnt_read_1, filename, visible=visible, $
-         name=name, desc=desc, flags=flags, points=p, vectors=v, $
+         name=name, desc=desc, flags=f, points=p, vectors=v, $
          comment=comment, version=version, data=data, tags=tags
 
  
@@ -386,7 +391,7 @@ end
 ;
 ;=============================================================================
 function pnt_read_2, filename, visible=visible, $
-         name=name, desc=desc, flags=flags, points=p, vectors=v, $
+         name=name, desc=desc, flags=f, points=p, vectors=v, $
          comment=comment, version=version, data=data, tags=tags
 
  
@@ -557,12 +562,391 @@ end
 
 
 ;=============================================================================
+; pnt_read_3
+;
+;=============================================================================
+function pnt_read_3, filename, visible=visible, $
+         name=name, desc=desc, flags=f, points=p, vectors=v, $
+         comment=comment, version=version, data=data, tags=tags, notes=notes
+
+ 
+ openr, unit, filename, /get_lun
+
+ ;- - - - - - - - - - - - - - - - - - -
+ ; read the file
+ ;- - - - - - - - - - - - - - - - - - -
+ name_token = 'name ='
+
+ line = psrpnt_get_next(unit)
+
+ bin = 0
+ fs = fstat(unit)
+ save_ptr = fs.cur_ptr
+ line = psrpnt_get_next(unit)
+ p = strpos(line, 'binary')
+ if(p[0] NE -1) then bin = 1 $
+ else point_lun, unit, save_ptr
+
+
+ done = 0
+ repeat $
+  begin
+   ;- - - - - - - - - - - - - - - - - - -
+   ; name, desc, n
+   ;- - - - - - - - - - - - - - - - - - -
+   line = psrpnt_get_next(unit, name_token, stat=stat)
+   if(stat EQ -1) then done = 1 $
+   else $
+    begin
+     name = strtrim(strep_s(line, name_token, ''), 2)
+     desc = strtrim(strep_s(psrpnt_get_next(unit), 'desc =', ''), 2)
+     n = fix(strtrim((str_sep(psrpnt_get_next(unit), ' '))[2], 2))
+
+     ;- - - - - - - - - - - - - - - - - - -
+     ; points
+     ;- - - - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'points:', stop=':', stat=stat)
+     if(stat EQ 0) then $
+      begin
+       buf = psrpnt_get_next(unit, n=n, bin=bin, buf=dblarr(2,n))
+       if(bin) then p = buf $
+       else $
+        begin
+         xs = str_nnsplit(buf, ' ', rem=ys)
+         p = [tr(double(xs)), tr(double(ys))]
+        end
+      end
+
+     ;- - - - - - - - - - - - - - - - - - -
+     ; vectors
+     ;- - - - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'vectors:', stop=':', stat=stat)
+     v = 0
+     if(stat EQ 0) then $
+      begin
+       buf = psrpnt_get_next(unit, n=n, bin=bin, buf=dblarr(3,n))
+       if(bin) then v = buf $
+       else $
+        begin
+         xs = str_nnsplit(buf, ' ', rem=rem)
+         ys = str_nnsplit(rem, ' ', rem=zs)
+         v = tr([tr(double(xs)), tr(double(ys)), tr(double(zs))])
+        end
+      end
+ 
+     ;- - - - - - - - - - - - - - - - -
+     ; point data
+     ;- - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'point data:', stop=':', stat=stat)
+     if(stat EQ 0) then $
+      begin
+       ss = str_nsplit(strcompress(line[0]), ' ')
+
+       ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+       ; This is a crap protocol.  Shouldn't exist, but somehow does.
+       ;  It looks like a protocol 1 file, but the point data are stored
+       ;  like a protocol 0 file.
+       ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+       if(n_elements(ss) EQ 2) then $
+        begin
+         done = 0
+         repeat $
+          begin
+           readf, unit, line
+           pp = strpos(line, ':')
+           if(pp[0] EQ -1) then data = append_array(data, double(line)) $
+           else done = 1
+          endrep until(done)
+
+         data = reform(data)
+        end $
+       ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+       ; this is the real protocol...
+       ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+       else $
+        begin
+         nn = fix(ss[n_elements(ss)-1])
+
+         buf = psrpnt_get_next(unit, n=n, bin=bin, buf=dblarr(nn,n))
+         if(bin) then data = buf $
+         else $
+          begin
+           lines = strcompress(buf)
+           test = str_nsplit(lines[0], ' ')
+           nn = n_elements(test)
+           data = dblarr(n, nn)
+
+           rem = lines
+
+;           for i=0, nn-1 do data[*,i] = str_nnsplit(rem, ' ', rem=rem)
+           for i=0, nn-2 do data[*,i] = str_nnsplit(rem, ' ', rem=rem)
+           data[*,i] = rem
+          end
+
+         if(n GT 1) then data = reform(data) 
+        end
+
+       data = transpose(data)
+      end     
+
+
+     ;- - - - - - - - - - - - - - - - -
+     ; generic user data
+     ;- - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'udata:', stop=':', stat=stat)
+     if(stat EQ 0) then udata_tlp = tag_list_read(unit=unit, bin=bin)
+
+
+     ;- - - - - - - - - - - - - - - - - - -
+     ; tags
+     ;- - - - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'tags:', stop=':', stat=stat)
+     if(stat EQ 0) then $
+          tags = psrpnt_get_next(unit, n=nn, buf=bytarr(nn))
+
+
+     ;- - - - - - - - - - - - - - - - - - -
+     ; flags
+     ;- - - - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'flags:', stop=':', stat=stat)
+     if(stat EQ 0) then $
+      begin
+       buf = psrpnt_get_next(unit, n=n, bin=bin, buf=bytarr(n))
+       if(bin) then f = buf $
+       else f = byte(fix(buf))
+      end
+   
+     ;- - - - - - - - - - - - - - - - - - -
+     ; notes -- read to eof
+     ;- - - - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'notes:', stop=':', stat=stat)
+     if(stat EQ 0) then $
+      begin
+       notes = ''
+       while(NOT eof(unit)) do $
+	begin
+	 readf, unit, line
+	 notes = append_array(notes, line)
+	end
+      end
+
+
+     ;- - - - - - - - - - - - - - - - - - -
+     ; make ptd
+     ;- - - - - - - - - - - - - - - - - - -
+     ptd = append_array(ptd, $
+             pnt_create_descriptors(name=name, desc=desc, flags=f, $
+                points=p, vectors=v, data=data, tag=tags, udata=udata_tlp, notes=notes) )
+    end
+  endrep until(done)
+
+
+ close, unit
+ free_lun, unit
+
+ return, ptd
+end
+;===========================================================================
+
+
+
+;=============================================================================
+; pnt_read_4
+;
+;=============================================================================
+function pnt_read_4, filename, visible=visible, $
+         name=name, desc=desc, flags=f, points=p, vectors=v, $
+         comment=comment, version=version, data=data, tags=tags, notes=notes
+
+ 
+ openr, unit, filename, /get_lun
+
+ ;- - - - - - - - - - - - - - - - - - -
+ ; read the file
+ ;- - - - - - - - - - - - - - - - - - -
+ name_token = 'name ='
+
+ line = psrpnt_get_next(unit)
+
+ bin = 0
+ fs = fstat(unit)
+ save_ptr = fs.cur_ptr
+ line = psrpnt_get_next(unit)
+ p = strpos(line, 'binary')
+ if(p[0] NE -1) then bin = 1 $
+ else point_lun, unit, save_ptr
+
+
+ done = 0
+ repeat $
+  begin
+   ;- - - - - - - - - - - - - - - - - - -
+   ; name, desc, n
+   ;- - - - - - - - - - - - - - - - - - -
+   line = psrpnt_get_next(unit, name_token, stat=stat)
+   if(stat EQ -1) then done = 1 $
+   else $
+    begin
+     name = strtrim(strep_s(line, name_token, ''), 2)
+     desc = strtrim(strep_s(psrpnt_get_next(unit), 'desc =', ''), 2)
+     n = fix(strtrim((str_sep(psrpnt_get_next(unit), ' '))[2], 2))
+
+     ;- - - - - - - - - - - - - - - - - - -
+     ; points
+     ;- - - - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'points:', stop=':', stat=stat)
+     if(stat EQ 0) then $
+      begin
+       buf = psrpnt_get_next(unit, n=n, bin=bin, buf=dblarr(2,n))
+       if(bin) then p = buf $
+       else $
+        begin
+         xs = str_nnsplit(buf, ' ', rem=ys)
+         p = [tr(double(xs)), tr(double(ys))]
+        end
+      end
+
+     ;- - - - - - - - - - - - - - - - - - -
+     ; vectors
+     ;- - - - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'vectors:', stop=':', stat=stat)
+     v = 0
+     if(stat EQ 0) then $
+      begin
+       buf = psrpnt_get_next(unit, n=n, bin=bin, buf=dblarr(3,n))
+       if(bin) then v = buf $
+       else $
+        begin
+         xs = str_nnsplit(buf, ' ', rem=rem)
+         ys = str_nnsplit(rem, ' ', rem=zs)
+         v = tr([tr(double(xs)), tr(double(ys)), tr(double(zs))])
+        end
+      end
+ 
+     ;- - - - - - - - - - - - - - - - -
+     ; point data
+     ;- - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'point data:', stop=':', stat=stat)
+     if(stat EQ 0) then $
+      begin
+       ss = str_nsplit(strcompress(line[0]), ' ')
+
+       ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+       ; This is a crap protocol.  Shouldn't exist, but somehow does.
+       ;  It looks like a protocol 1 file, but the point data are stored
+       ;  like a protocol 0 file.
+       ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+       if(n_elements(ss) EQ 2) then $
+        begin
+         done = 0
+         repeat $
+          begin
+           readf, unit, line
+           pp = strpos(line, ':')
+           if(pp[0] EQ -1) then data = append_array(data, double(line)) $
+           else done = 1
+          endrep until(done)
+
+         data = reform(data)
+        end $
+       ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+       ; this is the real protocol...
+       ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+       else $
+        begin
+         nn = fix(ss[n_elements(ss)-1])
+
+         buf = psrpnt_get_next(unit, n=n, bin=bin, buf=dblarr(nn,n))
+         if(bin) then data = buf $
+         else $
+          begin
+           lines = strcompress(buf)
+           test = str_nsplit(lines[0], ' ')
+           nn = n_elements(test)
+           data = dblarr(n, nn)
+
+           rem = lines
+
+;           for i=0, nn-1 do data[*,i] = str_nnsplit(rem, ' ', rem=rem)
+           for i=0, nn-2 do data[*,i] = str_nnsplit(rem, ' ', rem=rem)
+           data[*,i] = rem
+          end
+
+         if(n GT 1) then data = reform(data) 
+        end
+
+       data = transpose(data)
+      end     
+
+
+     ;- - - - - - - - - - - - - - - - -
+     ; generic user data
+     ;- - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'udata:', stop=':', stat=stat)
+     if(stat EQ 0) then udata_tlp = tag_list_read(unit=unit, bin=bin)
+
+
+     ;- - - - - - - - - - - - - - - - - - -
+     ; tags
+     ;- - - - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'tags:', stop=':', stat=stat)
+     if(stat EQ 0) then $
+          tags = psrpnt_get_next(unit, n=nn, buf=bytarr(nn))
+
+
+     ;- - - - - - - - - - - - - - - - - - -
+     ; flags
+     ;- - - - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'flags:', stop=':', stat=stat)
+     if(stat EQ 0) then $
+      begin
+       buf = psrpnt_get_next(unit, n=n, bin=bin, buf=bytarr(n))
+       if(bin) then f = buf $
+       else f = byte(fix(buf))
+      end
+   
+     ;- - - - - - - - - - - - - - - - - - -
+     ; notes -- read to eof
+     ;- - - - - - - - - - - - - - - - - - -
+     line = psrpnt_get_next(unit, 'notes:', stop=':', stat=stat)
+     if(stat EQ 0) then $
+      begin
+       notes = ''
+       while(NOT eof(unit)) do $
+	begin
+	 readf, unit, line
+         if(strtrim(line,2) EQ '__end_notes__') then break
+	 notes = append_array(notes, line)
+	end
+      end
+
+
+     ;- - - - - - - - - - - - - - - - - - -
+     ; make ptd
+     ;- - - - - - - - - - - - - - - - - - -
+     ptd = append_array(ptd, $
+             pnt_create_descriptors(name=name, desc=desc, flags=f, $
+                points=p, vectors=v, data=data, tag=tags, udata=udata_tlp, notes=notes) )
+    end
+  endrep until(done)
+
+
+ close, unit
+ free_lun, unit
+
+ return, ptd
+end
+;===========================================================================
+
+
+
+;=============================================================================
 ; pnt_read
 ;
 ;=============================================================================
 function pnt_read, filename, bin=bin, $
          name=name, desc=desc, flags=flags, points=points, vectors=vectors, $
-         comment=comment, data=data, tags=tags
+         comment=comment, data=data, tags=tags, notes=notes
 @pnt_include.pro
 
  openr, unit, filename, /get_lun
@@ -594,6 +978,7 @@ function pnt_read, filename, bin=bin, $
  ;---------------------------------------------------------------------
  ; parse file according to protocol
  ;---------------------------------------------------------------------
+ nv_message, verb=0.1, 'Reading ' + filename
  case protocol of
   0: begin
       ptd = pnt_read_0(filename, visible=visible, $
@@ -606,6 +991,12 @@ function pnt_read, filename, bin=bin, $
   2: ptd = pnt_read_2(filename, visible=visible, $
          name=name, desc=desc, flags=flags, points=points, vectors=vectors, $
          comment=comment, version=version, data=data, tags=tags)
+  3: ptd = pnt_read_3(filename, visible=visible, $
+         name=name, desc=desc, flags=flags, points=points, vectors=vectors, $
+         comment=comment, version=version, data=data, tags=tags, notes=notes)
+  4: ptd = pnt_read_4(filename, visible=visible, $
+         name=name, desc=desc, flags=flags, points=points, vectors=vectors, $
+         comment=comment, version=version, data=data, tags=tags, notes=notes)
   else: nv_message, 'Invalid protocol.'
  endcase
 

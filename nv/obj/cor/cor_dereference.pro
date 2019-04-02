@@ -49,7 +49,9 @@
 function cor_dereference, xd
 @core.include
 
+ if(NOT keyword_set(xd)) then return, xd
  if(size(xd, /type) NE 11) then return, xd
+ ;if ~isa(xd,'ominas_core') then return,xd
 
  s = size(xd)
  n1 = (n2 = 1)

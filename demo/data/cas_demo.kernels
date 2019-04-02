@@ -10,6 +10,10 @@ $DEMO_SPICE_LSK/naif0012.tls
 $DEMO_SPICE_CK/16028_16033ra.bc
 $DEMO_SPICE_SPK/160519R_SCPSE_16025_16041.bsp
 
+# used for eclipse example
+$DEMO_SPICE_CK/17191_17258pe_psiv.bc
+$DEMO_SPICE_SPK/140114AP_SCPSE_13290_17265.bsp
+
 # used for grim example
 $DEMO_SPICE_CK/04094_04101ra.bc
 
@@ -34,7 +38,8 @@ $DEMO_SPICE_SPK/010420R_SCPSE_EP1_JP83.bsp
 # generic kernels for cas/cas iss / vims
 $DEMO_SPICE_FK/cas_v37.tf
 $DEMO_SPICE_IK/cas_iss_v08.ti
-$DEMO_SPICE_SCK/cas00083.tsc
+#$DEMO_SPICE_SCK/cas00083.tsc
+$DEMO_SPICE_SCK/cas00172.tsc
 $DEMO_SPICE_IK/cas_vims_v06.ti
 $DEMO_SPICE_IK/cas_uvis_v06.ti
 
@@ -86,3 +91,7 @@ $DEMO_SPICE_CK/04032_04060ca_ISS.bc
 # used for UVIS example
 $DEMO_SPICE_SPK/071127R_SCPSE_07221_07262.bsp
 $DEMO_SPICE_CK/07252_07257ra.bc
+
+#used for CIRS example
+$DEMO_SPICE_SPK/100325R_SCPSE_10021_10055.bsp 
+$DEMO_SPICE_CK/10044_10049ra.bc

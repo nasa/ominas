@@ -2,10 +2,8 @@
 ; detect_tdl.pro
 ;
 ;===========================================================================
-function detect_tdl, dd
+function detect_tdl, filename=filename, header=header
 
- filename = dat_filename(dd)
- header = dat_header(dd)
  status = 0
 
 
@@ -16,7 +14,8 @@ function detect_tdl, dd
  else $
   begin
    openr, unit, filename, /get_lun, error=error
-   if(error NE 0) then nv_message, /anonymous, !err_string
+   if(error NE 0) then return, 0
+   if((fstat(unit)).size LT 20) then return, 0
    record = assoc(unit, bytarr(20,/nozero))
    s = string(record[0])
    close, unit
@@ -27,6 +26,7 @@ function detect_tdl, dd
  ;===================================
  ; check for label field
  ;===================================
+ if ~isa(s,'string') then return,0
  if(strpos(s[0], 'TDL_LBLSIZE') NE -1) then status=1
 
 

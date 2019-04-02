@@ -24,7 +24,6 @@ function spice_planets, dd, ref, $
 
  ;----------------------------------------------------------------------
  ; get object names
- ;  If no names are requested, then request all bodies with known radii
  ;----------------------------------------------------------------------
  if(NOT keyword_set(name)) then name = spice_get_all_target_names()
  n = n_elements(name)

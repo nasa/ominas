@@ -20,7 +20,8 @@
 ;  INPUT: 
 ;	md:	 Array (nt) of map descriptors.
 ;
-;	west:	 Array (nt) of new west flags.
+;	west:	 Array (nt) of new west flags.  If not set, the flag is
+;		 set to 1.
 ;
 ;  OUTPUT: NONE
 ;
@@ -46,6 +47,8 @@
 pro map_set_west, md, west, noevent=noevent
 @core.include
  _md = cor_dereference(md)
+
+ if(NOT defined(west)) then west = make_array(n_elements(_md), val=1)
 
  _md.west=west
 

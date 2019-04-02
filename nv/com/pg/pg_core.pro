@@ -17,7 +17,9 @@
 ;
 ; ARGUMENTS:
 ;  INPUT:
-;	  dd:	 Data descriptor(s).
+;	  dd:	 Data descriptor(s).  Multiple descriptors are given,
+;		 the data arrays are stacked, so the 0 and 1 dimensions must 
+;		 all agree.
 ;
 ; outline_ptd:   POINT descriptor giving the outline of the region to plot,
 ;                as produced by the pg_select_region.
@@ -69,11 +71,77 @@ function pg_core, dd, cd=cd, gd=gd, outline_ptd, distance=distance, $
  ;-----------------------------------------------
  if(NOT keyword_set(dd)) then dd = dat_gd(gd, /dd)
  if(NOT keyword_set(cd)) then cd = dat_gd(gd, dd=dd, /cd)
+ ndd = n_elements(dd)
+
+ ;-----------------------------------
+ ; construct the cube
+ ;-----------------------------------
+ for i=0, n_elements(dd)-1 do $
+  begin
+   data = dat_data(dd[i], abscissa=ab)
+   dim = dat_dim(dd[i])
+
+   is_cube = 1
+   if(n_elements(dim) EQ 2) then is_cube = 0 $
+   else if(dim[2] EQ 1) then is_cube = 0
+
+   if(NOT is_cube) then $
+    begin
+     data = reform(data, 1, dim[0], dim[1], /over)
+     ab = reform(ab, 1, dim[0], dim[1], /over)
+    end $
+   else $
+    begin
+     data = transpose(data, [2,0,1])
+     ab = transpose(ab, [2,0,1])
+    end
+
+   cube = append_array(cube, data)
+   abscissa = append_array(abscissa, ab)
+  end
+ cube = transpose(cube)
+ abscissa = transpose(abscissa)
+ dim = size(cube, /dim)
+ if(n_elements(dim) EQ 2) then dim = [dim, 1]
+
+
+ ;-----------------------------------
+ ; get the sample points
+ ;-----------------------------------
+ outline_pts = pnt_points(outline_ptd)
+ if(n_elements(outline_pts) EQ 2) then sub = xy_to_w(dim[0:1], outline_pts) $
+ else sub = polyfillv(outline_pts[0,*], outline_pts[1,*], dim[0], dim[1])
+ nsub = n_elements(sub)
+
+ ;-----------------------------------------------
+ ; extract core
+ ;-----------------------------------------------
+;; need to interpolate each channel using imageinterp_cam; see pg_profile_image
+; core = get_cube_core(cube, cd, p, nl, nw, sample, $
+;       distance=distance, interp=interp, arg_interp=arg_interp, sigma=sigma, image_pts=image_pts)
 
 
 
+ cube = reform(cube, dim[0]*dim[1], dim[2], /over)
+ abscissa = reform(abscissa, dim[0]*dim[1], dim[2], /over)
+ cores = cube[sub,*]
+ abscissas = abscissa[sub,*]
 
+ core = total(cores, 1)/nsub
+ abscissa = total(abscissas, 1)/nsub
+ if(nsub GT 1) then sigma = sqrt( total(cores^2,1)/nsub - (total(cores,1)/nsub)^2 )
 
+ dd_core = dat_create_descriptors(1, data=core, abscissa=abscissa, name=cor_name(dd[0]))
+ dat_set_header, dd_core[0], dat_header(dd[0])
+
+ if(keyword_set(sigma)) then $
+  begin
+   dd_core = [dd_core, $
+     dat_create_descriptors(1, data=sigma, abscissa=abscissa, name=cor_name(dd[0]))]
+   dat_set_header, dd_core[1], dat_header(dd[0])
+  end
+
+ return, dd_core
 
 
 
@@ -121,8 +189,8 @@ function pg_core, dd, cd=cd, gd=gd, outline_ptd, distance=distance, $
  dat_set_header, dd_prof[1], dat_header(dd)
 
  image_ptd = pnt_create_descriptors(points=image_pts)
- cor_set_udata, dd_prof[0], 'IMAGE_PS', image_ptd
- cor_set_udata, dd_prof[1], 'IMAGE_PS', image_ptd
+ cor_set_udata, dd_prof[0], 'IMAGE_PTD', image_ptd
+ cor_set_udata, dd_prof[1], 'IMAGE_PTD', image_ptd
 
  return, dd_prof
 end

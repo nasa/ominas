@@ -179,9 +179,10 @@ function grim_image, grim_data, plane=plane, pn=pn, colormap=colormap, $
  if(NOT keyword_set(plane)) then plane = grim_get_plane(grim_data)
  ctmod, top=top
 
-;;; dim = (dat_dim(plane.dd))[0:1]
  dim = dat_dim(plane.dd)
  if(NOT keyword_set(dim)) then return, 0
+
+;; dim = grim_redimension(dim, 2)
  dim = dim[0:1]
 
  ;---------------------------------------
@@ -190,6 +191,9 @@ function grim_image, grim_data, plane=plane, pn=pn, colormap=colormap, $
  planes = grim_visible_planes(grim_data, current=current, plane=plane)
  rgb = planes.rgb
 
+ ;------------------------------------------------------
+ ; determine scaling
+ ;------------------------------------------------------
  max = plane.max[0]
  if(NOT keyword_set(max)) then max = max(dat_max(planes.dd))
 
@@ -362,16 +366,17 @@ pro grim_display_image, grim_data, plane=plane, $
    wset, grim_data.wnum
 
    zoom = min([entire_xsize/dim[0], entire_ysize/dim[1]]) * 0.95
-
    offset = 0.5 * [dim[0]-entire_xsize/zoom, $
                      dim[1]-entire_ysize/zoom]
   end
+
+ integer_zoom = grim_get_toggle_flag(grim_data, 'INTEGER_ZOOM')
 
  tvim, wnum, /silent, doffset=doffset, zoom=zoom, rotate=rotate, order=order, $
        default=default, previous=previous, flip=flip, restore=restore, $
        xsize=xsize, ysize=ysize, offset=offset, top=top, noplot=no_plot, $
        no_scale=no_scale, no_wset=no_wset, no_coord=no_coord, tvimage=tvimage, $
-       home=home, draw_pixmap=draw_pixmap, no_copy=no_copy;, erase=erase
+       home=home, draw_pixmap=draw_pixmap, no_copy=no_copy, integer_zoom=integer_zoom;, erase=erase
 
  if(NOT plane.image_visible) then return
 
@@ -949,6 +954,67 @@ end
 
 
 ;=============================================================================
+; grim_update_jumpto_droplist
+;
+;=============================================================================
+pro grim_update_jumpto_droplist, grim_data, names=names, max_planes=max_planes
+if(NOT keyword_set(grim_data.jumpto_droplist)) then return
+
+ if(NOT keyword_set(max_planes)) then max_planes = 50
+
+ pns = lindgen(grim_data.n_planes)
+ if(grim_data.n_planes GT max_planes) then $
+  begin
+   pns = lindgen(max_planes) + grim_data.pn - max_planes/2
+   if(pns[0] LT 0) then pns = pns - pns[0] $
+   else if(pns[max_planes-1] GE grim_data.n_planes) then $
+           pns = pns - (pns[max_planes-1] - grim_data.n_planes)
+  end
+
+ val = strtrim(pns, 2)
+ if(keyword_set(names)) then $
+  begin
+   planes = grim_get_plane(grim_data, pn=pns)
+   val = str_pad(val + ': ', 5) + cor_name(planes.dd)
+  end
+
+ widget_control, grim_data.jumpto_droplist, set_value=val
+ widget_control, grim_data.jumpto_droplist, $
+                              set_droplist_select=where(val EQ grim_data.pn)
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_update_jumpto_combobox
+;
+;=============================================================================
+pro grim_update_jumpto_combobox, grim_data, names=names, max_planes=max_planes
+if(NOT keyword_set(grim_data.jumpto_combobox)) then return
+
+ if(NOT keyword_set(max_planes)) then max_planes = 50
+
+ pns = lindgen(grim_data.n_planes)
+
+ val = strtrim(pns, 2)
+ if(keyword_set(names)) then $
+  begin
+   planes = grim_get_plane(grim_data, pn=pns)
+   val = str_pad(val + ': ', 5) + cor_name(planes.dd)
+  end
+
+ widget_control, grim_data.jumpto_combobox, set_value=val
+ widget_control, grim_data.jumpto_combobox, $
+                              set_combobox_select=where(val EQ grim_data.pn)
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
 ; grim_refresh
 ;
 ;=============================================================================
@@ -963,12 +1029,27 @@ pro grim_refresh, grim_data, wnum=wnum, plane=plane, $
  no_context=no_context, no_callback=no_callback, no_back=no_back, $
  no_coord=no_coord, tvimage=tvimage, no_plot=no_plot, just_image=just_image, $
  dx=dx, dy=dy, update=update, current=current, no_copy=no_copy, no_main=no_main, $
- no_user=no_user, overlay_color=overlay_color
+ no_user=no_user, overlay_color=overlay_color, disable=disable, enable=enable
 @grim_block.include
 
 
-
  if(NOT keyword_set(grim_data)) then grim_data = grim_get_data(plane=plane) 
+
+ if(keyword_set(disable)) then $
+  begin
+   grim_data.enable_refresh = 0
+   grim_set_data, grim_data
+   return
+  end
+ if(keyword_set(enable)) then $
+  begin
+   grim_data.enable_refresh = 1
+   grim_set_data, grim_data
+   return
+  end
+ if(NOT grim_data.enable_refresh) then return
+
+
  if(NOT keyword_set(noglass)) then widget_control, grim_data.draw, /hourglass
  if(NOT keyword_set(no_wset)) then grim_wset, grim_data, grim_data.wnum
 
@@ -981,7 +1062,7 @@ pro grim_refresh, grim_data, wnum=wnum, plane=plane, $
    planes = grim_get_visible_planes(grim_data)
   end $
  else planes = plane
-
+ all_planes = grim_get_plane(grim_data, /all)
 
  ;-----------------------------------
  ; apply any default activations
@@ -1067,11 +1148,13 @@ pro grim_refresh, grim_data, wnum=wnum, plane=plane, $
  if(NOT keyword_set(no_title)) then $
   begin
    beta = ''
-   if(grim_data.beta) then beta = '(beta)'
-   title = 'GRIM' + beta + ' ' + strtrim(grim_data.grn,2) + $
-           ';  plane ' + strtrim(grim_data.pn,2) + ' of ' + $
-           strtrim(grim_data.n_planes,2) + ';  ' + $
-           grim_title(plane)
+   if(grim_data.beta) then beta = ' (beta)'
+   tag = ''
+   if(keyword_set(grim_data.tag)) then tag = ' "' + grim_data.tag + '"'
+   title = 'GRIM' + beta + ' ' + strtrim(grim_data.grn,2) + tag + ';  ' + $
+           strtrim(grim_data.n_planes,2) + ' plane' + $
+           (grim_data.n_planes GT 1 ? 's' : '') + $
+           ';  ' + grim_title(plane)
     if(keyword_set(grim_data.def_title)) then title = title + ' -- ' + grim_data.def_title
     
     title = title + ' <' + grim_channel_string(plane) + '>'
@@ -1081,9 +1164,10 @@ pro grim_refresh, grim_data, wnum=wnum, plane=plane, $
 
 
  ;-----------------------------------
- ; clear out plane text box
+ ; update plane number droplist
  ;-----------------------------------
- widget_control, grim_data.jumpto_text, set_value=''
+ grim_update_jumpto_droplist, grim_data
+ grim_update_jumpto_combobox, grim_data
 
 
  ;-----------------------------------
@@ -1118,7 +1202,7 @@ pro grim_refresh, grim_data, wnum=wnum, plane=plane, $
  ;-----------------------------------
  ; update active and primary arrays
  ;-----------------------------------
- grim_update_active_xds, grim_data, plane=plane
+ grim_update_activations, grim_data, plane=plane, /no_sync
 
 
  ;-----------------------------------

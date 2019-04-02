@@ -1,6 +1,7 @@
 abbrev=abbrev, $
 user=user, $
 name=name, $
+notes=notes, $
 tasks=tasks, $
 udata=udata, $
 uname=uname, $

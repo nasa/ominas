@@ -2,15 +2,27 @@
 ; dh_write_fits.pro
 ;
 ;=============================================================================
-pro dh_write_fits, dd, filename, data, header, abscissa=abscissa, nodata=nodata
+function dh_write_fits, dd, filename, nodata=nodata, sample=sample, status=status
+ 
+ if(keyword_set(nodata)) then return, 0
+ if(defined(sample)) then return, -1
 
- if(keyword_set(nodata)) then return
-
+; filename = dat_filename(dd)
  if(NOT keyword_set(filename)) then filename = dat_filename(dd)
- if(NOT keyword_set(header)) then header = dat_header(dd)
- if(NOT keyword_set(data)) then data = dat_data(dd, abscissa=_abscissa)
- if(NOT keyword_set(abscissa)) then abscissa = _abscissa
 
- write_fits, filename, data, header, /silent
+ header = dat_header(dd)
+ data = dat_data(dd)
+ abscissa = dat_abscissa(dd)
+
+ fits_write, filename, data, header
+ if(defined(abscissa)) then $
+  begin
+   fits_open, filename, fcb, /append
+   fits_write, fcb, abscissa, extname='ABSCISSA', xtension='IMAGE'
+   fits_close, fcb
+  end
+
+
+ return, 0
 end
 ;=============================================================================

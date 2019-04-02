@@ -5,9 +5,10 @@
 ;  dt returns offset applied from shutter close
 ;
 ;===========================================================================
-function cas_uvis_spice_time, label, dt=dt, string=string, status=status, exposure=exposure
+function cas_uvis_spice_time, dd, dt=dt, string=string, status=status, exposure=exposure
 
  status = -1
+ label=dat_header(dd)
  start_time=pdspar(label,'START_TIME')
  if(NOT keyword_set(start_time)) then return, -1d100
  status = 0
@@ -29,7 +30,8 @@ function cas_uvis_spice_time, label, dt=dt, string=string, status=status, exposu
  dt = -0.5d*exposure
  nv_message,verb=0.91,'UVIS START_TIME='+strtrim(start_time,2)
  if(keyword_set(string)) then return, close_time
- return, spice_str2et(close_time) + dt
+ ret=spice_str2et(start_time)+ (-0d0)*dt
+ return, ret
 ;===========================================================================
 end
 

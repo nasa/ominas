@@ -5,7 +5,7 @@
 ;
 ;
 ; PURPOSE:
-;	Computesthe intersection of a plane with a GLOBE object.
+;	Computes the intersection of a plane with a GLOBE object.
 ;
 ;
 ; CATEGORY:

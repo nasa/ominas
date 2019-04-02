@@ -41,7 +41,7 @@ pro gen_db_struct__define
 	last :		0d, $	
 	mtime:		0d, $	
 	lbltime :	0d, $	
-	installtime :	0d $	
+	installtime :	0d$	
     }
 
 

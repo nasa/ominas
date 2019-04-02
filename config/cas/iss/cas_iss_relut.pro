@@ -2,7 +2,10 @@
 ; cas_iss_relut
 ;
 ;==============================================================================
-function cas_iss_relut, image, label, force=force
+function cas_iss_relut, dd, force=force
+
+ image = dat_data(dd, /true)
+ label = dat_header(dd)
 
  if(NOT keyword_set(label)) then force = 1
 
@@ -23,6 +26,6 @@ function cas_iss_relut, image, label, force=force
  ;--------------------------
  nv_message, verb=0.2, 'Re-LUT-ing...'
 
- return, byte(lut[image])
+ dat_set_data, dd, byte(lut[image])
 end
 ;==============================================================================

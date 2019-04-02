@@ -284,6 +284,7 @@ if nbytes EQ 0 then if not SILENT then $
 	; xdr conversion - JNS; 1/1998
 	;--------------------------------------
 	  case bitpix of 
+	 	  8:	
 	 	  16:	byteorder, data, /ntohs
 	 	  32:	byteorder, data, /ntohl
 	 	 -32:   byteorder, data, /xdrtof

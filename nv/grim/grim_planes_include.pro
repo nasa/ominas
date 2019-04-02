@@ -1,61 +1,75 @@
 ;=============================================================================
-; grim_next_plane
+; grim_change_plane
 ;
 ;=============================================================================
-pro grim_next_plane, grim_data, norefresh=norefresh
+pro grim_change_plane, grim_data, pn, norefresh=norefresh, $
+         next=next, previous=previous, first=first, last=last
 
  if(grim_data.n_planes EQ 1) then return
 
  ;-----------------------------------
- ; change to next valid plane
+ ; change to valid plane
  ;-----------------------------------
  flags = *grim_data.pl_flags_p
 
- repeat $
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ ; /first: look for earliest valid plane
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ if(keyword_set(first)) then $
   begin
-   grim_data.pn = grim_data.pn + 1
-   if(grim_data.pn EQ grim_data.n_planes) then grim_data.pn = 0
-  endrep until(flags[grim_data.pn] NE 0)
+   grim_data.pn = 0
+   while(flags[grim_data.pn] EQ 0) do grim_data.pn = grim_data.pn + 1
+  end
+
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ ; /last: look for latest valid plane
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ if(keyword_set(last)) then $
+  begin
+   grim_data.pn = grim_data.n_planes - 1
+   while(flags[grim_data.pn] EQ 0) do grim_data.pn = grim_data.pn - 1
+  end
+
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ ; /next: look for next valid plane
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ if(keyword_set(next)) then $
+  repeat $
+   begin
+    grim_data.pn = grim_data.pn + 1
+    if(grim_data.pn EQ grim_data.n_planes) then grim_data.pn = 0
+   endrep until(flags[grim_data.pn] NE 0)
+
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ ; /previous: look for previous valid plane
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ if(keyword_set(previous)) then $
+  repeat $
+   begin
+    grim_data.pn = grim_data.pn - 1
+    if(grim_data.pn EQ -1) then grim_data.pn = grim_data.n_planes-1
+   endrep until(flags[grim_data.pn] NE 0)
+
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ ; pn: only change if specified plane is valid
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ if(defined(pn)) then $
+  begin
+   if(flags[grim_data.pn] EQ 0) then return
+   grim_data.pn = pn
+  end
 
  grim_set_data, grim_data
 
+
+ ;-----------------------------------
+ ; refresh, notify, and sync
+ ;-----------------------------------
  no_erase = 1 
  if(grim_data.type EQ 'PLOT') then no_erase = 0
  
- if(NOT keyword_set(norefresh)) then grim_refresh, grim_data, no_erase=no_erase, /noglass
-
- grim_call_plane_callbacks, grim_data
- grim_sync_planes, grim_data
-end
-;=============================================================================
-
-
-
-;=============================================================================
-; grim_previous_plane
-;
-;=============================================================================
-pro grim_previous_plane, grim_data
-
- if(grim_data.n_planes EQ 1) then return
-
- ;-----------------------------------
- ; change to next valid plane
- ;-----------------------------------
- flags = *grim_data.pl_flags_p
-
- repeat $
-  begin
-   grim_data.pn = grim_data.pn - 1
-   if(grim_data.pn EQ -1) then grim_data.pn = grim_data.n_planes-1
-  endrep until(flags[grim_data.pn] NE 0)
-
- grim_set_data, grim_data
-
- no_erase = 1 
- if(grim_data.type EQ 'PLOT') then no_erase = 0
- 
- grim_refresh, grim_data, no_erase=no_erase, /noglass
+ if(NOT keyword_set(norefresh)) then $
+                     grim_refresh, grim_data, no_erase=no_erase, /noglass
  grim_call_plane_callbacks, grim_data
  grim_sync_planes, grim_data
 end
@@ -68,6 +82,8 @@ end
 ;
 ;=============================================================================
 function grim_get_plane, grim_data, all=all, pn=pn, visible=visible
+
+ if(NOT keyword_set(grim_data)) then return, 0
 
  if(keyword_set(all)) then $
   begin
@@ -158,8 +174,6 @@ function grim_get_image, grim_data, plane=plane, abscissa=abscissa, $
    current=current, sample=sample, channel=channel, nd=nd
 
  if(NOT keyword_set(plane)) then plane = grim_get_plane(grim_data)
-
- dim = (dat_dim(plane.dd))[0:1]
 
  ;--------------------------------------------------------------------
  ; if rgb plane, then override offset to yield image corresponding
@@ -295,7 +309,7 @@ pro grim_rm_plane, grim_data, pn
  ;---------------------------------------------------------------
  ; change to a valid plane
  ;---------------------------------------------------------------
- grim_previous_plane, grim_data
+ grim_change_plane, grim_data, /previous
  grim_refresh, grim_data
 
 
@@ -421,11 +435,11 @@ end
 ;=============================================================================
 function grim_clone_plane, grim_data, plane=plane, spawn=spawn
 
+ ;---------------------------------------------
+ ; add a new plane
+ ;---------------------------------------------
 ; if(keyword_set(spawn)) then 
  grim_add_planes, grim_data, plane.dd, pn=pn
-
- xd = grim_xd(plane)
- ptd = grim_ptd(plane)
 
  new_plane = nv_clone(plane)
 
@@ -435,18 +449,26 @@ function grim_clone_plane, grim_data, plane=plane, spawn=spawn
  new_plane.cmd = colormap_descriptor(data=new_plane.pn, $
                                 n_colors=grim_n_colors(dat_typecode(new_plane.dd)))
 
+ ;---------------------------------------------
+ ; clone descriptors
+ ;---------------------------------------------
+ xd = grim_xd(plane)
+ ptd = grim_ptd(plane)				;;;returns 0
+
  new_xd = grim_xd(new_plane)
  new_ptd = grim_ptd(new_plane)
-
 
  nv_notify_register, new_plane.dd, 'grim_descriptor_notify', scalar_data=grim_data.base
  nv_notify_register, new_xd, 'grim_descriptor_notify', scalar_data=grim_data.base
 
-
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ ; replace dependencies of original plane with those of new plane
+ ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  cor_substitute_xd, new_xd, plane.dd, new_plane.dd, /use_gd, /noevent
 
- cor_substitute_xd, new_ptd, xd, new_xd, /use_gd, /noevent
+ cor_substitute_xd, new_xd, xd, new_xd, /use_gd, /noevent
  cor_substitute_xd, new_ptd, ptd, new_ptd, /use_gd, /noevent
+ cor_substitute_xd, new_ptd, xd, new_xd, /use_gd, /noevent
 
  if(keyword_set(ptd)) then $
   begin
@@ -454,6 +476,8 @@ function grim_clone_plane, grim_data, plane=plane, spawn=spawn
    cor_substitute_xd, assoc_xds, xd, new_xd, /noevent
    pnt_set_assoc_xd, new_ptd, assoc_xds
   end
+
+
 
  grim_set_plane, grim_data, new_plane
  grim_set_data, grim_data
@@ -623,7 +647,7 @@ pro grim_add_planes, grim_data, dd, pns=pns, filter=filter, fov=fov, clip=clip, 
 		load_path	:	load_path, $
 		save_path	:	save_path, $
 		rendering	:	0, $
-		prescaled	:	0, $			; overlays always visible?
+		prescaled	:	0, $	
 		visible		:	0, $			; overlays always visible?
 		image_visible	:	0, $
 		tvd_save_p	:	ptr_new(0), $
@@ -703,8 +727,7 @@ gd		:	ptr_new(0), $	; Generic descriptor
 		mask_p		: 	ptr_new(-1), $
 		tiepoint_ptdp	: 	ptr_new(obj_new()), $
 		curve_ptdp	: 	ptr_new(obj_new()), $
-		user_ptd_tlp	:	ptr_new(), $	
-		notes_p		:	ptr_new(''), $
+		user_ptd_tlp	:	ptr_new({tag_list_struct}), $	
 
 	;-----------------
 	; stretch

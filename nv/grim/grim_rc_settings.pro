@@ -30,11 +30,13 @@ pro grim_rc_settings, rcfile=rcfile, keyvals=keyvals, $
 	filetype=filetype, hide=hide, mode_args=mode_args, xzero=xzero, rgb=rgb, $
         psym=psym, nhist=nhist, maintain=maintain, ndd=ndd, workdir=workdir, $
         activate=activate, frame=frame, compress=compress, loadct=loadct, maxdat=maxdat, $
-	arg_extensions=arg_extensions, extensions=extensions, beta=beta, rendering=rendering, $
-        plane_syncing=plane_syncing, tiepoint_syncing=tiepoint_syncing, curve_syncing=curve_syncing, visibility=visibility, channel=channel, $
+	arg_extensions=arg_extensions, arg_menus=arg_menus, extensions=extensions, beta=beta, rendering=rendering, $
+        plane_syncing=plane_syncing, tiepoint_syncing=tiepoint_syncing, curve_syncing=curve_syncing, action_syncing=action_syncing, activation_syncing=activation_syncing, visibility=visibility, channel=channel, $
         render_numbra=render_numbra, render_sampling=render_sampling, render_minimum=render_minimum, slave_overlays=slave_overlays, $
         delay_overlays=delay_overlays, auto_stretch=auto_stretch, lights=lights, $
-        render_rgb=render_rgb, render_current=render_current, render_spawn=render_spawn, render_auto=render_auto, render_sky=render_sky
+        render_rgb=render_rgb, render_current=render_current, render_spawn=render_spawn, render_auto=render_auto, render_sky=render_sky, $
+	guideline=guideline, integer_zoom=integer_zoom, exclude_overlays=exclude_overlays, $
+	settings_overlays=settings_overlays
 
 
  ;----------------------------------------------------
@@ -42,7 +44,7 @@ pro grim_rc_settings, rcfile=rcfile, keyvals=keyvals, $
  ;----------------------------------------------------
  defsysv, '!grimrc', exists=exists
  if(exists) then rcname = !grimrc $
- else rcname = getenv('HOME') + '/' + rcfile
+ else rcname = getenv('HOME') + path_sep() + rcfile
  if(NOT keyword_set(rcname)) then return
 
  fname = file_search(rcname)
@@ -198,6 +200,11 @@ pro grim_rc_settings, rcfile=rcfile, keyvals=keyvals, $
  else _arg_extensions = arg_extensions
  if(keyword_set(_arg_extensions)) then arg_extensions = _arg_extensions
 
+ if(n_elements(arg_menus) EQ 0) then $
+               _arg_menus = extra_value(kv, 'ARG_MENUS') $
+ else _arg_menus = arg_menus
+ if(keyword_set(_arg_menus)) then arg_menus = _arg_menus
+
  if(n_elements(cam_trs) EQ 0) then _cam_trs = extra_value(kv, 'CAM_TRS') $
  else _cam_trs = cam_trs
  if(keyword_set(_cam_trs)) then cam_trs = _cam_trs
@@ -301,6 +308,16 @@ pro grim_rc_settings, rcfile=rcfile, keyvals=keyvals, $
  else _curve_syncing = curve_syncing
  if(keyword_set(_curve_syncing)) then curve_syncing = fix(_curve_syncing)
 
+ if(n_elements(activation_syncing) EQ 0) then $
+                       _activation_syncing = extra_value(kv, 'ACTIVATION_SYNCING') $
+ else _activation_syncing = activation_syncing
+ if(keyword_set(_activation_syncing)) then activation_syncing = fix(_activation_syncing)
+
+ if(n_elements(action_syncing) EQ 0) then $
+                       _action_syncing = extra_value(kv, 'ACTION_SYNCING') $
+ else _action_syncing = action_syncing
+ if(keyword_set(_action_syncing)) then action_syncing = fix(_action_syncing)
+
  if(n_elements(rgb) EQ 0) then _rgb = extra_value(kv, 'RGB') $
  else _rgb = rgb
  if(keyword_set(_rgb)) then rgb = fix(_rgb)
@@ -358,6 +375,26 @@ pro grim_rc_settings, rcfile=rcfile, keyvals=keyvals, $
                       _render_sky = extra_value(kv, 'RENDER_SKY') $
  else _render_sky = render_sky
  if(keyword_set(_render_sky)) then render_sky = fix(_render_sky)
+
+ if(n_elements(guideline) EQ 0) then $
+                      _guideline = extra_value(kv, 'GUIDELINE') $
+ else _guideline = guideline
+ if(keyword_set(_guideline)) then guideline = fix(_guideline)
+
+ if(n_elements(integer_zoom) EQ 0) then $
+                      _integer_zoom = extra_value(kv, 'INTEGER_ZOOM') $
+ else _integer_zoom = integer_zoom
+ if(keyword_set(_integer_zoom)) then integer_zoom = fix(_integer_zoom)
+
+ if(n_elements(exclude_overlays) EQ 0) then $
+                      _exclude_overlays = extra_value(kv, 'EXCLUDE_OVERLAYS') $
+ else _exclude_overlays = exclude_overlays
+ if(keyword_set(_exclude_overlays)) then exclude_overlays = _exclude_overlays
+
+ if(n_elements(settings_overlays) EQ 0) then $
+                      _settings_overlays = extra_value(kv, 'SETTINGS_OVERLAYS') $
+ else _settings_overlays = settings_overlays
+ if(keyword_set(_settings_overlays)) then settings_overlays = _settings_overlays
 
 
  ;-----------------------------------------------------------------

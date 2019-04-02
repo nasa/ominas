@@ -5,7 +5,7 @@
 ;
 ;
 ; PURPOSE:
-;       Extracts a region from an image using sinc interpolation.
+;       Extracts a region from an image using nearest-neighbor interpolation.
 ;
 ;
 ; CATEGORY:

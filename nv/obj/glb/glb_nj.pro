@@ -53,7 +53,7 @@
 function glb_nj
 
  nj_string = getenv('GLB_NJ')
- if(keyword__set(nj_string)) then nj = strtrim(nj_string, 2) else nj = 11
+ if(keyword__set(nj_string)) then nj = strtrim(nj_string, 2) else nj = 129
 
  return, nj
 end

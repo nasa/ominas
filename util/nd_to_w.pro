@@ -4,7 +4,8 @@
 ;  p is [nd,n]
 ;
 ;==============================================================================
-function nd_to_w, dim, p
+function nd_to_w, dim, p, unique=unique, clip=clip, sub=sub
+COMPILE_OPT strictarr			; needed for call to unique() below
 
  nd = (size(p, /dim))[0]
 
@@ -16,6 +17,17 @@ function nd_to_w, dim, p
    w = w + x
   end
 
+ if(keyword_set(unique)) then w = unique(w, sub=sub)
+
+ if(keyword_set(clip)) then $
+  begin
+   ii = where((w GE 0) AND (w LT n))
+   if(ii[0] NE -1) then $
+    begin
+     w = w[ii]
+     sub = sub[ii]
+    end
+  end
 
  return, reform(round(w))
 end

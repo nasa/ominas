@@ -114,7 +114,7 @@ function file_manage, fn, catpath, catfile, reload=reload
    ;- - - - - - - - - - - - -
    ; read the file
    ;- - - - - - - - - - - - -
-   files = catdirs + '/' + catfile
+   files = catdirs + path_sep() + catfile
 
    for i=0, n_elements(files)-1 do $
                     dat = append_array(dat, call_function(fn, files[i]))

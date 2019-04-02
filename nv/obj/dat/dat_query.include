@@ -24,12 +24,15 @@
  if(arg_present(input_fn)) then input_fn = dat_input_fn(_xd, cat=cat, condition=condition, /noevent)
  if(arg_present(output_fn)) then output_fn = dat_output_fn(_xd, cat=cat, condition=condition, /noevent)
  if(arg_present(keyword_fn)) then keyword_fn = dat_keyword_fn(_xd, cat=cat, condition=condition, /noevent)
+ if(arg_present(io_keyvals)) then io_keyvals = dat_io_keyvals(_xd, cat=cat, condition=condition, /noevent)
  if(arg_present(input_transforms)) then input_transforms = dat_input_transforms(_xd, cat=cat, condition=condition, /noevent)
  if(arg_present(output_transforms)) then output_transforms = dat_output_transforms(_xd, cat=cat, condition=condition, /noevent)
+ if(arg_present(tf_keyvals)) then tf_keyvals = dat_tf_keyvals(_xd, cat=cat, condition=condition, /noevent)
  if(arg_present(input_translators)) then input_translators = dat_input_translators(_xd, cat=cat, condition=condition, /noevent)
  if(arg_present(output_translators)) then output_translators = dat_output_translators(_xd, cat=cat, condition=condition, /noevent)
- if(arg_present(input_keyvals)) then input_keyvals = dat_input_keyvals(_xd, cat=cat, condition=condition, /noevent)
- if(arg_present(output_keyvals)) then output_keyvals = dat_output_keyvals(_xd, cat=cat, condition=condition, /noevent)
+ if(arg_present(tr_keyvals)) then tr_keyvals = dat_tr_keyvals(_xd, cat=cat, condition=condition, /noevent)
+ if(arg_present(label_data)) then label_data = dat_label_data(_xd, cat=cat, condition=condition, /noevent)
+ if(arg_present(label_abscissa)) then label_abscissa = dat_label_abscissa(_xd, cat=cat, condition=condition, /noevent)
 
 @cor_query.include
 

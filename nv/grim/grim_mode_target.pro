@@ -147,7 +147,7 @@ pro grim_mode_target_mode, grim_data, data_p
 
  grim_mode_target_cursor, swap=swap
  grim_print, grim_data, $
-      'Target CAMERA -- LEFT: Target Cursor; RIGHT: Target Body '
+      'Target CAMERA -- L:Target Cursor R:Target Body '
 
 end
 ;=============================================================================

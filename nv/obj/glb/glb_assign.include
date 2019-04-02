@@ -2,7 +2,6 @@
 ;  implemented as a .include because arg_present does not propagate to 
 ;  lower-level calls
 
- if(defined(model)) then glb_set_model, _xd, model, /noevent
  if(defined(radii)) then glb_set_radii, _xd, radii, /noevent
  if(defined(lora)) then glb_set_lora, _xd, lora, /noevent
  if(defined(lref)) then glb_set_lref, _xd, lref, /noevent

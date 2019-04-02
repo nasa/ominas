@@ -299,7 +299,7 @@ end
 pro grim_mode_magnify_mode, grim_data, data_p
 
  grim_mode_magnify_cursor, swap=swap
- grim_print, grim_data, 'MAGNIFY -- LEFT: Magnify Data; RIGHT: Magnify Display'
+ grim_print, grim_data, 'MAGNIFY -- L:Magnify Data R:Magnify Display'
 
 end
 ;=============================================================================

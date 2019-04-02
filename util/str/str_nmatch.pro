@@ -4,7 +4,7 @@
 ;       str_nmatch
 ;
 ; PURPOSE:
-;       Identifies element of one string array that match those of another.
+;       Identifies elements of one string array that match those of another.
 ;
 ;
 ; CATEGORY:

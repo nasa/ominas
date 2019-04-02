@@ -20,7 +20,7 @@
 ;  INPUT:
 ;	dd:	Data descriptor.
 ;
-;       outline_ptd:    POINT giving the outline of the sector to plot,
+;       outline_ptd:   POINT object giving the outline of the sector to plot,
 ;                      as produced by the pg_ring_sector.
 ;
 ;  OUTPUT:
@@ -169,9 +169,10 @@ function pg_profile_ring, dd, cd=cd, dkx=dkx, gd=gd, outline_ptd, $
    cp_disk = image_to_disk(cd, dkd, cp)
    cp_inertial = bod_body_to_inertial_pos(dkd, $
                    dsk_disk_to_body(dkd, cp_disk))
+
    dsk_projected_resolution, dkd, cd, cp_inertial, $
-                               (cam_scale(cd))[0], rad=dr, lon=km_ta, rr=rr
-   ta = km_ta / rr
+                               (cam_scale(cd))[0], rad=dr, lon=proj_ta, rr=rr
+   ta = proj_ta / rr
    dx = dr[0]
    if(keyword_set(azimuthal)) then dx = ta[0]
 

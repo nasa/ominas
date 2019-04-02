@@ -401,7 +401,7 @@ if ~strmatch(link,'*/') then begin ;if entry is not a directory
           ;spawn,'touch -d "'+tmstr+'" '+self.ldir+link
           tmstr=string(yr,mon,day,h,m,s,format='(I04,I02,I02,I02,I02,".",I02)')
           ;print, 'TZ=UTC touch -t "'+tmstr+'" '+self.ldir+link
-          spawn, 'TZ=UTC touch -t "'+tmstr+'" '+self.ldir+link
+          spawn, 'test "$?BASH_VERSION" = "0" || eval '+"'"+'setenv() { export "$1=$2"; }'+"'"+'; setenv TZ UTC; touch -t "'+tmstr+'" '+self.ldir+link
         endif else begin ;Windows systems
           spawn,'powershell -WindowStyle Hidden "$(Get-Item '+self.ldir+link+').lastwritetime=$(Get-Date '+"'"+tm+"'"+')"',/noshell
         endelse

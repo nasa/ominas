@@ -80,14 +80,14 @@ function dat_parse_keyvals, keyvals, keywords=keywords, extra=extra
  if(keyword_set(extra)) then return, dat_parse_keyvals_extra(keyvals)
 
  s = size(keyvals)
- ntran = s[1]
+ nfn = s[1]
  max_nkey = s[2]
 
  kv = {keyval_struct}
- kv.keywords_p = nv_ptr_new(ptrarr(ntran))
- kv.values_p = nv_ptr_new(ptrarr(ntran))
+ kv.keywords_p = nv_ptr_new(ptrarr(nfn))
+ kv.values_p = nv_ptr_new(ptrarr(nfn))
 
- for i=0, ntran-1 do $
+ for i=0, nfn-1 do $
   begin
    w = where(keyvals[i,*] NE '')
 
@@ -107,7 +107,6 @@ function dat_parse_keyvals, keyvals, keywords=keywords, extra=extra
   end
 
 
-; return, nv_ptr_new(kv)
  return, kv
 end
 ;=============================================================================

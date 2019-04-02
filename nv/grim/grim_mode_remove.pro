@@ -171,8 +171,7 @@ end
 pro grim_mode_remove_mode, grim_data, data_p
 
  grim_mode_remove_cursor, swap=swap
- grim_print, grim_data, $
-            'REMOVE OVERLAYS -- LEFT: Standard; RIGHT: User'
+ grim_print, grim_data, 'REMOVE OVERLAYS -- L:Standard R:User'
 
 end
 ;=============================================================================

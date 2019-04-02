@@ -1,6 +1,7 @@
 ;=============================================================================
 ; ext_read_jpeg
 ;
+;  color table not yet implemented
 ;=============================================================================
 function ext_read_jpeg, filename, dim=dim, type=type, nodata=nodata
 

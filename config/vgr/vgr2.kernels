@@ -20,7 +20,17 @@ $VGR_SPICE_CK/vgr2_wa_uranus_sedr.bc
 #
 ###############################################################################
 
-$VGR_SPICE_SPK/sat337.bsp
+$VGR_SPICE_SPK/jup310.bsp
+$VGR_SPICE_SPK/jup341.bsp
+$VGR_SPICE_SPK/sat368.bsp
+$VGR_SPICE_SPK/sat375.bsp
+$VGR_SPICE_SPK/sat393.bsp
+$VGR_SPICE_SPK/ura091-rocks-merge.bsp
+$VGR_SPICE_SPK/ura111.bsp
+$VGR_SPICE_SPK/ura112.bsp
+$VGR_SPICE_SPK/nep081.bsp
+$VGR_SPICE_SPK/nep086.bsp
+$VGR_SPICE_SPK/nep088.bsp
 
 
 $VGR_SPICE_SPK/vgr2_jup230.bsp

@@ -13,19 +13,15 @@
 ;
 ;
 ; CALLING SEQUENCE:
-;	altaz_dir = glb_local_to_altaz(gbd, surf_pts, local_dir)
+;	altaz_pts = glb_local_to_altaz(gbd, local_pts)
 ;
 ;
 ; ARGUMENTS:
 ;  INPUT: 
 ;	gbd:	        Array (nt) of any subclass of GLOBE descriptors.
 ;
-;	body_pts:	Array (nv,3,nt) of column vectors in the body
-;                       frame (representing points on the surface of 
-;                       the globe).
-;
-;       local_dir:      Array (3,nt) of column vectors in the local
-;                       frame, giving the direction from each surf_pts.
+;       local_pts:      Array (nv,3,nt) of column vectors in the local
+;                       system giving the vectors to transform.
 ;
 ;  OUTPUT: NONE
 ;
@@ -50,12 +46,12 @@
 ;	
 ;-
 ;=============================================================================
-function glb_local_to_altaz, gbd, v, _r
+function glb_local_to_altaz, gbd, _r
 @core.include
  
  _gbd = cor_dereference(gbd)
 
- sv = size(v)
+ sv = size(_r)
  nv = sv[1]
  nt = n_elements(_gbd)
 

@@ -1,7 +1,7 @@
-# instrument		input			output		
+# instrument		input			output		Keyword arguments
 # string		transform		transform
 #------------------------------------------------------------------------------
 
-  CAS_RADAR             cas_radar_transform     -
+  CAS_RADAR             cas_radar_transform     -		
 
 END

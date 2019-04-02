@@ -14,8 +14,11 @@ $VGR_SPICE_CK/vgr1_super_v2.bc
 #
 ###############################################################################
 
-$VGR_SPICE_SPK/sat337.bsp
-
+$VGR_SPICE_SPK/jup310.bsp
+$VGR_SPICE_SPK/jup341.bsp
+$VGR_SPICE_SPK/sat368.bsp
+$VGR_SPICE_SPK/sat375.bsp
+$VGR_SPICE_SPK/sat393.bsp
 
 $VGR_SPICE_SPK/vgr1_jup230.bsp
 $VGR_SPICE_SPK/vgr1_sat337.bsp

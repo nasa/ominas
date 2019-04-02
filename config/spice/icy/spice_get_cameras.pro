@@ -40,8 +40,11 @@ function spice_get_cameras, sc, inst, plat, ref, et, tol, $
  if(NOT found) then $
   begin
    cspice_ckgp, id, sclk, tol, ref, pmat, clkout, found
-   if(NOT found) then return, -1
-   nv_message, verb=0.1, 'WARNING -- no angular velocity data avaliable.'
+   if(NOT found) then begin
+     nv_message, /warning, verb=0.1, 'no orientation data avaliable.'
+     return, -1
+   endif
+   nv_message, /warning, verb=0.1, 'no angular velocity data avaliable.'
   end
 
 

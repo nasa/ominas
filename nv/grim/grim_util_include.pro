@@ -467,18 +467,128 @@ end
 ;=============================================================================
 ; grim_parse_overlay
 ;
-;  fn:name1,name2,...
+;  fn:name1/field1=value1,name2/field2=value2/field3=value3;...
+;                       or
+;  fn:name1/field1=value1;name2/field2=value2/field3=value3;...
 ;
 ;=============================================================================
-function grim_parse_overlay, overlay, names
+function grim_parse_overlay, plane, overlay, names
+
+ ;---------------------------------------------------------
+ ; determine which delimiter is being used
+ ;---------------------------------------------------------
+ delim = ','
+ p = strpos(overlay, delim)
+ if(p[0] EQ -1) then delim = ';'
 
  names = ''
 
+ ;---------------------------------------------------------
+ ; get overlay function
+ ;---------------------------------------------------------
  s = str_split(overlay, ':')
  fn = s[0]
- if(n_elements(s) GT 1) then names = strupcase(str_nsplit(s[1], ','))
+ if(n_elements(s) EQ 1) then return, fn
+
+ ;---------------------------------------------------------
+ ; get overlay names and parameters
+ ;---------------------------------------------------------
+ items = strupcase(str_nsplit(s[1], '/'))
+ p = strpos(items, '=')
+ w = where(p EQ -1, complement=ww)
+ if(w[0] NE -1) then names = str_nsplit(items[w], delim)
+ if(ww[0] NE -1) then parm = items[ww]
+
+ ;---------------------------------------------------------
+ ; assign parameters
+ ;---------------------------------------------------------
+ if(keyword_set(parm)) then $
+  begin
+   overlays = *plane.overlays_p
+   tags = tag_names(overlays)
+
+   w = where(overlays.name EQ fn)
+   if(w[0] NE -1) then $
+   for i=0, n_elements(parm)-1 do $
+    begin
+     s = str_split(parm[i], '=')
+     key = s[0] & val = s[1]
+     ww = where(tags EQ strupcase(key))
+     if(ww[0] NE -1) then overlays[w].(ww) = match_type(overlays[w].(ww), val)
+    end
+   *plane.overlays_p = overlays
+  end
 
  return, fn
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_parse_overlay_exclusions
+;
+;  fn:name1,name2,...
+;          or
+;  fn:name1;name2;...
+;
+;=============================================================================
+pro grim_parse_overlay_exclusions, grim_data, exclude_overlays
+;print, exclude_overlays
+;stop
+
+ for i=0, n_elements(exclude_overlays)-1 do $
+  begin
+   overlay = grim_parse_overlay(0, exclude_overlays[i], names)
+   nstruct = n_elements(names)
+   if(NOT keyword_set(names)) then $
+    begin
+     names = overlay
+     overlay = ''
+    end
+
+   struct = replicate({overlay:'', name: ''}, nstruct)
+   struct.overlay = strupcase(overlay)
+   struct.name = strupcase(names)
+
+   *grim_data.exclude_overlays_p = $
+                     append_array(*grim_data.exclude_overlays_p, struct)
+  end
+
+ grim_set_data, grim_data
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_redimension
+;
+;=============================================================================
+function grim_redimension, dim0, ndim
+
+ ndim0 = n_elements(dim0)
+
+ if(ndim EQ ndim0) then return, dim0
+ if(ndim GT ndim0) then return, pad_array(dim0, ndim, pad=1)
+
+ dim = lonarr(ndim)
+ if(ndim GT 1) then dim[0:ndim-2] = dim0[0:ndim-2]
+ dim[ndim-1] = product(dim0[ndim-1:*])
+ return, dim
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_redimension_data
+;
+;=============================================================================
+function grim_redimension_data, data, ndim
+ 
+ dim = grim_redimension(dim0, ndim)
+
 end
 ;=============================================================================
 

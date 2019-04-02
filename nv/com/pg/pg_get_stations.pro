@@ -91,7 +91,7 @@ function pg_get_stations, arg1, arg2, od=od, bx=bx, std=_std, _extra=keyvals, $
                           override=override, verbatim=verbatim, count=count, $
                               @stn__keywords_tree.include
                               @dat__keywords.include
-                              @nv_trs_keywords_include.pro
+                              @dat_trs_keywords_include.pro
                               end_keywords
 
  count = 0
@@ -123,7 +123,7 @@ function pg_get_stations, arg1, arg2, od=od, bx=bx, std=_std, _extra=keyvals, $
  ;-----------------------------------------------
  std = dat_get_value(dd, 'STN_DESCRIPTORS', key1=od, key2=bx, key4=_std, key6=primary, $
                              key7=time, key8=name, trs=trs, $
-                              @nv_trs_keywords_include.pro
+                              @dat_trs_keywords_include.pro
                               end_keywords)
 
  ;------------------------------------------------------------------------

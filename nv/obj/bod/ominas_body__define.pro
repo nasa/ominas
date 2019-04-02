@@ -2,16 +2,40 @@
 ; ominas_body::init
 ;
 ;=============================================================================
-function ominas_body::init, ii, crd=crd0, bd=bd0, $
+function ominas_body::init, _ii, crd=crd0, bd=bd0, $
 @bod__keywords_tree.include
 end_keywords
 @core.include
  
+ if(keyword_set(_ii)) then ii = _ii
+ if(NOT keyword_set(ii)) then ii = 0 
+
+
+ ;---------------------------------------------------------------
+ ; set up parent class
+ ;---------------------------------------------------------------
  if(keyword_set(bd0)) then struct_assign, bd0, self
  void = self->ominas_core::init(ii, crd=crd0, $
 @cor__keywords.include
 end_keywords)
 
+
+ ;-------------------------------------------------------------------------
+ ; Handle index errors: set index to zero and try again.  This allows a 
+ ; single input to be applied to multiple objects, via multiple calls to
+ ; this method.  In that case, all inputs must be given as single inputs.
+ ;-------------------------------------------------------------------------
+ catch, error
+ if(error NE 0) then $
+  begin
+   ii = 0
+   catch, /cancel
+  end
+
+ 
+ ;---------------------------------------------------------------
+ ; assign initial values
+ ;---------------------------------------------------------------
  self.abbrev = 'BOD'
  self.tag = 'BD'
 
@@ -61,11 +85,6 @@ end
 ;
 ;
 ; FIELDS:
-;	crd:	CORE class descriptor.  
-;
-;		Methods: bod_core
-;
-;
 ;	opaque:	Flag describing whether a body is "easily visible".  
 ;
 ;		Methods: bod_opaque, bod_set_opaque

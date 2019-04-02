@@ -110,7 +110,7 @@ pro cas_uvis_spice_parse_labels, dd, _time, $
      ;-----------------------------------
      ; exposure time
      ;-----------------------------------
-     tim=cas_uvis_spice_time(label,exposure=exp)
+     tim=cas_uvis_spice_time(dd[i],exposure=exp)
      exposure[i] = exp
 
      ;-----------------------------------
@@ -118,8 +118,8 @@ pro cas_uvis_spice_parse_labels, dd, _time, $
      ;-----------------------------------
      axisname=strsplit(pdspar(label,'AXIS_NAME'),' ,()',/extract)
      coreitems=long(strsplit(pdspar(label,'CORE_ITEMS'),' ,()',/extract))
-     size[0,i] = coreitems[where(strmatch(axisname,'*SAMPLE*',/fold_case))]
-     size[1,i] = coreitems[where(strmatch(axisname,'*LINE*',/fold_case))]
+     size[1,i] = coreitems[where(strmatch(axisname,'*SAMPLE*',/fold_case))]
+     size[0,i] = coreitems[where(strmatch(axisname,'*LINE*',/fold_case))]
 
      ;-----------------------------------
      ; filters
@@ -139,7 +139,7 @@ pro cas_uvis_spice_parse_labels, dd, _time, $
    ;-----------------------------------
    ; optic axis
    ;-----------------------------------
-   oaxis[*,i] = size[*,i]/2d
+   oaxis[*,i] = [-2,6];size[*,i]/2d;[-2,36];size[*,i]/2d
   end
 
  if(NOT keyword_set(_time)) then _time = time
@@ -165,17 +165,21 @@ function cas_uvis_spice_cameras, dd, ref, pos=pos, constants=constants, $
        exposure=exposure, size=size, filters=filters, oaxis=oaxis
 
  bin = 1
-
- case dat_instrument(dd[0]) of
-	'CAS_UVIS': $
-	  begin
-	   inst = -82840l ;FUV_HI
-	   scale=0.08594d0*!dpi/180d0
-	   
-	   orient_fn = 'cas_cmat_to_orient'
+ label=dat_header(dd[0])
+ cam_scale=make_array(2,ndd, val=1d0)
+ case pdspar(label,'SLIT_STATE') of
+	'LOW_RESOLUTION': begin
+	   inst = -82840l ;FUV_LO
+	   cam_scale[1,*]=2d0*0.04297d0*!dpi/180d0
+	   cam_scale[0,*]=(2d0*1.83346495*!dpi/180d0)/134d0   
 	  end
+	 else: begin
+	   inst = -82840l ;FUV_HI
+	   cam_scale[1,*]=2d0*0.02148592d0*!dpi/180d0
+	   cam_scale[0,*]=(2d0*1.83346495*!dpi/180d0)/134d0 
+	 end
  endcase
-
+ orient_fn = 'cas_cmat_to_orient'
  return, cas_to_ominas( $
            spice_cameras(dd, ref, '', '', pos=pos, $
 		sc = sc, $
@@ -183,7 +187,7 @@ function cas_uvis_spice_cameras, dd, ref, pos=pos, constants=constants, $
 		plat = plat, $
 		orient = orient, $
 		cam_time = time, $
-		cam_scale = make_array(2,ndd, val=scale), $
+		cam_scale = cam_scale, $
 		cam_oaxis = oaxis, $
 		cam_fn_psf = make_array(ndd, val='cas_iss_psf'), $
 		cam_filters = filters, $
@@ -243,13 +247,13 @@ end
 ;
 ;===========================================================================
 function cas_uvis_spice_input, dd, keyword, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
  return, spice_input(dd, keyword, 'cas', 'uvis', values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords)
 
 end

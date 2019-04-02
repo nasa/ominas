@@ -69,7 +69,7 @@ done
 
 #spks for satellites
 
-spks=( jup300.bsp jup300.cmt jup300.inp jup310.bsp jup310.cmt jup310.inp jup329.bsp jup329.cmt jup329.cmt2 jup329.inp sat368.bsp sat368.cmt sat368.inp sat375.bsp sat375.cmt sat375.inp sat393.bsp sat393.cmt sat393_daphnis.bsp sat393.inp sat393.nio sat393-rocks_pan.bsp ura091.mrg ura091-rockin.txt  ura091-rocks.bsp-source ura091-rocks-merge.bsp ura111.bsp ura111.cmt ura111.inp ura112.bsp ura112.cmt ura112.inp nep081.bsp  nep081.cmt  nep081.inp  nep086.bsp  nep086.cmt  nep086.inp  nep088.bsp  nep088.cmt  nep088.inp )
+spks=( jup310.bsp jup310.cmt jup310.inp jup341.bsp jup341.cmt jup341.inp sat368.bsp sat368.cmt sat368.inp sat375.bsp sat375.cmt sat375.inp sat393.bsp sat393.cmt sat393_daphnis.bsp sat393.inp sat393.nio sat393-rocks_pan.bsp ura091.mrg ura091-rockin.txt  ura091-rocks.bsp-source ura091-rocks-merge.bsp ura111.bsp ura111.cmt ura111.inp ura112.bsp ura112.cmt ura112.inp nep081.bsp nep081.cmt nep081.inp nep086.bsp nep086.cmt nep086.inp nep088.bsp nep088.cmt nep088.inp )
 
 spkb=https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/
 

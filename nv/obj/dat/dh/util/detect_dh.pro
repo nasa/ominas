@@ -2,16 +2,16 @@
 ; detect_dh.pro
 ;
 ;===========================================================================
-function detect_dh, dd, udata
+function detect_dh, filename=filename, header=header, udata
 
- filename = dat_filename(dd)
  status = 0
 
  ;==============================
  ; open the file
  ;==============================
  openr, unit, filename, /get_lun, error=error
- if(error NE 0) then nv_message, /anonymous, !err_string
+; if(error NE 0) then nv_message, /anonymous, !err_string
+ if(error NE 0) then return, 0
 
  ;=================================
  ; read the first thiry characters

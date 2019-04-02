@@ -91,7 +91,7 @@ function pg_get_arrays, arg1, arg2, od=od, bx=bx, ard=_ard, _extra=keyvals, $
                           override=override, verbatim=verbatim, count=count, $
                               @arr__keywords_tree.include
                               @dat__keywords.include
-                              @nv_trs_keywords_include.pro
+                              @dat_trs_keywords_include.pro
                               end_keywords
 
  count = 0
@@ -120,7 +120,7 @@ function pg_get_arrays, arg1, arg2, od=od, bx=bx, ard=_ard, _extra=keyvals, $
  ;-----------------------------------------------
  ard = dat_get_value(dd, 'ARR_DESCRIPTORS', key1=od, key2=bx, key4=_ard, key6=primary, $$
                              key8=name, trs=trs, $
-                              @nv_trs_keywords_include.pro
+                              @dat_trs_keywords_include.pro
                               end_keywords)
 
  ;------------------------------------------------------------------------

@@ -103,6 +103,16 @@ pg_repoint, cd=cd, bod_pos(pd0)-bod_pos(cd), /north
 ;                  'terminator:SATURN', $
 ;                  'planet_grid:SATURN', $
 ;                  'ring'], frame='ring'
+;                  
+;  .. image:: graphics/predict_example_01.png
+;  
+;  .. image:: graphics/predict_example_02.png
+;  
+;  .. image:: graphics/predict_example_03.png
+;  
+;  .. image:: graphics/predict_example_04.png
+;  
+;  .. image:: graphics/predict_example_05.png
 ;
 ;-
 ;-------------------------------------------------------------------------
@@ -128,16 +138,18 @@ stop, '=== Auto-example complete.  Use cut & paste to continue.'
 ;
 ;  Here is some code to compute a footprint for the current camera
 ;  pointing and graft it into GRIM.  To compute additional footprints, use 
-;  GRIM's navigate mode to change the pointing and then paste the lines
-;  again:: 
+;  GRIM's navigate mode to change the position and pointing and then paste 
+;  the lines again:: 
 ;
 ;     grift, cd=cd, pd=pd, rd=rd
 ;     footprint_ptd = pg_footprint(cd=cd, bx=[pd,rd])
-;     graft, footprint_ptd, tag='FP-'+strtrim(counter(),2)
+;     graft, footprint_ptd, name='FP-'+strtrim(counter(),2)
+;     
+;  .. image:: graphics/predict_example_06.png
 ;
 ;-
 ;-------------------------------------------------------------------------
 grift, cd=cd, pd=pd, rd=rd
 footprint_ptd = pg_footprint(cd=cd, bx=[pd,rd])
-graft, footprint_ptd, tag='FP-'+strtrim(counter(),2), col=ctbrown()
+graft, footprint_ptd, name='FP-'+strtrim(counter(),2), col=ctpink()
 

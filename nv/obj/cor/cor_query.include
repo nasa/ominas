@@ -3,6 +3,7 @@
 ;  lower-level calls
 
 if(arg_present(name)) then name = cor_name(_xd, /noevent)
+if(arg_present(notes)) then notes = cor_notes(_xd, /noevent)
 if(arg_present(abbrev)) then abbrev = cor_abbrev(_xd, /noevent)
 if(arg_present(user)) then user = cor_user(_xd, /noevent)
 if(arg_present(tasks)) then tasks = cor_tasks(_xd, /noevent)

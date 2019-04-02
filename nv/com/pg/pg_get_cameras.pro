@@ -101,7 +101,7 @@ function pg_get_cameras, arg1, arg2, cd=_cd, od=od, pd=pd, _extra=keyvals, $
                           no_default=no_default, count=count, $
                               @cam__keywords_tree.include
                               @dat__keywords.include
-                              @nv_trs_keywords_include.pro
+                              @dat_trs_keywords_include.pro
                               end_keywords
 
  count = 0
@@ -143,6 +143,9 @@ function pg_get_cameras, arg1, arg2, cd=_cd, od=od, pd=pd, _extra=keyvals, $
 
    if(keyword_set(free)) then nv_free, dd
   end $
+ ;-------------------------------------------------------------------
+ ; otherwise, get planet descriptors from the translators
+ ;-------------------------------------------------------------------
  else $
   begin
    ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -150,13 +153,17 @@ function pg_get_cameras, arg1, arg2, cd=_cd, od=od, pd=pd, _extra=keyvals, $
    ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    if(NOT keyword_set(default_orient)) then default_orient = idgen(3)
 
+   ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   ; Get the source dd if this is a slice
+   ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   dd0 = dat_slice_source(dd)
 
    ;-----------------------------------------------
    ; call translators
    ;-----------------------------------------------
-   cd = dat_get_value(dd, 'CAM_DESCRIPTORS', key1=od, key2=pd, key4=_cd, key3=default_orient, $
+   cd = dat_get_value(dd0, 'CAM_DESCRIPTORS', key1=od, key2=pd, key4=_cd, key3=default_orient, $
                              key7=time, key8=name, trs=trs, $
-                              @nv_trs_keywords_include.pro
+                              @dat_trs_keywords_include.pro
                               end_keywords)
 
    ;------------------------------------------------------------------------
@@ -165,8 +172,12 @@ function pg_get_cameras, arg1, arg2, cd=_cd, od=od, pd=pd, _extra=keyvals, $
    ; in the gd.
    ;------------------------------------------------------------------------
    if(keyword_set(free)) then nv_free, dd
-
    if(NOT keyword_set(cd)) then return, obj_new()
+
+   ;-----------------------------------------------
+   ; Select relevant cds if this is a slice
+   ;-----------------------------------------------
+   cd = dat_slice_select(dd, cd)
    n = n_elements(cd)
 
    ;---------------------------------------------------
@@ -202,7 +213,6 @@ function pg_get_cameras, arg1, arg2, cd=_cd, od=od, pd=pd, _extra=keyvals, $
                  end_keywords
     if(defined(_name)) then name = _name
     if(defined(_time)) then time = _time
-
   end
 
 

@@ -72,7 +72,7 @@
 ;=============================================================================
 pro pg_put_maps, dd, trs, md=_md, $
 @map__keywords_tree.include
-@nv_trs_keywords_include.pro
+@dat_trs_keywords_include.pro
 		end_keywords
 
 
@@ -94,7 +94,7 @@ end_keywords
  ; put descriptor
  ;-------------------------------
  dat_put_value, dd, 'MAP_DESCRIPTORS', md, trs=trs, $
-@nv_trs_keywords_include.pro
+@dat_trs_keywords_include.pro
                              end_keywords
 
  nv_free, md

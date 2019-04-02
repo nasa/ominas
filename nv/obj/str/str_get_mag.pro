@@ -5,7 +5,7 @@
 ;
 ;
 ; PURPOSE:
-;       Calculates the visual magnitude for each given star descriptor.
+;       Calculates the apparent visual magnitude for each given star descriptor.
 ;
 ;
 ; CATEGORY:

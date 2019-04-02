@@ -3,7 +3,7 @@
 ;
 ;
 ;=============================================================================
-function circle, center, radius, np=np, noreform=noreform
+function circle, center, radius, np=np, close=close
 
  radius = double(radius)
  n = n_elements(radius)
@@ -17,8 +17,10 @@ function circle, center, radius, np=np, noreform=noreform
 
 
  p = xy + center[linegen3z(2,n,np)]
+ p = reform(p, 2, n*np)
 
- if(NOT keyword_set(noreform)) then return, reform(p, 2, n*np)
+ if(keyword_set(close)) then p = transpose([transpose(p), transpose(p[*,0])])
+
  return, p
 end
 ;=============================================================================

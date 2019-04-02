@@ -51,7 +51,7 @@
 function dat_cache
 @core.include
 
- cache = -1
+ cache = 0
 
  string = getenv('DAT_CACHE')
  if(keyword_set(string)) then cache = long(string) $
@@ -61,7 +61,6 @@ function dat_cache
           'maintenance modes 1 and 2.  Arrays smaller than this size are', $
           'held in memory.  Larger arrays are sampled as needed.  Set this', $
           'variable to enable caching.']
-
 
  return, cache
 end

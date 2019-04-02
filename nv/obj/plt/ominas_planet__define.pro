@@ -2,16 +2,40 @@
 ; ominas_planet::init
 ;
 ;=============================================================================
-function ominas_planet::init, ii, crd=crd0, bd=bd0, sld=sld0, gbd=gbd0, pd=pd0, $
+function ominas_planet::init, _ii, crd=crd0, bd=bd0, sld=sld0, gbd=gbd0, pd=pd0, $
 @plt__keywords_tree.include
 end_keywords
 @core.include
  
+ if(keyword_set(_ii)) then ii = _ii
+ if(NOT keyword_set(ii)) then ii = 0 
+
+
+ ;---------------------------------------------------------------
+ ; set up parent class
+ ;---------------------------------------------------------------
  if(keyword_set(pd0)) then struct_assign, pd0, self
  void = self->ominas_globe::init(ii, crd=crd0, bd=bd0, sld=sld0, gbd=gbd0, $
 @glb__keywords_tree.include
 end_keywords)
 
+
+ ;-------------------------------------------------------------------------
+ ; Handle index errors: set index to zero and try again.  This allows a 
+ ; single input to be applied to multiple objects, via multiple calls to
+ ; this method.  In that case, all inputs must be given as single inputs.
+ ;-------------------------------------------------------------------------
+ catch, error
+ if(error NE 0) then $
+  begin
+   ii = 0
+   catch, /cancel
+  end
+
+ 
+ ;---------------------------------------------------------------
+ ; assign initial values
+ ;---------------------------------------------------------------
  self.abbrev = 'PLT'
  self.tag = 'PD'
 
@@ -39,10 +63,7 @@ end
 ;	N/A 
 ;
 ;
-; FIELDS:
-;	gbd:	GLOBE class descriptor.  
-;
-;		Methods: str_globe, str_set_globe
+; FIELDS: NONE
 ;
 ;
 ; STATUS:

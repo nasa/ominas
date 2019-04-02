@@ -1,7 +1,7 @@
-# filetype	input function		output function		keyword function
+# filetype	input function		output function		keyword function	Keyword arguments
 #		
 
-  VICAR		dh_read_vicar		dh_write_vicar		dh_vicpar
+  VICAR		dh_read_vicar		dh_write_vicar		dh_vicpar		
   FITS		dh_read_fits		dh_write_fits		dh_sxpar
   TDL		dh_read_tdl		dh_write_tdl		-
   VGR_CD	dh_read_vgr_cd		dh_write_vicar		dh_vicpar
@@ -13,4 +13,6 @@
   EXT		dh_read_ext		dh_write_ext		-
   MASK		dh_read_mask		dh_write_mask		-
   ISIS          dh_read_isis            pp_write_isis           -
-  PDS_W10N      dh_read_pds_w10n        -                       -
+  W10N_PDS      dh_read_w10n_pds        -                       dh_w10n_pds_par
+  PDSCIRSTABLE	dh_read_pdscirstable	-			dh_pdspar
+  GEOTIFF	dh_read_geotiff		dh_write_geotiff			dh_structpar

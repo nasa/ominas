@@ -530,14 +530,14 @@ end
 ;-
 ;===============================================================================
 function _strcat_tycho_input, dd, keyword, n_obj=n_obj, dim=dim, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
 
  return, strcat_input('tycho', dd, keyword, n_obj=n_obj, dim=dim, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords )
 
 end
@@ -553,8 +553,8 @@ end
 ;-
 ;===============================================================================
 function strcat_tycho_input, dd, keyword, n_obj=n_obj, dim=dim, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
 
@@ -569,8 +569,8 @@ function strcat_tycho_input, dd, keyword, n_obj=n_obj, dim=dim, values=values, s
 	path=path_tycho, names=names, $
 	ra1=ra1, ra2=ra2, dec1=dec1, dec2=dec2, $
 	faint=faint, bright=bright, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
   if(NOT keyword__set(path_tycho)) then return, ''
  

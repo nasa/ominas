@@ -409,7 +409,8 @@ function obtain_image_architecture, sample_type
     ; obtain all types of keyword values from the label:
     if ((strpos(sample_type, "LSB") gt -1) || $
         (strpos(sample_type, "PC") gt -1) || $
-        (strpos(sample_type, "VAX") gt -1)) then begin
+        (strpos(sample_type, "VAX") gt -1) || $
+        (strpos(sample_type, "IEEE") gt -1)) then begin
         arch = "LSB"
     endif
 

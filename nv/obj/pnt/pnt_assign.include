@@ -2,8 +2,8 @@
 ;  implemented as a .include because arg_present does not propagate to 
 ;  lower-level calls
 
- if(defined(points)) then pnt_set_points, _xd, points, /noevent
- if(defined(vectors)) then pnt_set_vectors, _xd, vectors, /noevent
+ if(keyword_set(points)) then pnt_set_points, _xd, points, /noevent
+ if(keyword_set(vectors)) then pnt_set_vectors, _xd, vectors, /noevent
  if(defined(flags)) then pnt_set_flags, _xd, flags, /noevent
  if(defined(desc)) then pnt_set_desc, _xd, desc, /noevent
  if(defined(data)) then pnt_set_data, _xd, data, /noevent

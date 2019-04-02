@@ -2,44 +2,8 @@
 ; detect_multi.pro
 ;
 ;===========================================================================
-function ___detect_multi, dd
+function detect_multi, filename=filename, header=header
 
- filename = dat_filename(dd)
- status=0
-
- ;==============================
- ; open the file
- ;==============================
- openr, unit, filename, /get_lun, error=error
- if(error NE 0) then nv_message, /anonymous, !err_string
-
- ;=================================
- ; check the first few characters
- ;=================================
- record = assoc(unit, bytarr(11,/nozero))
- s = string(record[0])
- if(s EQ '___MULTI___') then status = 1
-
- ;==============================
- ; close config file
- ;==============================
- close, unit
- free_lun, unit
-
- return, status
-end
-;===========================================================================
-
-
-
-;===========================================================================
-; detect_multi.pro
-;
-;===========================================================================
-function detect_multi, dd
-
- filename = dat_filename(dd)
- header = dat_header(dd)
  status = 0
 
  ;===============================================
@@ -49,7 +13,8 @@ function detect_multi, dd
  else $
   begin
    openr, unit, filename, /get_lun, error=error
-   if(error NE 0) then nv_message, /anonymous, !err_string
+   if(error NE 0) then return, 0
+   if((fstat(unit)).size LT 11) then return, 0
    record = assoc(unit, bytarr(11,/nozero))
    s = string(record[0])
    close, unit
@@ -60,6 +25,7 @@ function detect_multi, dd
  ;===================================
  ; check for indicator string
  ;===================================
+ if ~isa(s,'string') then return,0
  if(s[0] EQ '___MULTI___') then status = 1
 
 

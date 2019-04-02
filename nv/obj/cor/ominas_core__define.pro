@@ -30,16 +30,40 @@ end
 ; ominas_core::init
 ;
 ;=============================================================================
-function ominas_core::init, ii, crd=crd0, $
+function ominas_core::init, _ii, crd=crd0, $
 @cor__keywords.include
 end_keywords
 @core.include
+
+
+ if(keyword_set(_ii)) then ii = _ii
+ if(NOT keyword_set(ii)) then ii = 0 
+
+
+ ;-------------------------------------------------------------------------
+ ; Handle index errors: set index to zero and try again.  This allows a 
+ ; single input to be applied to multiple objects, via multiple calls to
+ ; this method.  In that case, all inputs must be given as single inputs.
+ ;-------------------------------------------------------------------------
+ catch, error
+ if(error NE 0) then $
+  begin
+   ii = 0
+   catch, /cancel
+  end
+
  
+ ;---------------------------------------------------------------
+ ; assign initial values
+ ;---------------------------------------------------------------
  if(keyword_set(crd0)) then struct_assign, crd0, self
 
 
  if(keyword_set(tasks)) then self.tasks_p = nv_ptr_new(tasks[*,ii]) $
  else self.tasks_p = nv_ptr_new([''])
+
+ if(keyword_set(notes)) then self.notes_p = nv_ptr_new(notes[*,ii]) $
+ else self.notes_p = nv_ptr_new([''])
 
  self.abbrev = 'COR'
  self.tag = 'CRD'
@@ -90,6 +114,12 @@ end
 ;		Methods: cor_user
 ;
 ;
+;	notes_p:
+;		Pointer to user notes.
+;
+;		Methods: cor_notes, cor_set_notes
+;
+;
 ;	tasks_p:
 ;		Pointer to tasks list.
 ;
@@ -123,6 +153,7 @@ pro ominas_core__define
  struct = $
     { ominas_core, inherits IDL_Object, $
 	tasks_p:	 nv_ptr_new(), $	; Pointer to task list 
+	notes_p:	 nv_ptr_new(), $	; User notes.
 	name:		 '', $			; Name of object
 	udata_tlp:	 nv_ptr_new(), $	; Pointer to user data
 	abbrev:		 '', $			; Abbreviation of descriptor class

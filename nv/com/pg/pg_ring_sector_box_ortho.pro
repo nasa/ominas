@@ -49,7 +49,7 @@
 ;
 ;
 ; RETURN: 
-;      POINT containing points on the sector outline.  The point
+;      POINT object containing points on the sector outline.  The point
 ;      spacing is determined by the sample keyword.
 ;
 ; KNOWN BUGS:

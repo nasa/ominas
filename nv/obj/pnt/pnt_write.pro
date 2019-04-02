@@ -22,7 +22,8 @@
 ;
 ;	ptd:		POINT object to write.
 ;
-;  OUTPUT: NONE
+;  OUTPUT: 
+;	status: 	0 if successful; -1 otherwise.
 ;
 ;
 ; KEYWORDS:
@@ -45,13 +46,24 @@
 ; 
 ;-
 ;=============================================================================
-pro pnt_write, filename, ptd, bin=bin, noevent=noevent
+pro pnt_write, filename, ptd, bin=bin, noevent=noevent, status=status
  nv_notify, ptd, type = 1, noevent=noevent
  _ptd = cor_dereference(ptd)
 
- openw, unit, filename, /get_lun
+ status = 0
 
- printf, unit, 'protocol 2'
+ catch, err 
+ if(keyword_set(err)) then $
+  begin
+   status = -1
+   return
+  end
+ openw, unit, filename, /get_lun
+ catch, /cancel
+
+ nv_message, verb=0.1, 'Writing ' + filename
+
+ printf, unit, 'protocol 4'
  if(keyword_set(bin)) then printf, unit, 'binary'
 
  nptd = n_elements(_ptd)
@@ -68,7 +80,6 @@ pro pnt_write, filename, ptd, bin=bin, noevent=noevent
    printf, unit
    printf, unit, 'name = ' + _ptd[i].name
    printf, unit, ' desc = ' + _ptd[i].desc
-
 
    n = pnt_nv(_ptd[i])
    printf, unit, ' n = ' + strtrim(n,2)
@@ -154,7 +165,6 @@ pro pnt_write, filename, ptd, bin=bin, noevent=noevent
      tag_list_write, _ptd[i].udata_tlp, unit=unit, bin=bin
     end
 
-
    ;- - - - - - - - - - - - - - - - -
    ; point-by-point user data
    ;- - - - - - - - - - - - - - - - -
@@ -175,6 +185,17 @@ pro pnt_write, filename, ptd, bin=bin, noevent=noevent
      if(keyword_set(bin)) then writeu, unit, flags $
      else printf, unit, '  ' + tr(strtrim(flags,2))
     end
+
+   ;- - - - - - - - - - - - - - - - -
+   ; notes
+   ;- - - - - - - - - - - - - - - - -
+   if(ptr_valid(_ptd[i].notes_p)) then $
+    begin
+     printf, unit, ' notes:'
+     notes = *_ptd[i].notes_p
+     if(keyword_set(notes)) then printf, unit, tr(notes)
+     printf, unit, ' __end_notes__'
+    end
   end
 
  close, unit
@@ -182,6 +203,3 @@ pro pnt_write, filename, ptd, bin=bin, noevent=noevent
 
 end
 ;===========================================================================
-
-
-

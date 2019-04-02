@@ -175,7 +175,7 @@ function rtf_read, fname, notes, status=status, note=note, lf=lf, $
        w = w[0]
        insert_fname = strmid(text[w], 1, strlen(text[w]))
        split_filename, insert_fname, insert_dir, insert_name
-       if(NOT keyword_set(insert_dir)) then insert_fname = dir + '/' + insert_fname
+       if(NOT keyword_set(insert_dir)) then insert_fname = dir + path_sep() + insert_fname
 
        include = append_array(include, insert_fname)
        insert_text = read_txt_file(insert_fname, $

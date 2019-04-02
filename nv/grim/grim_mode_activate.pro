@@ -46,13 +46,14 @@ pro grim_mode_activate_mouse_event, event, data
  if(struct NE 'WIDGET_DRAW') then return
  if(input_wnum NE grim_data.wnum) then return
  if(event.press EQ 2) then return
+ if(event.press EQ 0) then return
 
  if(event.press EQ 1) then $
      grim_activate_select, $
-	 grim_data, plane, [event.x, event.y], clicks=event.clicks, ptd=ptd $
+	 grim_data, plane, [event.x, event.y], clicks=event.clicks $
  else if(event.press EQ 4) then $
      grim_activate_select, $
-	grim_data, plane, [event.x, event.y], /deactivate, clicks=event.clicks, ptd=ptd $
+	grim_data, plane, [event.x, event.y], /deactivate, clicks=event.clicks $
  else return
 
  grim_refresh, grim_data, /noglass, /no_image;, /update
@@ -69,7 +70,7 @@ end
 pro grim_mode_activate_mode, grim_data, data_p
 
  device, cursor_standard = 60
- grim_print, grim_data, 'ACTIVATE OVERLAYS -- LEFT: Activate; RIGHT: Deactivate'
+ grim_print, grim_data, 'ACTIVATE OVERLAYS -- L:Activate R:Deactivate'
 
 end
 ;=============================================================================
@@ -100,7 +101,7 @@ end
 ;	double click activates or deactivates all overlays associated 
 ;	with a given descriptor, or all stars.  Active overlays appear 
 ;	in the colors selected in the 'Overlay Settings' menu selection.  
-;	Inactive overlays appear in cyan.  A descriptor is active
+;	Inactive overlays appear in gray.  A descriptor is active
 ;	whenever any of its overlays are active.
 ;
 ;

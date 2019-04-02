@@ -9,7 +9,8 @@ pro which, name, output=output
  ;-------------------------------------------------------------
  ; find routine
  ;-------------------------------------------------------------
- if(NOT routine_exists(name, /compile)) then $
+; if(NOT routine_exists(name, /compile)) then $
+ if(NOT routine_exists(name)) then $
   begin
    print, 'Not found.'
    return

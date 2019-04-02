@@ -169,8 +169,8 @@ end
 ;
 ;=============================================================================
 function dh_std_input, dd, keyword, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 common dhsi_block, all_xds
 
@@ -203,10 +203,10 @@ common dhsi_block, all_xds
    ;- - - - - - - - - - - - - - - - -
    ; translator keywords
    ;- - - - - - - - - - - - - - - - -
-   history = tr_keyword_value(dd[j], 'history')
+   history = dat_keyword_value(dd[j], 'history')
    if(keyword_set(history)) then hi = fix(history)
 
-   dh_file = tr_keyword_value(dd[j], 'dh_in')
+   dh_file = dat_keyword_value(dd[j], 'dh_in')
 
    ;- - - - - - - - - - - - - - - - -
    ; get detached header
@@ -217,7 +217,7 @@ common dhsi_block, all_xds
      dh_name = file_basename(dh_file)
      if(strupcase(dh_name) EQ 'AUTO') then $
                                  dh_name = dh_fname(/write, cor_name(dd[j]))
-     dh_file = dh_dir + '/' + dh_name
+     dh_file = dh_dir + path_sep() + dh_name
      dh = dh_read(dh_file)
      dat_set_dh, dd[j], dh
     end

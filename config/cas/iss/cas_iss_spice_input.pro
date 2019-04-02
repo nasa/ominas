@@ -81,27 +81,6 @@
 
 
 ;===========================================================================
-; cas_iss_spice_label_struct__define
-;
-;===========================================================================
-pro cas_iss_spice_label_struct__define
-
- struct = {cas_iss_spice_label_struct, $
-		dt: 0d, $
-		time: 0d, $
-		stime: '', $
-		exposure: 0d, $
-		size: [0,0], $
-		filters: ['',''], $
-		target: '', $
-		oaxis: [0d,0d] $
-           }
-end
-;===========================================================================
-
-
-
-;===========================================================================
 ; cas_iss_spice_parse_labels
 ;
 ;===========================================================================
@@ -112,6 +91,7 @@ pro cas_iss_spice_parse_labels, dd, _time, $
 
  meta0 = {cas_iss_spice_label_struct}
  meta0.size = [1024,1024]
+ meta0.oaxis = [511.5,511.5]
 
  for i=0, ndd-1 do $
   begin
@@ -231,13 +211,13 @@ end
 ;
 ;===========================================================================
 function cas_iss_spice_input, dd, keyword, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
  return, spice_input(dd, keyword, 'cas', 'iss', values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords)
 
 end

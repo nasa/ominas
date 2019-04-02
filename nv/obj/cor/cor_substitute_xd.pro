@@ -63,7 +63,7 @@ function crgd_replace, xds, xd, xd_new
  for i=0, n_elements(xds)-1 do $
   begin
    w = where(xd EQ xds[i])
-   if(w[0] NE -1) then xds[i] = xd_new[w]
+   if(w[0] NE -1) then xds[i] = xd_new[w[0]]
   end
 
  return, xds
@@ -97,8 +97,8 @@ pro cor_substitute_xd, xd0, xd, xd_new, use_gd=use_gd, noevent=noevent
    gd = cor_gd(xd0[i], noevent=noevent)
    if(keyword_set(gd)) then $
     begin 
-     tags = tag_names(gd)
-     for j=0, n_elements(tags)-1 do gd.(j) = crgd_replace(gd.(j), xd, xd_new)
+     ntags = n_tags(gd)
+     for j=0, ntags-1 do gd.(j) = crgd_replace(gd.(j), xd, xd_new)
      cor_set_gd, xd0[i], gd, noevent=noevent
     end 
   end

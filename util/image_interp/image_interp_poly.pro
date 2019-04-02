@@ -78,6 +78,7 @@ function image_interp_poly, image, grid_x, grid_y, mask=mask, zmask=zmask, valid
  y0_y1 = grid_y0-grid_y1
 
 
+;if(caller() NE 'IMAGE_INTERP') then stop
  interp = dblarr(nxy,nz)
  for i=0, nz-1 do $
   begin

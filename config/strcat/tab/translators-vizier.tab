@@ -1,0 +1,4 @@
+# Instrument	Input			Output		Keyword arguments
+# string	translator		translator
+#------------------------------------------------------------------------------
+  COMMON	strcat_vizier_input		-	catalog=UCAC5

@@ -51,7 +51,7 @@ function station_read, filename, names=names, default=default
  if(w[0] NE -1) then $
   begin
    names[w] = str_nnsplit(names[w], ':', rem=_array_fnames)
-   array_fnames[w] = dir + '/' + _array_fnames + '.arr'
+   array_fnames[w] = dir + path_sep() + _array_fnames + '.arr'
   end
 
  dat = replicate({station_record}, n)

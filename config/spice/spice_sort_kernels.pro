@@ -95,7 +95,7 @@ function si_protect_kernels, _kernels, specs
     end
   end
  
- return, dirs + '/' + kernels
+ return, dirs + path_sep() + kernels
 end
 ;=============================================================================
 
@@ -218,14 +218,10 @@ pro spice_sort_kernels, all_kernels, $
                    kernels_to_load = append_array(kernels_to_load, xk_to_load)
 
 
-     loaded_kernels = strep_s(loaded_kernels, '//', '/')
-     all_kernels = strep_s(all_kernels, '//', '/')
-     kernels_to_load = strep_s(kernels_to_load, '//', '/')
-     kernels_to_unload = strep_s(kernels_to_unload, '//', '/')
-;     loaded_kernels = clean_fnames(loaded_kernels)
-;     all_kernels = clean_fnames(all_kernels)
-;     kernels_to_load = clean_fnames(kernels_to_load)
-;     kernels_to_unload = clean_fnames(kernels_to_unload)
+     loaded_kernels = clean_fnames(loaded_kernels)
+     all_kernels = clean_fnames(all_kernels)
+     kernels_to_load = clean_fnames(kernels_to_load)
+     kernels_to_unload = clean_fnames(kernels_to_unload)
 
      ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      ; determine kernels to unload 

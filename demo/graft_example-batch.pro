@@ -167,6 +167,8 @@ pg_draw, ring_ptd, col=ctorange()
 ;    graft, limb_ptd, col=ctyellow()
 ;    graft, term_ptd, col=ctred()
 ;    graft, ring_ptd, col=ctorange()
+;    
+;  .. image:: graphics/graft_example_01.png
 ;
 ;-
 ;-------------------------------------------------------------------------

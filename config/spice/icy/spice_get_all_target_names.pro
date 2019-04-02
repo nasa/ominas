@@ -1,6 +1,7 @@
 ;===========================================================================
 ; spice_get_all_target_names
 ;
+;  request all bodies with known radii
 ;===========================================================================
 function spice_get_all_target_names
 

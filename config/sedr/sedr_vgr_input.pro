@@ -151,8 +151,8 @@
 ;-
 ;=============================================================================
 function sedr_vgr_input, dd, keyword, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
  common sedr_block, sedr, bconst
@@ -163,8 +163,8 @@ function sedr_vgr_input, dd, keyword, values=values, status=status, $
  ;-----------------------------------------------
  ; translator keywords
  ;-----------------------------------------------
- j2000 = tr_keyword_value(dd, 'j2000')
- source = tr_keyword_value(dd, 'sedr_source')
+ j2000 = dat_keyword_value(dd, 'j2000')
+ source = dat_keyword_value(dd, 'sedr_source')
 
 
  ;-----------------------------

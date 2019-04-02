@@ -32,7 +32,7 @@ function get_viewport_indices, dim, p=data_xy, $
  device_size = [!d.x_size,!d.y_size]
  device_xy = gridgen(device_size)
 
- data_xy = (convert_coord(device_xy, /device, /to_data))[0:1,*]
+ data_xy = (convert_coord(device_xy, /device, /to_data, /double))[0:1,*]
  data_xy_test = round(data_xy)
  n = n_elements(data_xy)/2
 

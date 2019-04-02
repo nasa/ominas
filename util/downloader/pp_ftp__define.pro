@@ -224,7 +224,7 @@ if keyword_set(fileout) then begin
   free_lun,luno
   ;tmstr=string(yr,mon,day,h,m,s,format='(I04,I02,I02,I02,I02,".",I02)')
   tmstr=strmid(mdtm,0,12)+'.'+strmid(mdtm,12,2)
-  spawn, 'TZ=UTC touch -t "'+tmstr+'" '+fileout
+  spawn, 'test "$?BASH_VERSION" = "0" || eval '+"'"+'setenv() { export "$1=$2"; }'+"'"+'; setenv TZ UTC; touch -t "'+tmstr+'" '+fileout
 endif
 
 return,ret
