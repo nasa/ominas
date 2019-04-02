@@ -33,8 +33,6 @@
 ;
 ;	crd:	Core descriptor(s) instead of using cor_create_descriptors.
 ;
-;	model:	Array (n) of model strings.
-;
 ;	lref:	Array (n) of longitude reference notes.
 ;
 ;	radii:	Array (3,n) of ellipsoid radii.
@@ -65,7 +63,7 @@
 ;
 ; RETURN:
 ;	Newly created or or freshly initialized globe descriptors, depending
-;	on the presence of the bd keyword.
+;	on the presence of the gbd keyword.
 ;
 ;
 ; STATUS:

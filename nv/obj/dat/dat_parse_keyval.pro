@@ -47,7 +47,6 @@
 pro dat_parse_keyval, _keyval, keyword, value
 @core.include
 
-; keyval = strcompress(_keyval, /remove_all)
  keyval = str_compress(_keyval, /remove_all)
 
  s = str_split(keyval, '=')

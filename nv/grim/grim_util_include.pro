@@ -467,10 +467,19 @@ end
 ;=============================================================================
 ; grim_parse_overlay
 ;
-;  fn:name1/field1=value1,name2/field2=value2/field3=value3,...
+;  fn:name1/field1=value1,name2/field2=value2/field3=value3;...
+;                       or
+;  fn:name1/field1=value1;name2/field2=value2/field3=value3;...
 ;
 ;=============================================================================
-function grim_parse_overlay, plane, overlay, names, struct=struct
+function grim_parse_overlay, plane, overlay, names
+
+ ;---------------------------------------------------------
+ ; determine which delimiter is being used
+ ;---------------------------------------------------------
+ delim = ','
+ p = strpos(overlay, delim)
+ if(p[0] EQ -1) then delim = ';'
 
  names = ''
 
@@ -487,7 +496,7 @@ function grim_parse_overlay, plane, overlay, names, struct=struct
  items = strupcase(str_nsplit(s[1], '/'))
  p = strpos(items, '=')
  w = where(p EQ -1, complement=ww)
- if(w[0] NE -1) then names = items[w]
+ if(w[0] NE -1) then names = str_nsplit(items[w], delim)
  if(ww[0] NE -1) then parm = items[ww]
 
  ;---------------------------------------------------------
@@ -517,20 +526,69 @@ end
 
 
 ;=============================================================================
-; grim_parse_overlay
+; grim_parse_overlay_exclusions
 ;
 ;  fn:name1,name2,...
+;          or
+;  fn:name1;name2;...
 ;
 ;=============================================================================
-function __grim_parse_overlay, plane, overlay, names
+pro grim_parse_overlay_exclusions, grim_data, exclude_overlays
+;print, exclude_overlays
+;stop
 
- names = ''
+ for i=0, n_elements(exclude_overlays)-1 do $
+  begin
+   overlay = grim_parse_overlay(0, exclude_overlays[i], names)
+   nstruct = n_elements(names)
+   if(NOT keyword_set(names)) then $
+    begin
+     names = overlay
+     overlay = ''
+    end
 
- s = str_split(overlay, ':')
- fn = s[0]
- if(n_elements(s) GT 1) then names = strupcase(str_nsplit(s[1], ','))
+   struct = replicate({overlay:'', name: ''}, nstruct)
+   struct.overlay = strupcase(overlay)
+   struct.name = strupcase(names)
 
- return, fn
+   *grim_data.exclude_overlays_p = $
+                     append_array(*grim_data.exclude_overlays_p, struct)
+  end
+
+ grim_set_data, grim_data
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_redimension
+;
+;=============================================================================
+function grim_redimension, dim0, ndim
+
+ ndim0 = n_elements(dim0)
+
+ if(ndim EQ ndim0) then return, dim0
+ if(ndim GT ndim0) then return, pad_array(dim0, ndim, pad=1)
+
+ dim = lonarr(ndim)
+ if(ndim GT 1) then dim[0:ndim-2] = dim0[0:ndim-2]
+ dim[ndim-1] = product(dim0[ndim-1:*])
+ return, dim
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_redimension_data
+;
+;=============================================================================
+function grim_redimension_data, data, ndim
+ 
+ dim = grim_redimension(dim0, ndim)
+
 end
 ;=============================================================================
 

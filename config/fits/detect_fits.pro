@@ -2,10 +2,8 @@
 ; detect_fits.pro
 ;
 ;===========================================================================
-function detect_fits, dd
+function detect_fits, filename=filename, header=header
 
- filename = dat_filename(dd)
- header = dat_header(dd)
  status = 0
 
  ;===============================================
@@ -16,6 +14,7 @@ function detect_fits, dd
   begin
    openr, unit, filename, /get_lun, error=error
    if(error NE 0) then return, 0
+   if((fstat(unit)).size LT 6) then return, 0
    record = assoc(unit, bytarr(6,/nozero))
    s=string(record[0])
    close, unit
@@ -26,6 +25,7 @@ function detect_fits, dd
  ;==============================
  ; check for indicator string
  ;==============================
+ if ~isa(s,'string') then return,0
  if(s EQ 'SIMPLE') then status=1
 
 

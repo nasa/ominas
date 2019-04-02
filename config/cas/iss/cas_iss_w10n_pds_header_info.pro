@@ -32,7 +32,7 @@ function cas_iss_w10n_pds_header_info, dd
  ;-----------------------------------
  target_name = strupcase(jlabel.PROPERTY[3].TARGET_NAME)
  meta.target = target_name
- if(tag_exist(jlabel.PROPERTY[3], 'TARGET_DESC')) then begin
+ if(tag_exists(jlabel.PROPERTY[3], 'TARGET_DESC')) then begin
     target_desc = strupcase(jlabel.PROPERTY[3].TARGET_DESC) 
     obs_id = jlabel.PROPERTY[3].OBSERVATION_ID
     if((strpos(strupcase(obs_id), 'OPNAV'))[0] NE -1) then meta.target = target_desc
@@ -41,7 +41,7 @@ function cas_iss_w10n_pds_header_info, dd
  ;-----------------------------------
  ; optic axis
  ;-----------------------------------
- meta.oaxis = meta.size/2d
+ meta.oaxis = meta.size/2d - 0.5
 
  ;-----------------------------------
  ; time

@@ -2,8 +2,12 @@
 ; dh_w10n_pds_par.pro
 ;
 ;=============================================================================
-pro dh_w10n_pds_par, label, keyword, get=get, set=set, debug=debug
+pro dh_w10n_pds_par, label, keyword, get=get, set=set
 
+ if (size(label,/type) NE 7) then begin
+   nv_message, verb=0.5, 'No label'
+   return
+ endif
  jlab = json_parse(label)
 
  ; Find where keyword is
@@ -16,8 +20,9 @@ pro dh_w10n_pds_par, label, keyword, get=get, set=set, debug=debug
     for j = 0, n_segments-1 do begin
        if (jlab[top_keys[i], j].hasKey(keyword)) then begin
           n_list = n_elements(jlab[top_keys[i], j, keyword])
-          if (keyword_set(debug)) then $
-             print, "Found " + keyword + " in ['" + top_keys[i] + "', " + strtrim(i,2) + '] with ' + strtrim(n_list,2) + ' elements'
+          nv_message, verb=0.5, $
+                "Found " + keyword + " in ['" + top_keys[i] + "', " + $
+                    strtrim(i,2) + '] with ' + strtrim(n_list,2) + ' elements'
           if (n_list EQ 1) then begin
              if (arg_present(get)) then get = jlab[top_keys[i], j, keyword] $
              else begin

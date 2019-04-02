@@ -42,17 +42,19 @@
 ;=============================================================================
 pro split_filename, filename, dir, name, ext
 
+ sep = path_sep()
  n = n_elements(filename)
 
  name = filename & dir = make_array(n, val='')
-; if((strpos(filename, '/'))[0] EQ -1) then return
 
- if((strpos(filename, '/'))[0] NE -1) then $
+
+ w = where(strpos(filename, sep) NE -1)
+ if(w[0] NE -1) then $
   begin
-   ff = str_flip(filename)
-   front = str_nnsplit(ff, '/', rem=back)
-   dir = str_flip(back)
-   name = str_flip(front)
+   ff = str_flip(filename[w])
+   front = str_nnsplit(ff, sep, rem=back)
+   dir[w] = str_flip(back)
+   name[w] = str_flip(front)
   end
 
  if(arg_present(ext)) then $
@@ -69,36 +71,3 @@ pro split_filename, filename, dir, name, ext
 end
 ;=============================================================================
 
-
-
-
-;=============================================================================
-; the old one....
-;
-;=============================================================================
-pro _split_filename, filename, dir, name
-
- n = n_elements(filename)
-
- dir = strarr(n)
- name = strarr(n)
-
- for i=0, n-1 do $
-  begin
-   p = rstrpos(filename[i], '/')
-   if(p EQ -1) then $
-    begin
-     dir[i] = ''
-     name[i] = filename[i]
-    end $
-   else $
-    begin
-     dir[i] = strmid(filename[i], 0, p+1)
-     name[i] = strmid(filename[i], p+1, strlen(filename[i])-p)
-    end
-
-  end
-
-
-end
-;=============================================================================

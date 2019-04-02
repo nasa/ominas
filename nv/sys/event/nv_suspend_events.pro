@@ -17,7 +17,9 @@
 ;
 ;
 ; ARGUMENTS:
-;  INPUT: NONE
+;  INPUT: 
+;	flush:		If set, the eent buffer is flushed before suspending
+;			events.
 ;
 ;  OUTPUT: NONE
 ;
@@ -40,9 +42,10 @@
 ;	
 ;-
 ;=============================================================================
-pro nv_suspend_events
+pro nv_suspend_events, flush=flush
 @nv_notify_block.common
 
+ if(keyword_set(flush)) then nv_flush
  suspended = 1
 
 end

@@ -1,0 +1,39 @@
+/=========================================================================/
+/ OMINAS detached header
+/   () = array index
+/   [] = object index
+/   {} = history index
+/=========================================================================/
+history = 4 / Current history value
+<updates>
+
+/ -------------------------------------------------------------------- /
+/ MAP descriptor -- updated Tue Aug  1 10:09:00 2017
+/ -------------------------------------------------------------------- /
+map_update_time = 2457967.42291667 
+map_tasks = '' 
+map_name = 'SKY' 
+map_abbrev = 'MAP' 
+map_tag = 'MD' 
+map_user = '' 
+map_projection = 'RECTANGULAR' 
+map_units(0) = 1.00000000000000 
+map_units(1) = 1.00000000000000 
+map_size(0) = 8192 
+map_size(1) = 4096 
+map_scale = 1.00000000000000 
+map_origin(0) = 4096.00000000000000 
+map_origin(1) = 2048.00000000000000 
+map_center(0) = 0.00000000000000 
+map_center(1) = 0.00000000000000 
+map_range(0) = -1.00000000000000e+100 
+map_range(1) = 1.00000000000000e+100 
+map_range(2) = -3.14159265358979 
+map_range(3) = 3.14159265358979 
+map_radii(0) = 1.0000000 
+map_radii(1) = 1.0000000 
+map_radii(2) = 1.0000000 
+map_graphic = 1 
+map_west = 1 
+map_rotate = 0 
+

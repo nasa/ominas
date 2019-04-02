@@ -32,24 +32,19 @@
 ;			Thumbnail images are alwasy square.
 ;
 ;	labels:		Labels to use for each thumbnail.  If none given, the
-;			filename is used, is one exists.
-;
-;	ids:		Array to identify each thumbnail.  If none given, the
-;			labels are used, if they exist.
-;
-;	select_ids:	Ids of Initial thumbnail(s) to appear selected.
+;			filename is used, if one exists.
 ;
 ;	left_fn:	Name of a procedure to call when the left mouse button
-;			is clicked on a thumbnail.  Default procedure selects
-;			that image and opens it in a new grim window.  The
+;			is clicked on a thumbnail.  The
 ;			user procedure is called as follows: 
 ;
-;				left_fn, fn_data, i, id, status=status
+;			   left_fn, brim_data, fn_data, i, dd, status=status
 ;
-;			fn_data is supplied by the caller through the fn_data
-;			keyword, i is the index of the thumbnail, id is the
-;			thumbnail id as given by the ids keyword,
-;			and status should return 0 if successful and nonzero
+;			brim_data is the brim data structure, required by 
+;			calls to brim functions, fn_data is supplied by the 
+;			caller through the fn_data keyword, i is the index of 
+;			the thumbnail, dd is the thumbnail data descriptor, 
+;			and status should return 0 if successful and nonzero 
 ;			otherwise.
 ;
 ;	middle_fn:	Name of a procedure to call when the middle mouse button
@@ -59,10 +54,6 @@
 ;			is clicked on a thumbnail.  There is no default.
 ;
 ;	fn_data:	Data to be supplied to the above user procedures.
-;
-;	exclusive_selection:	
-;			If set, only one image may be selected at once.  
-;			(Currently multiple image selection is not supported.)
 ;
 ;	path:		Initial path to use for the file selection widget, 
 ;			which appears only if the file argument is not given. 
@@ -79,9 +70,9 @@
 ;  OUTPUT:
 ;	get_path:	Final path selected in the file selection widget.
 ;
-;	select_ids:	On return, select_ids contains the ids of the selected
+;	select:		On return, select contains the file names of the selected
 ;			images.  If there are no selections, its value will be
-;			the null string: ''.
+;			the null string.
 ;
 ;
 ; RETURN:
@@ -127,95 +118,141 @@
 
 
 ;=============================================================================
-; brim_display_image
+; brim_image
 ;
 ;
 ;=============================================================================
-pro brim_display_image, brim_data, _i, image
+function brim_image, brim_data, ii, abscissa=abscissa, full=full
+;full=1
 
- i = _i[0]
+ dd = brim_data.dd[ii]
+ if(keyword_set(full)) then return, dat_data(dd, abscissa=abscissa)
 
- if(NOT keyword_set(image)) then image = (*brim_data.images_p)[*,*,i]
+ ;----------------------------------------------
+ ; get image parameters
+ ;----------------------------------------------
+ dim = dat_dim(dd)
+ if(NOT keyword_set(dim)) then return, 0
+ dim = dim[0:1]
+ max = max(dat_max(dd))
 
- wset, brim_data.wnums[i]
- tvscl, image, order=brim_data.order
+ ;------------------------------------------------------------------------
+ ; set tvim coordinate system
+ ;  Constrain to integer or 1/integer zoom to avoid aliasing in the 
+ ;  sampling grid.  This allows for queries on file types the support
+ ;  simple off/stepsize queries, e.g., w10n.
+ ;------------------------------------------------------------------------
+ zoom = min([double(!d.x_size)/dim[0], double(!d.y_size)/dim[1]])
+ if(zoom GT 1) then zoom = long(zoom) $ 
+ else if(zoom LT 1)  then zoom = 1d/(double(long(1/zoom)-1))
+help, zoom
+ tvim, /silent, zoom=zoom
 
- if(keyword_set(brim_data.labels)) then $
-    widget_control, brim_data.label_widgets[i], set_value=brim_data.labels[i]
+ ;----------------------------------------------
+ ; sample image
+ ;----------------------------------------------
+ vp = get_viewport_indices(dim, p=sample, $
+                              device_indices=vpi, device_size=device_size)
+ if(n_elements(vp) EQ 1) then return, 0
 
+ image = dat_data(dd, sample=sample, abscissa=abscissa)
+ thumbnail = make_array(type=size(image, /type), dim=device_size)
+ thumbnail[vpi] = image
 
+ return, thumbnail
 end
 ;=============================================================================
 
 
 
 ;=============================================================================
-; brim_resolve_ids
+; brim_display
 ;
 ;
 ;=============================================================================
-function brim_resolve_ids, brim_data, ids
+pro brim_display, brim_data, ii
 
- n = n_elements(ids)
- i = lonarr(n)
- for j=0, n-1 do $
+ dd = brim_data.dd
+ size = brim_data.thumbsize
+ if(NOT defined(ii)) then ii = lindgen(n_elements(dd))
+ if(ii[0] EQ -1) then return
+
+ ;----------------------------------------------
+ ; determine label strings
+ ;----------------------------------------------
+ labels = brim_data.labels
+ if(NOT keyword_set(labels)) then labels = cor_name(dd)
+
+ ;----------------------------------------------
+ ; display images
+ ;----------------------------------------------
+ for j=0, n_elements(ii)-1 do $ 
   begin
-   w = where(ids[j] EQ brim_data.ids)   
-   if(w[0] NE -1) then i[j] = w[0]
-  end
+   i = ii[j]
 
- return, i
-end
-;=============================================================================
+   ;- - - - - - - - - - - - - - - - - - - - - - - - -
+   ; get thumbnail
+   ;- - - - - - - - - - - - - - - - - - - - - - - - -
+   image = cor_udata(dd[i], 'BRIM_THUMBNAIL')
+   if(NOT keyword_set(image)) then $
+                      image = brim_image(brim_data, i, abscissa=abscissa)
 
-
-
-;=============================================================================
-; brim_load
-;
-;
-;=============================================================================
-pro brim_load, brim_data, files, display=display
-
- if(ptr_valid(brim_data.images_p)) then nv_ptr_free, brim_data.images_p
-
-
- n = n_elements(files)
-
- images = dblarr(brim_data.thumbsize, brim_data.thumbsize, n)
-
- for i=0, n-1 do $
-  begin
-   ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   ; if files is a string, then assume it gives filenames.
-   ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   if(size(files, /type) EQ 7) then $
+   ;- - - - - - - - - - - - - - - - - - - - - - - - -
+   ; display thumbnail
+   ;- - - - - - - - - - - - - - - - - - - - - - - - -
+   ndim = n_elements(size(image, /dim))
+   if(ndim EQ 1) then tvgr, brim_data.wnums[i], abscissa, image $
+   else $
     begin
-     _im = 0
-     dd = dat_read(files[i], _im);, maintain=2)
-     if(obj_valid(dd[0])) then nv_free, dd
-    end $
-   ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   ; otherwise, assume it gives data descriptors.
-   ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   else  _im = dat_data(files[i])
-; need to sample images with dat_data instead of congrid
+     if(ndim EQ 3) then image = total(image,3)
 
-   if(keyword_set(_im)) then $
-    if((size(_im))[0] EQ 2) then $
-     begin
-      images[*,*,i] = congrid(_im, brim_data.thumbsize, brim_data.thumbsize)
+     dim = size(image, /dim) 
+     zoom = min(float(size)/float(dim))
 
-      if(keyword_set(display)) then $
-                  brim_display_image, brim_data, i, images[*,*,i]
-     end
+     if(brim_data.order NE -1) then order = brim_data.order
+     tvim, brim_data.wnums[i], order=order, image, zoom=zoom
+    end
+
+   ;- - - - - - - - - - - - - - - - - - - - - - - - -
+   ; save thumbnail
+   ;- - - - - - - - - - - - - - - - - - - - - - - - -
+   cor_set_udata, dd[i], 'BRIM_THUMBNAIL', image
+   widget_control, brim_data.label_widgets[i], set_value=labels[i]
   end
 
+end
+;=============================================================================
 
- brim_data.images_p = nv_ptr_new(images)
 
 
- widget_control, brim_data.base, set_uvalue=brim_data
+;=============================================================================
+; brim_data_event
+;
+;=============================================================================
+pro brim_data_event, event
+;print, 'brim_data_event'
+
+; data = *event.data_p
+
+; brim_data = data.data
+; dd = data.dd
+
+
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; brim_register_data_events
+;
+;=============================================================================
+pro brim_register_data_events, brim_data, dd
+
+ for i=0, n_elements(dd)-1 do $
+   nv_notify_register, dd[i], 'brim_data_event', data={data:brim_data, dd:dd[i]}
+
 end
 ;=============================================================================
 
@@ -225,44 +262,16 @@ end
 ; brim_configure
 ;
 ;=============================================================================
-function brim_configure, brim_data, n, files=files, base=base, $
+function brim_configure, dd, base=base, $
      thumbsize=thumbsize, labels=labels, $
-     select_ids=select_ids, $
-     left_fn=left_fn, right_fn=right_fn, middle_fn=middle_fn, fn_data=fn_data, $
-     exclusive_selection=exclusive_selection, path=path, get_path=get_path, $
-     modal=modal, title=title, ids=ids, order=order, filter=filter, $
-     enable_selection=enable_selection
+     left_fn=left_fn, middle_fn=middle_fn, right_fn=right_fn, fn_data=fn_data, $
+     path=path, get_path=get_path, $
+     modal=modal, title=title, order=order
 
  label_ysize = 30
 ; label_ysize = 22
  nmore = 0
-
- if(keyword_set(brim_data)) then $
-  begin
-   if(NOT defined(enable_selection)) then $
-                           enable_selection = brim_data.enable_selection
-   if(NOT defined(order)) then order = brim_data.order
-   if(NOT defined(exclusive_selection)) then $
-                           exclusive_selection = brim_data.exclusive_selection
-   if(NOT defined(fn_data)) then fn_data = brim_data.fn_data
-   if(NOT defined(middle_fn)) then middle_fn = brim_data.middle_fn  
-   if(NOT defined(right_fn)) then right_fn = brim_data.right_fn
-   if(NOT defined(left_fn)) then left_fn = brim_data.left_fn  
-   if(NOT defined(thumbsize)) then thumbsize = brim_data.thumbsize
-
-   draw_bases = brim_data.draw_bases
-   scroll_base = brim_data.scroll_base
-   draw_widgets = brim_data.draw_widgets
-   label_widgets = brim_data.label_widgets
-   wnums = brim_data.wnums
-
-   if(ptr_valid(brim_data.select_ids_p)) then nv_ptr_free, brim_data.select_ids_p
-   if(ptr_valid(brim_data.images_p)) then nv_ptr_free, brim_data.images_p
-
-   n = n_elements(brim_data.draw_bases)
-   nmore = n_elements(files) - n
-   if(nmore NE 0) then base = brim_data.base
-  end 
+ n = n_elements(dd)
 
  ;------------------------------------
  ; widgets
@@ -323,36 +332,14 @@ function brim_configure, brim_data, n, files=files, base=base, $
 
   end
 
-
  ;----------------------------------
  ; data structure
  ;----------------------------------
  if(NOT keyword_set(base)) then base = brim_data.base
 
- if(NOT keyword_set(labels)) then $
-  begin
-   fnames = cor_name(files)
-   split_filename, fnames, dirs, labels
-  end
- if(keyword_set(ids)) then $
-  begin
-   w = str_isnum(strtrim(ids,2))
-   if( (w[0] NE -1) AND $
-           (n_elements(w) EQ n_elements(labels)) ) then $
-                               labels = strtrim(ids,2) + ':' + labels
-  end
-
- if(NOT keyword_set(ids)) then ids = labels
-
- if(exclusive_selection) then $
-          if(NOT defined(select_ids)) then select_ids = ids[0]
- if(NOT exclusive_selection) then $
-          if(NOT defined(select_ids)) then select_ids = ''
-
  brim_data = { $
 		base			:	base, $
-		select_ids_p		:	nv_ptr_new(select_ids), $
-		enable_selection	:	enable_selection, $
+		select_dd_p		:	nv_ptr_new(obj_new()), $
 		left_fn			:	left_fn, $
 		middle_fn		:	middle_fn, $
 		right_fn		:	right_fn, $
@@ -364,9 +351,7 @@ function brim_configure, brim_data, n, files=files, base=base, $
 		draw_widgets		:	draw_widgets, $
 		label_widgets		:	label_widgets, $
 		labels			:	labels, $
-		ids			:	ids, $
-		exclusive_selection	:	exclusive_selection, $
-		files			:	files, $
+		dd			:	dd, $
 		order			:	order, $
 		base_xsize		:	0l, $
 		base_ysize		:	0l, $
@@ -389,9 +374,27 @@ function brim_configure, brim_data, n, files=files, base=base, $
  ; load and display images
  ;----------------------------------
  widget_control, /hourglass
- brim_load, brim_data, files, /display
+ brim_display, brim_data
+ brim_register_data_events, brim_data, dd
 
  return, brim_data
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; brim_frame
+;
+;
+;=============================================================================
+pro brim_frame, brim_data, i
+
+ wset, brim_data.wnums[i]
+ xs = !d.x_size-2
+ ys = !d.y_size-2
+ plots, [1,xs,xs,1,1], [1,1,ys,ys,1], /device, col=ctred(), th=3
+
 end
 ;=============================================================================
 
@@ -402,81 +405,45 @@ end
 ;
 ;
 ;=============================================================================
-pro brim_select, brim_data, _i, id=id, dd=dd
+pro brim_select, brim_data, i, select=select, deselect=deselect, clear=clear
 
-; ;------------------------------------------
-; ; if dd given, then need to reload images
-; ;------------------------------------------
-; if(keyword__set(dd)) then $
-;  begin
-;   brim_data = brim_configure(brim_data, files=dd, id=id)
-;  end
-
-
- if(NOT brim_data.enable_selection) then return
+ select_dd = *brim_data.select_dd_p
 
  ;-------------------------------------
- ; resolve ids if necessary
+ ; clear selections
  ;-------------------------------------
- if(keyword__set(id)) then i = brim_resolve_ids(brim_data, _i) $
- else i = _i
-
- new_selection = 1
- ;------------------------------------------
- ; exclusive selection
- ;------------------------------------------
- if(brim_data.exclusive_selection) then $
-  begin 
-   ;- - - - - - - - - - - - - - - -
-   ; erase current selection
-   ;- - - - - - - - - - - - - - - -
-   ii = brim_resolve_ids(brim_data, *brim_data.select_ids_p)
-   brim_display_image, brim_data, ii
-
-   ;- - - - - - - - - - - - - - - -
-   ; set new selection
-   ;- - - - - - - - - - - - - - - -
-   *brim_data.select_ids_p = brim_data.ids[i]
-  end $
- ;------------------------------------------
- ; general selection
- ;------------------------------------------
- else $
+ if(keyword_set(clear)) then $
   begin
-   if((*brim_data.select_ids_p)[0] EQ '') then $
-                                  *brim_data.select_ids_p = brim_data.ids[i] $
-   else $
-    begin
-     w = where(*brim_data.select_ids_p EQ brim_data.ids[i])
-
-     ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     ; add selection if not already selected, otherwise delete selection
-     ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     if(w[0] EQ -1) then $
-       *brim_data.select_ids_p = [*brim_data.select_ids_p, brim_data.ids[i]] $
-     else $
-      begin
-       *brim_data.select_ids_p = $
-                           rm_list_item(*brim_data.select_ids_p, w[0], only='')
-       brim_display_image, brim_data, i
-       new_selection = 0
-      end
-    end
-  end
-
- ;------------------------------------------
- ; highlight new selection
- ;------------------------------------------
- if(new_selection) then $
-  begin
-   wset, brim_data.wnums[i]
-
-   xs = !d.x_size-3
-   ys = !d.y_size-3
-   plots, [1,xs,xs,1,1], [1,1,ys,ys,1], /device, col=ctred(), th=2
+   w = [-1]
+   if(keyword_set(select_dd)) then w = nwhere(brim_data.dd, select_dd)
+   brim_display, brim_data, w
+   *brim_data.select_dd_p = obj_new()
+   return
   end
 
 
+ ;-------------------------------------
+ ; determine which thumbs are selected
+ ;-------------------------------------
+ w = where(select_dd EQ brim_data.dd[i])
+
+
+ ;-------------------------------------
+ ; implement selection/deselection
+ ;-------------------------------------
+ if(keyword_set(select) OR (w[0] EQ -1)) then $
+  begin
+   select_dd = append_array(select_dd, brim_data.dd[i])
+   brim_frame, brim_data, i
+  end
+
+ if(keyword_set(deselect) OR (w[0] NE -1)) then $
+  begin
+   select_dd = rm_list_item(select_dd, w, only=obj_new(), /scalar)
+   brim_display, brim_data, i
+  end
+
+ *brim_data.select_dd_p = select_dd
  widget_control, brim_data.base, set_uvalue=brim_data
 end
 ;=============================================================================
@@ -484,20 +451,51 @@ end
 
 
 ;=============================================================================
-; brim_fn_grim
+; brim_grim
 ;
 ;=============================================================================
-pro brim_fn_grim, brim_data, i, label, status=status
-
- status = 0
-
- if(size(brim_data.files, /type) EQ 7) then dd = dat_read(brim_data.files[i]) $
- else dd = brim_data.files[i]
+pro brim_grim, brim_data, dd
 
  widget_control, /hourglass
 
  if(brim_data.order NE -1) then order = brim_data.order
- grim, /new, dd, order=order
+; grim, /new, dd, order=order
+ grim, /new, dat_filename(dd), order=order
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; brim_fn_left
+;
+;=============================================================================
+pro brim_fn_left, brim_data, data, i, dd, status=status
+
+ status = 0
+ event = data
+
+ if(event.clicks EQ 2) then $
+  begin
+   brim_select, brim_data, /clear
+   brim_select, brim_data, i, /select
+   select_dd = *brim_data.select_dd_p
+   dd = unique(append_array(brim_data.dd[i], select_dd))
+   brim_grim, brim_data, dd
+  end $
+ else brim_select, brim_data, i
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; brim_fn_right
+;
+;=============================================================================
+pro brim_fn_right, brim_data, data, i, dd, status=status
 
 end
 ;=============================================================================
@@ -554,9 +552,16 @@ pro brim_draw_event, event
 
  widget_control, event.top, get_uvalue=brim_data 
 
- i = where(event.id EQ brim_data.draw_widgets)
+ i = (where(event.id EQ brim_data.draw_widgets))[0]
 
  struct = tag_names(event, /struct)
+
+; if(struct EQ 'WIDGET_TRACKING') then $
+;  if(event.enter) then $
+;   begin
+;    brim_select, brim_data, i
+;    return
+;   end
  if(struct EQ 'WIDGET_TRACKING') then return
 
  ;--------------------------
@@ -574,23 +579,18 @@ pro brim_draw_event, event
  if(event.type NE 0) then return 
 
  fn_data = brim_data.fn_data
- if(NOT keyword_set(fn_data)) then fn_data = brim_data
+ if(NOT keyword_set(fn_data)) then fn_data = event
 
  case event.press of
-  1 : $
-   begin
-    status = 0
-    if(keyword__set(brim_data.left_fn)) then $
-           call_procedure, brim_data.left_fn, fn_data, i, $
-                                          brim_data.ids[i], status=status
-    if(status EQ 0) then brim_select, brim_data, i
-   end
+  1 : if(keyword__set(brim_data.left_fn)) then $
+           call_procedure, brim_data.left_fn, brim_data, fn_data, i, $
+                                          brim_data.dd[i], status=status
   2 : if(keyword__set(brim_data.middle_fn)) then $
-           call_procedure, brim_data.middle_fn, fn_data, i, $
-                                          brim_data.ids[i], status=status
+           call_procedure, brim_data.middle_fn, brim_data, fn_data, i, $
+                                          brim_data.dd[i], status=status
   4 : if(keyword__set(brim_data.right_fn)) then $
-           call_procedure, brim_data.right_fn, fn_data, i, $
-                                          brim_data.ids[i], status=status
+           call_procedure, brim_data.right_fn, brim_data, fn_data, i, $
+                                          brim_data.dd[i], status=status
   else:
  endcase
 
@@ -604,69 +604,71 @@ end
 ; brim
 ;
 ;=============================================================================
-pro brim, files, thumbsize=thumbsize, labels=labels, select_ids=select_ids, $
-     left_fn=left_fn, right_fn=right_fn, middle_fn=middle_fn, fn_data=fn_data, $
-     exclusive_selection=exclusive_selection, path=path, get_path=get_path, $
-     modal=modal, title=title, ids=ids, order=order, filter=filter, $
-     enable_selection=enable_selection, base=base
+pro brim, arg, thumbsize=thumbsize, labels=labels, $
+     left_fn=left_fn, middle_fn=middle_fn, right_fn=right_fn, fn_data=fn_data, $
+     path=path, get_path=get_path, picktitle=picktitle, $
+     modal=modal, title=title, order=order, filter=filter, $
+     base=base, select=select
 
- if(NOT defined(left_fn)) then left_fn = 'brim_fn_grim'
-
+ if(NOT keyword_set(arg)) then arg = ''
+ if(NOT defined(left_fn)) then left_fn = 'brim_fn_left'
  if(NOT defined(middle_fn)) then middle_fn = ''
- if(NOT defined(right_fn)) then right_fn = ''
+ if(NOT defined(right_fn)) then right_fn = 'brim_fn_right'
  if(NOT keyword_set(fn_data)) then fn_data = ''
- if(NOT keyword_set(exclusive_selection)) then exclusive_selection = 0
+ if(NOT keyword_set(labels)) then labels = ''
  if(NOT keyword_set(order)) then order = -1
- enable_selection = keyword_set(enable_selection)
  if(NOT keyword_set(thumbsize)) then thumbsize = 100
+ if(NOT keyword_set(picktitle)) then picktitle = 'Select files to load'
 
- ;----------------------------------
- ; select files if none given
- ;----------------------------------
- if(NOT keyword_set(files)) then $
+ sep = path_sep()
+
+ ;-------------------------------------------------------------------------
+ ; test for dd or filename inputs
+ ;-------------------------------------------------------------------------
+ if(size(arg, /type) EQ 11) then dd = arg $
+ else $
   begin
-   files = $
-    pickfiles(get_path=get_path, title='Select files to load', $
-                                               path=path, filter=filter)
-   if(NOT keyword_set(files[0])) then return
-  end 
- 
- ;---------------------------------------------------------
- ; resolve any file specifications and determine filetypes
- ;---------------------------------------------------------
- if(size(files, /type) EQ 7) then $
-  begin
-   for i=0, n_elements(files)-1 do $
+   filespecs = arg
+
+   ;----------------------------------
+   ; select files if none given
+   ;----------------------------------
+   if(NOT keyword_set(filespecs)) then $
     begin
-     if(strpos(files[i], '/') EQ -1) then files[i] = pwd() + '/' + files[i]
-     ff = file_search(files[i])
-     if(keyword_set(ff)) then _files = append_array(_files, ff)
-    end
-   if(NOT keyword_set(_files)) then return
-   files = _files
+     files = $
+      pickfiles(get_path=get_path, title=picktitle, $
+                                               path=path, filter=filter)
+     if(NOT keyword_set(files[0])) then return
+    end $
+   ;--------------------------------------------------------------------
+   ; Otherwise determine filetypes and resolve any file specifications 
+   ;--------------------------------------------------------------------
+   else $
+    for i=0, n_elements(filespecs)-1 do $
+     begin
+      filetype = dat_detect_filetype(filename=filespecs[i])
+      if(keyword_set(filetype)) then $
+                files = append_array(files, dat_expand(filetype, filespecs[i]))
+     end
 
    w = where(files NE '')
    if(w[0] EQ -1) then return
    files = files[w]
 
-   w = where(strpos(files,':') EQ -1)
-   if(w[0] EQ -1) then return
-   files = files[w]
-
-   w = where(strpos(files,'/') NE -1)
+   w = where(strpos(files,sep) NE -1)
    if(w[0] EQ -1) then return
    files = files[w]
 
    if(NOT keyword_set(files)) then return
 
-   split_filename, files, dirs, names
-   labels = names  
+   dd = dat_read(files, maintain=2)
   end
+
 
  ;----------------------------------
  ; geometry
  ;----------------------------------
- n = n_elements(files) 
+ n = n_elements(dd) 
 
  nx = sqrt(n)
  if((nx mod 1) NE 0) then nx = fix(nx) + 1
@@ -677,32 +679,44 @@ pro brim, files, thumbsize=thumbsize, labels=labels, select_ids=select_ids, $
  if(NOT keyword_set(title)) then title = 'BRIM'
 
 ; base = widget_base(title=title, /column, /tlb_size_events)
- base = widget_base(title=title, /tlb_size_events)
+ base = widget_base(title=title, /tlb_size_events, resource_name='brim_base')
 
  scroll_base = widget_base(base, xpad=0, ypad=0, /scroll, col=nx, space=0)
  widget_control, scroll_base, set_uvalue=nx
 
- brim_data = brim_configure(0, n, files=files, base=base, $
+ brim_data = brim_configure(dd, base=base, $
      thumbsize=thumbsize, labels=labels, $
-     select_ids=select_ids, $
-     left_fn=left_fn, right_fn=right_fn, middle_fn=middle_fn, fn_data=fn_data, $
-     exclusive_selection=exclusive_selection, path=path, get_path=get_path, $
-     modal=modal, title=title, ids=ids, order=order, filter=filter, $
-     enable_selection=enable_selection)
-
-
-
- ;----------------------------------
- ; show initial selections
- ;----------------------------------
- if(keyword_set(select_ids)) then brim_select, brim_data, select_ids, /id
-
+     left_fn=left_fn, middle_fn=middle_fn, right_fn=right_fn, fn_data=fn_data, $
+     path=path, get_path=get_path, $
+     modal=modal, title=title, order=order)
 
  no_block = 1
  if(keyword_set(modal)) then no_block = 0
  xmanager, 'brim', base, no_block=no_block
 
 
- select_ids = *brim_data.select_ids_p
+ ;----------------------------------
+ ; menu
+ ;----------------------------------
+; menu_desc = [ '1\File' , $
+;               '0\Load                \brim_menu_file_load_event', $
+;               '0\Open                \brim_menu_file_open_event', $
+;               '2\<null>              \brim_menu_delim_event']
+;bb = widget_base(group_leader=base, /floating, tlb_frame_attr=6)
+;menu = cw__pdmenu(bb, menu_desc)
+;widget_control, bb, /realize
+
+
+
+ ;----------------------------------
+ ; output selections
+ ;----------------------------------
+ select_dd = *brim_data.select_dd_p
+ if(keyword_set(select_dd)) then $
+  begin
+   nselect = n_elements(select_dd)
+   select = strarr(nselect)
+   for i=0, nselect-1 do select[i] = dat_filename(select_dd[i])
+  end
 end
 ;=============================================================================

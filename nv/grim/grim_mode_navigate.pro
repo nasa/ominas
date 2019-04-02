@@ -42,7 +42,7 @@ pro grim_mode_navigate_get_points, grim_data, plane=plane, $
 
  points_ptd = pnt_compress(points_ptds)
  curves_ptd = pnt_compress(curves_ptds)
- user_ptd = pnt_compress(user_ptds)
+ user_ptd = pnt_compress(user_ptds, /nodata)
 
 end
 ;=============================================================================
@@ -287,6 +287,50 @@ end
 
 
 ;=============================================================================
+; grim_mode_navigate_nadir_zenith
+;
+;=============================================================================
+pro grim_mode_navigate_nadir_zenith, grim_data, dir, event
+
+
+ plane = grim_get_plane(grim_data)
+
+ ;-------------------------------------------
+ ; get surface point
+ ;-------------------------------------------
+ p = (convert_coord(double(event.x), double(event.y), /device, /to_data))[0:1]
+ surf_pt = grim_image_to_surface(grim_data, plane, p, $
+                                         bx=bx, names=names, body_pt=body_pt)
+ if(NOT keyword_set(surf_pt)) then return
+ surf_pos = bod_body_to_inertial_pos(bx, body_pt)
+
+
+ ;-------------------------------------------
+ ; get current altitude above bx
+ ;-------------------------------------------
+ cd = grim_xd(plane, /cd)
+ cam_pos_surf = inertial_to_surface_pos(bx, bod_pos(cd))
+
+
+ ;-------------------------------------------
+ ; reposition camera above selected location
+ ;-------------------------------------------
+ surf_pt[2] = cam_pos_surf[2]
+ new_pos = surface_to_inertial_pos(bx, surf_pt)
+ bod_set_pos, cd, new_pos
+
+
+ ;-------------------------------------------
+ ; repoint camera
+ ;-------------------------------------------
+ pg_repoint, cd=cd, dir*v_unit(new_pos - surf_pos)
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
 ; grim_mode_navigate_reposition_y_event
 ;
 ;=============================================================================
@@ -388,7 +432,6 @@ end
 pro grim_mode_navigate_reposition_y, grim_data
 
  plane = grim_get_plane(grim_data)
-
 
  grim_mode_navigate_get_points, grim_data, $
                                plane=plane, points_ptd, curves_ptd, user_ptd
@@ -538,6 +581,17 @@ pro grim_mode_navigate_mouse_event, event, data
 
 
  ;---------------------------------------
+ ; nadir/zenith mode
+ ;---------------------------------------
+ if(event.modifiers EQ 2) then $
+  begin
+   dir = event.press EQ 1 ? -1 : 1
+   grim_mode_navigate_nadir_zenith, grim_data, dir, event
+   return
+  end
+
+
+ ;---------------------------------------
  ; get points
  ;---------------------------------------
  grim_mode_navigate_get_points, grim_data, plane=plane, $
@@ -584,7 +638,7 @@ pro grim_mode_navigate_mode, grim_data, data_p
 
  device, cursor_standard = 142
  grim_print, grim_data, $
-      'NAVIGATE CAMERA -- LEFT: Nod; RIGHT: Twist  <Shift> LEFT:XZ; RIGHT: track; WHEEL: Y '
+      'NAVIGATE CAMERA -- L:Nod R:Twist <Shift> L:XZ R:Track WHEEL:Y <Ctrl> L:Nadir R:Zenith'
 
 end
 ;=============================================================================
@@ -600,24 +654,34 @@ end
 ; PURPOSE:
 ;	Selects the navigate cursor mode.  
 ;
-;	 Camera orientation: 
-;	   Left button:		Allows the optic axis to be repointed.
+;	 No modifiers: 
+;	   Left:	Repoint the camera by dragging the cursor.
 ;
-;	   Right button:	Allows the camera to twist about an axis 
-;				corresponding to the selected pixel location.
+;	   Right:	Twists the camera by dragging the cursor about 
+;			an axis  corresponding to the initial cursor 
+;			position.
 ;
-;	 Camera position:
-;	   <Shift> Left:	Allows the camera to be repositioned in the 
-;				X-Z plane (image plane).  Speeds depend on
-;				the object under the cursor.
+;	 <Shift>:
+;	   Left:	Repositions the camera in the X-Z plane 
+;			(image plane) by dragging the cursor.  Speed 
+;			depends on the initial object under the cursor.
 ;
-;	   <Shift> Right:	Allows the camera to be repositioned and 
-;				reoriented simultaneosly by tracking the
-;				object under the cursor.
+;	   Right:	Repositions and reorients the camera
+;			simultaneosly by tracking the object under 
+;			the cursor.
 ;
-;	   <Shift> Wheel:	Allows the camera to be repositioned in the 
-;				Y (optic axis) direction.  Speeds depend on
-;				the object under the cursor.
+;	   Wheel:	Repositions the camera in the Y (optic axis) 
+;			direction.  Speed depends on the initial object 
+;			under the cursor.
+;
+;	 <Ctrl>:
+;	   Left:	Repositions the camera directly above the selected
+;			body location at the current altitude, pointing 
+;			straight down.
+;
+;	   Right:	Repositions the camera directly above the selected
+;			body location at the current altitude, pointing 
+;			straight up.
 ;
 ;
 ; CATEGORY:

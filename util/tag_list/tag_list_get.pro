@@ -98,6 +98,8 @@ function tag_list_get, tlp, name, $
                     index=index, reference=reference, prefix=prefix
 
  if(NOT ptr_valid(tlp)) then return, 0
+ if(NOT keyword_set(*tlp)) then return, 0
+ if(NOT ptr_valid((*tlp)[0].data_p)) then return, 0
  ntlp = n_elements(*tlp)
 
 ; if((NOT keyword__set(name)) AND (n_elements(index) EQ 0)) then return, 0

@@ -10,16 +10,17 @@ function vgr_iss_w10n_pds_header_info, dd
  if(NOT keyword_set(label)) then return, 0
 
  jlabel = json_parse(label, /tostruct)
- lab02 = jlabel.task[0].lab02
- lab03 = jlabel.task[0].lab03
- lab05 = jlabel.task[0].lab05
+ meta.lab02 = jlabel.task[0].lab02
+ meta.lab03 = jlabel.task[0].lab03
+ meta.lab05 = jlabel.task[0].lab05
+ meta.lab07 = jlabel.task[0].lab07
 
  sc_name = vgr_parse_inst(dat_instrument(dd), cam=name)
 
  ;-----------------------------------
  ; exposure time
  ;-----------------------------------
- exp = strmid(lab03, strpos(lab03,' EXP ')+5, 9)
+ exp = strmid(meta.lab03, strpos(meta.lab03,' EXP ')+5, 9)
  meta.exposure = double(exp) / 1000d
 
  ;-----------------------------------
@@ -57,25 +58,25 @@ function vgr_iss_w10n_pds_header_info, dd
  ;-----------------------------------
  ; optic axis
  ;-----------------------------------
- meta.oaxis = meta.size/2d
+ meta.oaxis = meta.size/2d - 0.5
 
  ;-----------------------------------
  ; filters
  ;-----------------------------------
- meta.filters = strmid(lab03, strpos(lab03,' FILT ')+8, 6)
+ meta.filters = strmid(meta.lab03, strpos(meta.lab03,' FILT ')+8, 6)
 
  ;-----------------------------------
  ; target
  ;-----------------------------------
- meta.target = strtrim(strmid(lab05, 35, 11), 2)
+ meta.target = strtrim(strmid(meta.lab05, 35, 11), 2)
  if (meta.target EQ 'ENCELADU') then meta.target = 'ENCELADUS'
- if (meta.target.EQ 'S-RINGS') then meta.target = 'SATURN'
+ if (meta.target EQ 'S-RINGS') then meta.target = 'SATURN'
 
  ;-----------------------------------
  ; time
  ;-----------------------------------
  meta.time = -1d100
- scet = strmid(lab02, strpos(lab02,' SCET ')+6, 15)
+ scet = strmid(meta.lab02, strpos(meta.lab02,' SCET ')+6, 15)
  p = strpos(strupcase(scet), 'UNKNOWN')
  if(p[0] EQ -1) then $
   begin

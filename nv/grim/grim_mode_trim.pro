@@ -132,7 +132,7 @@ end
 pro grim_mode_trim_mode, grim_data, data_p
 
  grim_mode_trim_cursor, swap=swap
- grim_print, grim_data, 'TRIM OVERLAYS -- LEFT: Standard; MIDDLE: Cancel; RIGHT: User'
+ grim_print, grim_data, 'TRIM OVERLAYS -- L:Standard M:Cancel R:User'
 
 end
 ;=============================================================================

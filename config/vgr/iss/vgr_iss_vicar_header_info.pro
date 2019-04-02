@@ -12,6 +12,14 @@ function vgr_iss_vicar_header_info, dd
  sc_name = vgr_parse_inst(dat_instrument(dd), cam=name)
 
  ;-----------------------------------
+ ; sublabels
+ ;-----------------------------------
+ meta.lab02 = vicgetpar(label, 'LAB02')
+ meta.lab03 = vicgetpar(label, 'LAB03')
+ meta.lab05 = vicgetpar(label, 'LAB05')
+ meta.lab07 = vicgetpar(label, 'LAB07')
+
+ ;-----------------------------------
  ; exposure time
  ;-----------------------------------
  meta.exposure = vicar_vgrkey(label, 'EXP') / 1000d
@@ -51,7 +59,7 @@ function vgr_iss_vicar_header_info, dd
  ;-----------------------------------
  ; optic axis
  ;-----------------------------------
- meta.oaxis = meta.size/2d
+ meta.oaxis = meta.size/2d - 0.5
 
  ;-----------------------------------
  ; filters
@@ -61,8 +69,7 @@ function vgr_iss_vicar_header_info, dd
  ;-----------------------------------
  ; target
  ;-----------------------------------
- lab05 = vicgetpar(label, 'LAB05')
- meta.target = strtrim(strmid(lab05, 35, 11), 2)
+ meta.target = strtrim(strmid(meta.lab05, 35, 11), 2)
  if (meta.target EQ 'ENCELADU') then meta.target = 'ENCELADUS'
  if (meta.target EQ 'S-RINGS') then meta.target = 'SATURN'
 

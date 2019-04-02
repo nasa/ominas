@@ -951,6 +951,7 @@ pro gr_lsqtool_event, event
  ; get data structure
  ;-----------------------------------------------
  grim_data = grim_get_data(/primary)
+ if(NOT keyword_set(grim_data)) then return
  data = grim_get_user_data(grim_data, 'GRLSQ_DATA')
  lsqd = grlsq_form_to_lsqd(data)
 
@@ -1061,6 +1062,7 @@ end
 pro grlsq_primary_notify, init_data_p
 
  grim_data = grim_get_data(/primary)
+ if(NOT keyword_set(grim_data)) then return
  data = grim_get_user_data(grim_data, 'GRLSQ_DATA')
  if(NOT keyword_set(data)) then $
                grim_set_user_data, grim_data, 'GRLSQ_DATA', *init_data_p $

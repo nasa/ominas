@@ -2,16 +2,40 @@
 ; ominas_station::init
 ;
 ;=============================================================================
-function ominas_station::init, ii, crd=crd0, bd=bd0, std=std0, $
+function ominas_station::init, _ii, crd=crd0, bd=bd0, std=std0, $
 @stn__keywords_tree.include
 end_keywords
 @core.include
  
+ if(keyword_set(_ii)) then ii = _ii
+ if(NOT keyword_set(ii)) then ii = 0 
+
+
+ ;---------------------------------------------------------------
+ ; set up parent class
+ ;---------------------------------------------------------------
  if(keyword_set(bd0)) then struct_assign, bd0, self
  void = self->ominas_body::init(ii, crd=crd0, bd=bd0,  $
 @bod__keywords_tree.include
 end_keywords)
 
+
+ ;-------------------------------------------------------------------------
+ ; Handle index errors: set index to zero and try again.  This allows a 
+ ; single input to be applied to multiple objects, via multiple calls to
+ ; this method.  In that case, all inputs must be given as single inputs.
+ ;-------------------------------------------------------------------------
+ catch, error
+ if(error NE 0) then $
+  begin
+   ii = 0
+   catch, /cancel
+  end
+
+ 
+ ;---------------------------------------------------------------
+ ; assign initial values
+ ;---------------------------------------------------------------
  self.abbrev = 'STN'
  self.tag = 'STD'
 
@@ -43,11 +67,6 @@ end
 ;
 ;
 ; FIELDS:
-;	bd:	BODY class descriptor.  
-;
-;		Methods: stn_body, stn_set_body
-;
-;
 ;	surface_pt:	Vector giving the surface coordinates of the 
 ;			stations location on the primary.  This 
 ;			is redundant with the location of bd, but it 

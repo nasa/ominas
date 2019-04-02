@@ -21,9 +21,9 @@
 ;       pos:	An array of 1x3 column vectors (1,3,n)
 ;
 ;  OUTPUT:
-;        ra:	Output array of Right Ascension (in degrees)
+;        ra:	Output array of Right Ascension 
 ;
-;       dec:	Output array of Declination (in degrees)
+;       dec:	Output array of Declination 
 ;
 ; KEYWORDS:
 ;
@@ -50,8 +50,8 @@ pro xyz_to_ra, pos, ra, dec
    y = pos[0,1,i]
    z = pos[0,2,i]
    dist = sqrt(x*x + y*y + z*z)
-   dec[i] = asin(z/dist)*180d/!dpi
-   ra[i] = atan(y/dist,x/dist)*180d/!dpi
+   dec[i] = asin(z/dist)
+   ra[i] = atan(y/dist,x/dist)
   end
 
  end

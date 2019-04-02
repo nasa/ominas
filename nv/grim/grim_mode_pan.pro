@@ -74,7 +74,7 @@ end
 pro grim_mode_pan_mode, grim_data, data_p
 
  device, cursor_standard = 52
- grim_print, grim_data, 'PAN -- LEFT: Pan; RIGHT: Recenter'
+ grim_print, grim_data, 'PAN -- L:Pan R:Recenter'
 
 end
 ;=============================================================================

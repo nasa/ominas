@@ -26,11 +26,12 @@ pro make_star_files_gsc2, indir=indir, catfile=catfile, outdir=outdir, $
  ;------------------------------------
  ; File management stuff
  ;------------------------------------
+ sep = path_sep()
  if not keyword__set(indir) then indir = '/catalog/gsc2.2/data/'
- if rstrpos(indir,'/') ne strlen(indir)-1 then indir = indir + '/'
+ if rstrpos(indir,sep) ne strlen(indir)-1 then indir = indir + sep
  if not keyword__set(catfile) then catfile = findfile( indir + 'gsc*dat' )
  if not keyword__set(outdir) then outdir = '/catalog/gsc2.2/'
- if rstrpos(outdir,'/') ne strlen(outdir)-1 then outdir = outdir + '/'
+ if rstrpos(outdir,sep) ne strlen(outdir)-1 then outdir = outdir + sep
 
  ;------------------------------------
  ; Initialize variables

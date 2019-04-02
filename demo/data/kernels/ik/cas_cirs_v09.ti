@@ -1,0 +1,875 @@
+KPL/IK
+ 
+ 
+CIRS Instrument Kernel
+==============================================================================
+ 
+   This instrument kernel (I-kernel) contains references to the mounting
+   alignment, internal and FOV geometry for the Cassini Composite Infrared
+   Spectrometer (CIRS) instruments.
+ 
+ 
+Version and Date
+----------------------------------------------------------
+ 
+   The TEXT_KERNEL_ID stores version information of loaded project text
+   kernels. Each entry associated with the keyword is a string that consists
+   of four parts: the kernel name, version, entry date, and type. For example,
+   the ISS I-kernel might have an entry as follows:
+ 
+           TEXT_KERNEL_ID += 'CASSINI_ISS V0.0.0 29-SEPTEMBER-1999 IK'
+                                  |          |         |            |
+                                  |          |         |            |
+              KERNEL NAME <-------+          |         |            |
+                                             |         |            V
+                             VERSION <-------+         |       KERNEL TYPE
+                                                       |
+                                                       V
+                                                  ENTRY DATE
+ 
+   CIRS I-Kernel Version:
+ 
+           \begindata
+ 
+           TEXT_KERNEL_ID += 'CASSINI_CIRS V0.9.0 11-JUNE-2002 IK'
+ 
+           \begintext
+ 
+   Version 0.9 -- June 11, 2002 -- Scott Turner
+ 
+            --   Updated CASSINI_CIRS_FP3, CASSINI_CIRS_FP4, and
+                 CASSINI_CIRS_FPB field of view sizes. See [8] for details.
+ 
+   Version 0.8 -- March 12, 2002 -- Scott Turner
+ 
+            --   Added mode timing keywords for CASSINI_CIRS_FPB FOV
+                 definition.
+ 
+   Version 0.7 -- January 23, 2002 -- Scott Turner
+ 
+            --   Added CASSINI_CIRS_FPB FOV definition.
+ 
+            --   Corrected CASSINI_CIRS_FP3 and CASSINI_CIRS_FP4 FOV
+                 definitions. These FOV angular extents were recorded as twice
+                 their actual value.
+ 
+   Version 0.6 -- April 23, 2001 -- Scott Turner
+ 
+            --   Updated kernel to utilize new FOV ANGLES specification.
+ 
+   Version 0.5 -- August 15, 2000 -- Scott Turner
+ 
+            --   Recalculated the FOV definitions to enhance precision.
+ 
+   Version 0.4 -- June 12, 2000 -- Scott Turner
+ 
+            --   Altered the FP1, FP3, and FP4 FOV definitions to conform to
+                 the 'CIRS Fields-of-View' PDF.
+ 
+   Version 0.3 -- June 7, 2000 -- Scott Turner
+ 
+            --   Changed the INS[#]_FOV_CENTER_PIXEL keyword to match the
+                 specification in the I-kernel SIS.
+ 
+   Version 0.2 -- March 27, 2000 -- Scott Turner
+ 
+            --   Altered the BOUNDARY_CORNERS vector definitions for the FP3
+                 and FP4 FOV definitions since they were oriented incorrectly.
+ 
+            --   Corrected a typo in the definition of FP1's FOV.
+ 
+            --   Some cosmetic alterations to the layout of the kernel were
+                 made.
+ 
+            --   Added TEXT_KERNEL_ID keyword.
+ 
+   Version 0.1 -- March 17, 2000 -- Scott Turner
+ 
+            --   This I-kernel reflects changes discussed at the SPICE meeting
+                 on 3/16/2000.
+ 
+            --   All of the INS[ID]_SEQ_[WORD] keywords were eliminated.
+ 
+            --   INS[ID]_SEQ_FOV_CENTER is now keyed to
+                 INS[ID]_FOV_CENTER_PIXEL.
+ 
+   Version 0.0 -- March 6, 2000 -- Scott Turner
+ 
+            --   Initial Prototype Release for Review.
+ 
+ 
+References
+----------------------------------------------------------
+ 
+            1.   ``Cassini Science Instruments and Investigations'', Revised
+                 Second Printing. Stephen J. Edberg.
+ 
+            2.   Cassini Spacecraft Frames Definition Kernel
+ 
+            3.   JPL Cassini Project Web Page describing the instruments.
+ 
+            4.   Cassini/NAIF SPICE Workship, November 8-9, 1999.
+ 
+            5.   Email from Jeff Boyer regarding necessary data for footprint
+                 calculations.
+ 
+            6.   'CIRS Fields-of-View' PDF, Stephen J. Edberg.
+ 
+            7.   Email from Jeff Boyer regarding missing CASSINI_CIRS_FPB mode
+                 timing keywords and their values.
+ 
+            8.   Page 28 from ECR 100515 listing updated alignment information
+                 for CASSINI_CIRS detectors.
+ 
+ 
+Contact Information
+----------------------------------------------------------
+ 
+   Direct questions, comments or concerns about the contents of this kernel
+   to:
+ 
+           Scott Turner, NAIF/JPL, (818)-345-3157, sturner@spice.jpl.nasa.gov
+ 
+ 
+Implementation Notes
+----------------------------------------------------------
+ 
+   This file is used by the SPICE system as follows: programs that make use of
+   this instrument kernel must ``load'' the kernel, normally during program
+   initialization. Loading the kernel associates data items with their names
+   in a data structure called the ``kernel pool''. The SPICELIB routine FURNSH
+   and CSPICE routine furnsh_c load SPICE kernels as shown below:
+ 
+   FORTRAN (SPICELIB)
+ 
+           CALL FURNSH ( 'kernel_name' )
+ 
+   C (CSPICE)
+ 
+           furnsh_c ( "kernel_name" )
+ 
+   In order for a program or subroutine to extract data from the pool, the
+   SPICELIB routines GDPOOL and GIPOOL are used. See [2] for details.
+ 
+   This file was created and may be updated with a text editor or word
+   processor.
+ 
+ 
+Naming Conventions
+----------------------------------------------------------
+ 
+   All names referencing values in this I-kernel start with the characters
+   `INS' followed by the NAIF Cassini spacecraft ID number (-82) followed by a
+   NAIF three digit code for the CIRS instruments. (FP1 = 890, FP3 = 891, FP4
+   = 892, FPB = 893).
+ 
+   The remainder of the name is an underscore character followed by the unique
+   name of the data item. For example, the CIRS FP1 boresight direction in the
+   CIRS FP1 optics frame (``CASSINI_CIRS_FP1'' -- see [2] ) is specified by:
+ 
+           INS-82890_BORESIGHT
+ 
+   The upper bound on the length of the name of any data item is 32
+   characters.
+ 
+   If the same item is included in more than one file, or if the same item
+   appears more than once within a single file, the latest value supersedes
+   any earlier values.
+ 
+ 
+CIRS description
+----------------------------------------------------------
+ 
+   From [3]:
+ 
+   The Composite Infrared Spectrometer (CIRS) is designed to measure infrared
+   energy of various wavelengths in the Saturnian system. It will address a
+   wide variety of science objectives for the atmospheres of Saturn and Titan,
+   and for Saturn's icy satellites and rings, including composition
+   determination and thermal state measurements. The CIRS instrument consists
+   of two assemblies: optics and electronics. For information on these
+   components, see below.
+ 
+   (CIRS)
+ 
+   The CIRS optics assembly consists of a telescope, a far infrared
+   interferometer, a mid infrared interferometer, a reference interferometer,
+   a moving scan mechanism, a cooler, thermal control equipment, an optics
+   assembly mount, covers for the telescope and cooler, and a calibration
+   shutter mechanism. For information on these components, see below.
+ 
+   (Optics Assembly)
+ 
+   The telescope is composed of a 50.8 cm-diameter paraboloid primary mirror
+   and a hyperboloid secondary mirror. A sun shade will be present around the
+   primary mirror. This shade will also serve as the primary mirror radiator.
+   A cylindrical tube extends from the central portion of the primary mirror
+   to support the secondary mirror, which has its own radiator.
+ 
+   The CIRS science data will be collected by two of the instrument's three
+   interferometers. Interferometers are instruments designed to make precise
+   measurements of wavelength within some range of the electromagnetic
+   spectrum. For example, the CIRS far infrared (FIR) interferometer covers a
+   spectral range of 10-600 cm-1. The FIR instrument is a polarizing
+   interferometer that uses substrate-mounted wire grid polarizers to polarize
+   and analyze the radiation. The interferometer operates by first polarizing
+   the radiation and then modulating its polarization. The FIR interferometer
+   has its moving mirror mounted on one end of the moving scan mechanism,
+   which it shares with the mid infrared interferometer. The fixed and moving
+   mirrors are roof mirrors, and the FIR focal plane consists of a matched
+   pair of thermopile detectors, each with a concentrator.
+ 
+   The mid-infrared (MIR) interferometer, which is a conventional Michelson
+   instrument, covers a spectral range of 600-1500 1/cm. The MIR
+   interferometer has its moving mirror mounted on the opposite end of the
+   moving scan mechanism from the FIR mirror. The fixed and moving mirrors are
+   cube corners, and the MIR uses a germanium lens to focus the interferometer
+   output onto focal planes FP3 and FP4.
+ 
+   The reference interferometer will provide timing correlation of the science
+   data sampling to the scan mechanism position. Specifically, the scan
+   mechanism's motion will produce a variable reference interferometer signal
+   that will be used to generate the timing signals necessary to time the
+   recording of science data. The reference interferometer is a Michelson
+   instrument, used on-axis at the optic center of the MIR interferometer. It
+   includes laser diode and LED sources, a quartz beamsplitter/compensator,
+   optics, and a silicon detector. The reference interferometer uses cube
+   corners for the fixed and moving mirrors.
+ 
+   The moving scan mechanism subassembly includes the optical and mechanical
+   components in the optics assembly required for moving the interferometer
+   mirrors to permit controlled sampling in the optical path difference. This
+   subassembly consists of a common carriage with a moving shaft for the three
+   interferometer mirrors, a motor to drive the shaft, a cantilever-spring
+   motor mount, and a velocity transducer. The scan mechanism includes a
+   launch lock that can be locked and unlocked repeatedly without
+   refurbishment by remote command through the onboard computer.
+ 
+   A single-stage, passive cooler, radiating to space, provides a 70-80 K cold
+   finger with four discrete, commandable set points within that range. The
+   nominal set point temperature will be 80 K. The cold finger has heaters for
+   decontamination and detector annealing.
+ 
+   A system of thermal control equipment, including temperature sensors,
+   electrical heaters, proportional heater controllers, and radiators, is used
+   to maintain the thermal control of the optics assembly. The temperature of
+   the instrument is monitored by sensors located at appropriate places in the
+   instrument, including, but not limited to, the telescope mirrors, the
+   interferometers, the detectors, the optics housing, the radiating surface,
+   and the Michelson motor.
+ 
+   The optics assembly mount thermally decouples the optics assembly from the
+   remote sensing pallet (RSP).
+ 
+   The telescope and 80-K cooler will be protected with covers until the
+   orbiter leaves the inner solar system, at which point the covers will be
+   separately jettisoned by wax thermal actuators (WTAs). Each cover has two
+   redundant parrafin actuators, either one of which can initiate the action
+   of a pin-puller assembly, which in turn initiates the action of an ejection
+   spring assembly.
+ 
+   The calibration shutter mechanism will be used to interrupt the MIR beam,
+   causing the MIR detectors to view a controlled 170-K black surface inside
+   the instrument. The shutter is commandable through the onboard computer.
+ 
+   The CIRS electronics assembly includes front-end electronics, scan
+   mechanism electronics, reference interferometer electronics, temperature
+   control and monitor electronics, the instrument data system, and power
+   converter electronics for conditioning the spacecraft power as required by
+   the instrument. For information on these components, see below.
+ 
+   (Electronics Assembly)
+ 
+   The front-end electronics provides analog and digital processing of the
+   detector signals. This includes filtering, multiplexing, amplification, and
+   digitization to achieve the science data requirements.
+ 
+   The scan mechanism electronics provides the operation and control of the
+   linear moving scan mechanism. The control system provides a constant
+   velocity travel during the forward (scan) direction and a fast flyback
+   during the reverse (flyback) direction. The control is a function of the
+   reference interferometer timing signals and other sensors, as needed. The
+   scan mechanism electronics also includes circuitry to actuate the
+   calibration shutter.
+ 
+   The reference interferometer electronics provides timing signals for
+   accurate sampling of the science data and for accurate control of the scan
+   mechanism velocity.
+ 
+   The CIRS instrument has four zones that are independently controlled by the
+   temperature control and monitor electronics. These zones are the primary
+   mirrors, the secondary mirrors, the interfermeters, and the 80-K cooler.
+   The temperature is monitored by temperature sensors located on the four
+   zones, which provide accurate temperature values at the cooled
+   temperatures. The sensors located on the optics assembly provide course
+   values at the decontamination temperature. The monitored temperatures will
+   be transmitted to the spacecraft.
+ 
+   The instrument data system (IDS) is a microprocessor circuit that provides
+   the instrument data processing function and communication with the
+   spacecraft. The IDS receives and processes commands, data, and timing
+   information from the spacecraft and configures and controls the
+   instrument's operational states. It processes the science data from the
+   front-end electronics and the housekeeping data from all of the
+   subassemblies, and then it transmits these data to the spacecraft.
+ 
+   The power converter electronics (PCE) conditions the regulated power
+   received from the spacecraft and provides direct power to the instrument
+   data system and the temperature controller and monitor subassemblies. The
+   PCE also provides, on command, power to other subassemblies and release of
+   the scan mechanism launch lock, the 80-K cooler cover, and the telescope
+   cover.
+ 
+ 
+CIRS Field of View Parameters
+----------------------------------------------------------
+ 
+ 
+FOV Sizes (in degrees)
+ 
+ 
+                          Spacecraft Frame:
+ 
+                                             Zsc
+                                              ^
+                                              |
+                                              |
+                                        <-----o
+                                      Xsc     Ysc
+                                                                Ybs
+           ___                                                   ^
+            |               *************                        |
+            |           ****             ****                    |
+            |        ***                     ***            __ ..... __   ___
+            |      **                           **         |  |     |  |   |
+            |     *                               *        |  |     |  |   |
+            |    *                                 *       |  |     |  |   |
+            |   *                                   *      |  |     |  |   |
+            |   *                                   *      |  |     |  |   |
+            |   *                                   *      |  |     |  |   |
+           0.22 *                 x                 *  <-- |  |  x  |  |  0.17
+            |   *                                   * Xbs  |  |  Zbs|  |   |
+            |   *                                   *      |  |     |  |   |
+            |   *                                   *      |  |     |  |   |
+            |    *                                 *       |  |     |  |   |
+            |     *                               *        |  |     |  |   |
+            |      **                           **         |__|.....|__|  _|_
+            |        ***                     ***           FP4      FP3
+            |           ****             ****
+           _|_              *************                  |--|     |--|
+                   FP1
+                                                           0.02     0.02
+ 
+   /mdThe field of view parameters for the three focal planes that constitute
+   the CIRS detectors are:
+ 
+            --   Focal Plane 1 (FP1)
+ 
+            --   Focal Plane 3 (FP3)
+ 
+            --   Focal Plane 4 (FP4)
+ 
+            --   Focal Plane Boresight (FPB)
+ 
+           Circular FOVs:
+ 
+           ------------  -------------------
+             Detector         Diameter
+           ------------  -------------------
+               FP1          0.223 degrees
+           ------------  -------------------
+ 
+           Rectangular FOVs:
+ 
+           ------------  --------------------  --------------------
+             Detector         Horizontal             Vertical
+           ------------  --------------------  --------------------
+               FP3          0.0172 degrees        0.172 degrees
+ 
+               FP4          0.0172 degrees        0.172 degrees
+ 
+               FPB          0.0688 degrees        0.172 degrees
+           ------------  --------------------  --------------------
+ 
+   The keywords INS[ID]_FOV_FRAME, INS[ID]_FOV_SHAPE, INS[ID]_BORESIGHT, and
+   the FOV ANGLES specification keywords defined below are used to describe
+   the instrument field of view. Since FP1 is a circular field of view and FP3
+   and FP4 are rectangular, the INS[ID]_FOV_SHAPE will either be 'CIRCLE' or
+   'RECTANGLE'. In the case of FP1, GETFOV returns a single vector that lies
+   along the edge of the circular cone, and for FP3, FP4, and FPB four
+   vectors. All four FOV boresights lie along the Z-axis.
+ 
+ 
+Focal Plane #1 (FP1) FOV Definition
+ 
+   Since FP1's diameter is 0.112 degrees, looking up the Y-axis in the
+   CASSINI_CIRS_FP1 frame we have: (Note we are arbitrarily choosing a vector
+   that terminates in the Z=1 plane.)
+ 
+ 
+                                  ^ X
+                                  |  ins
+                                  |
+                                  |        /|
+                                  |      /  |
+                                  |    /    |
+                                  |  /    o |
+                                  |/ 0.112  |
+                                  o--------------->
+                                Y  \        |    Z
+                                 ins \      |     ins
+                                       \    |
+                                         \  |
+                                           \|
+ 
+                                  |-- 1.0 --|
+                                                Plane Y = 0
+ 
+ 
+   Now from here we see that the X component of one 'boundary corner' vector
+   is:
+ 
+           X Component = 1.0 * tan ( 0.11172677 degrees )
+                       = 0.001950002
+ 
+   Utilizing the ANGLES FOV specification:
+ 
+   Focal Plane #1 (FP1):
+ 
+           \begindata
+ 
+           INS-82890_FOV_FRAME                 = 'CASSINI_CIRS_FP1'
+           INS-82890_FOV_SHAPE                 = 'CIRCLE'
+           INS-82890_BORESIGHT                 = (
+ 
+                  0.0000000000000000   0.0000000000000000  +1.0000000000000000
+ 
+                                                 )
+           INS-82890_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-82890_FOV_REF_VECTOR            = (
+ 
+                 +1.0000000000000000   0.0000000000000000   0.0000000000000000
+ 
+                                                 )
+           INS-82890_FOV_REF_ANGLE             = ( 0.00195 )
+           INS-82890_FOV_ANGLE_UNITS           = 'RADIANS'
+ 
+           \begintext
+ 
+ 
+Focal Plane #3 (FP3) FOV Definition
+ 
+   Similar calculations hold for FP3 and FP4. GETFOV returns four boundary
+   corner vectors for rectangular fields of view. This requires two separate
+   views to visualize. First consider looking down the X-axis at the X=0 plane
+   which permits the computation of the Y components of the boundary corner
+   vectors. In this plane the half angle of note is 0.08594366926962 degrees.
+ 
+ 
+                                  ^ Y
+                                  |  ins
+                                  |
+                                  |        /|
+                                  |      /  |
+                                  |    /    |
+                                  |  /    o |
+                                  |/ 0.086  |
+                                  x--------------->
+                                X  \        |    Z
+                                 ins \      |     ins
+                                       \    |
+                                         \  |
+                                           \|
+ 
+                                  |-- 1.0 --|
+                                                Plane X = 0
+ 
+ 
+           Y Component = +/- 1.0 * tan ( 0.08594366926962 degrees )
+                       = +/- 0.001500001125
+ 
+   Since the field of view is rectangular a similar computation yields the X
+   components. This time look up the Y-axis at the Y=0 plane. The half angle
+   of interest is 0.008594366926962 degrees.
+ 
+ 
+                                  ^ X
+                                  |  ins
+                                  |
+                                  |        /|
+                                  |      /  |
+                                  |    /    |
+                                  |  /    o |
+                                  |/ 0.008  |
+                                  o--------------->
+                                Y  \        |    Z
+                                 ins \      |     ins
+                                       \    |
+                                         \  |
+                                           \|
+ 
+                                  |-- 1.0 --|
+                                                Plane Y = 0
+ 
+ 
+           X Component = +/- 1.0 * tan ( 0.008594366926962 degrees )
+                       = +/- 0.00015000000113
+ 
+   Utilizing the ANGLES FOV specification and radians instead of degrees, we
+   have:
+ 
+   Focal Plane #3 (FP3):
+ 
+           \begindata
+ 
+           INS-82891_FOV_FRAME                 = 'CASSINI_CIRS_FP3'
+           INS-82891_FOV_SHAPE                 = 'RECTANGLE'
+           INS-82891_BORESIGHT                 = (
+ 
+                  0.0000000000000000   0.0000000000000000  +1.0000000000000000
+ 
+                                                 )
+           INS-82891_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-82891_FOV_REF_VECTOR            = (
+ 
+                  0.0000000000000000  +1.0000000000000000   0.0000000000000000
+ 
+                                                 )
+           INS-82891_FOV_REF_ANGLE             = ( 0.0015000 )
+           INS-82891_FOV_CROSS_ANGLE           = ( 0.0001500 )
+           INS-82891_FOV_ANGLE_UNITS           = 'RADIANS'
+ 
+           \begintext
+ 
+ 
+Focal Plane #4 (FP4) FOV Definition
+ 
+   Similar calculations hold for FP3 and FP4. GETFOV returns four boundary
+   corner vectors for rectangular fields of view. This requires two separate
+   views to visualize. First consider looking down the X-axis at the X=0 plane
+   which permits the computation of the Y components of the boundary corner
+   vectors. In this plane the half angle of note is 0.08594366926962 degrees.
+ 
+ 
+                                  ^ Y
+                                  |  ins
+                                  |
+                                  |        /|
+                                  |      /  |
+                                  |    /    |
+                                  |  /    o |
+                                  |/ 0.086  |
+                                  x--------------->
+                                X  \        |    Z
+                                 ins \      |     ins
+                                       \    |
+                                         \  |
+                                           \|
+ 
+                                  |-- 1.0 --|
+                                                Plane X = 0
+ 
+ 
+           Y Component = +/- 1.0 * tan ( 0.08594366926962 degrees )
+                       = +/- 0.001500001125
+ 
+   Since the field of view is rectangular a similar computation yields the X
+   components. This time look up the Y-axis at the Y=0 plane. The half angle
+   of interest is 0.008594366926962 degrees.
+ 
+ 
+                                  ^ X
+                                  |  ins
+                                  |
+                                  |        /|
+                                  |      /  |
+                                  |    /    |
+                                  |  /    o |
+                                  |/ 0.008  |
+                                  o--------------->
+                                Y  \        |    Z
+                                 ins \      |     ins
+                                       \    |
+                                         \  |
+                                           \|
+ 
+                                  |-- 1.0 --|
+                                                Plane Y = 0
+ 
+ 
+           X Component = +/- 1.0 * tan ( 0.008594366926962 degrees )
+                       = +/- 0.00015000000113
+ 
+   Again, utilizing the ANGLES FOV specification and radians:
+ 
+   Focal Plane #4 (FP4):
+ 
+           \begindata
+ 
+           INS-82892_FOV_FRAME                 = 'CASSINI_CIRS_FP4'
+           INS-82892_FOV_SHAPE                 = 'RECTANGLE'
+           INS-82892_BORESIGHT                 = (
+ 
+                  0.0000000000000000   0.0000000000000000  +1.0000000000000000
+ 
+                                                 )
+           INS-82892_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-82892_FOV_REF_VECTOR            = (
+ 
+                  0.0000000000000000  +1.0000000000000000   0.0000000000000000
+ 
+                                                 )
+           INS-82892_FOV_REF_ANGLE             = ( 0.0015000 )
+           INS-82892_FOV_CROSS_ANGLE           = ( 0.0001500 )
+           INS-82892_FOV_ANGLE_UNITS           = 'RADIANS'
+ 
+           \begintext
+ 
+ 
+CIRS Focal Plane Boresight:
+ 
+   This FOV definition was created to assist software developers in utilizing
+   the CASSINI_CIRS_FPB frame to point the orbiter. By definition it is a
+   rectangular FOV that encloses CASSINI_CIRS_FP3 and CASSINI_CIRS_FP4. From
+   [8], we have that the FP3 and FP4 boresights are separated by 0.94
+   milliradians, and each detector is 0.3 milliradians square. Thus:
+ 
+           \begindata
+ 
+           INS-82893_FOV_FRAME                 = 'CASSINI_CIRS_FPB'
+           INS-82893_FOV_SHAPE                 = 'RECTANGLE'
+           INS-82893_BORESIGHT                 = (
+ 
+                  0.0000000000000000   0.0000000000000000  +1.0000000000000000
+ 
+                                                 )
+           INS-82893_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-82893_FOV_REF_VECTOR            = (
+ 
+                  0.0000000000000000  +1.0000000000000000   0.0000000000000000
+ 
+                                                 )
+           INS-82893_FOV_REF_ANGLE             = ( 0.0015000 )
+           INS-82893_FOV_CROSS_ANGLE           = ( 0.0006200 )
+           INS-82893_FOV_ANGLE_UNITS           = 'RADIANS'
+ 
+           \begintext
+ 
+ 
+CIRS Radiator (RAD):
+ 
+   The FOV values for the CIRS radiator are place holders until a time when
+   the real values are provided.
+ 
+           \begindata
+ 
+           INS-82898_FOV_FRAME                 = 'CASSINI_CIRS_RAD'
+           INS-82898_FOV_SHAPE                 = 'CIRCLE'
+           INS-82898_BORESIGHT                 = (
+ 
+                  0.0000000000000000   0.0000000000000000  +1.0000000000000000
+ 
+                                                 )
+           INS-82898_FOV_CLASS_SPEC            = 'ANGLES'
+           INS-82898_FOV_REF_VECTOR            = (
+ 
+                 +1.0000000000000000   0.0000000000000000   0.0000000000000000
+ 
+                                                 )
+           INS-82898_FOV_REF_ANGLE             = ( 90.0 )
+           INS-82898_FOV_ANGLE_UNITS           = 'DEGREES'
+ 
+           \begintext
+ 
+ 
+CIRS Pixel Parameters
+----------------------------------------------------------
+ 
+   These parameters describe the pixel structure associated with the
+   instruments and their fields of views. In some cases this is a
+   generalization of the notion of pixel, in that instead of representing
+   pixels on a CCD they may represent a collection of individual detectors.
+ 
+ 
+Focal Plane 1 (FP1)
+ 
+           \begindata
+ 
+           INS-82890_FOV_CENTER_PIXEL  = ( 0, 0 )
+           INS-82890_PIXEL_SAMPLES     = ( 1 )
+           INS-82890_PIXEL_LINES       = ( 1 )
+ 
+           \begintext
+ 
+ 
+Focal Plane 3 (FP3)
+ 
+           \begindata
+ 
+           INS-82891_FOV_CENTER_PIXEL  = ( 4.5, 0 )
+           INS-82891_PIXEL_SAMPLES     = ( 1 )
+           INS-82891_PIXEL_LINES       = ( 10 )
+ 
+           \begintext
+ 
+ 
+Focal Plane 4 (FP4)
+ 
+           \begindata
+ 
+           INS-82892_FOV_CENTER_PIXEL  = ( 4.5, 0 )
+           INS-82892_PIXEL_SAMPLES     = ( 1 )
+           INS-82892_PIXEL_LINES       = ( 10 )
+ 
+           \begintext
+ 
+ 
+Focal Plane Boresight (FPB)
+ 
+           \begindata
+ 
+           INS-82893_FOV_CENTER_PIXEL  = ( 0, 0 )
+           INS-82893_PIXEL_SAMPLES     = ( 1 )
+           INS-82893_PIXEL_LINES       = ( 1 )
+ 
+           \begintext
+ 
+ 
+CIRS Radiator (RAD)
+ 
+           \begindata
+ 
+           INS-82898_FOV_CENTER_PIXEL  = ( 0, 0 )
+           INS-82898_PIXEL_SAMPLES     = ( 1 )
+           INS-82898_PIXEL_LINES       = ( 1 )
+ 
+           \begintext
+ 
+ 
+Instrument Mode Timing
+----------------------------------------------------------
+ 
+   The following values were provided as samples in [5]. The values are
+   defined in [5] as follows:
+ 
+ 
+           ``The initial values for the following keywords are given
+           per instrument number:
+ 
+           INS[instrument number]_[instrument acronym]_MODE_NAME
+           INS[instrument number]_[instrument acronym]_TRIGGER_OFFSET
+           INS[instrument number]_[instrument acronym]_CYCLE_DURATION
+ 
+           INS..._MODE_NAME contains the name of the instrument mode for
+           the INS..._TRIGGER_OFFSET and INS..._CYCLE_DURATION
+           keywords.
+ 
+           INS..._TRIGGER_OFFSET specifies the reference time of the
+           first instrument frame (to be calculated for a footprint)
+           relative to the time of transacting the corresponding TRIGGER
+           command. The units are SFOC duration.
+ 
+           INS..._CYCLE_DURATION specifies the duration between successive
+           instrument frames (from the first one) for the INS..._MODE_NAME.''
+ 
+ 
+ 
+FP1 Mode Timing
+ 
+   The following values define the instrument modes and timing for the CIRS
+   FP1.
+ 
+           \begindata
+ 
+           INS-82890_MODE_NAME      = 'ONE'
+           INS-82890_TRIGGER_OFFSET = '0:01:00.0'
+           INS-82890_CYCLE_DURATION = '0:00:52.5'
+ 
+           \begintext
+ 
+ 
+FP3 Mode Timing
+ 
+   The following values define the instrument modes and timing for the CIRS
+   FP3.
+ 
+           \begindata
+ 
+           INS-82891_MODE_NAME      = 'ONE_ORIGINAL'
+           INS-82891_TRIGGER_OFFSET = '0:01:00.0'
+           INS-82891_CYCLE_DURATION = '0:00:52.5'
+ 
+           \begintext
+ 
+ 
+FP4 Mode Timing
+ 
+   The following values define the instrument modes and timing for the CIRS
+   FP4.
+ 
+           \begindata
+ 
+           INS-82892_MODE_NAME      = 'ONE_ORIGINAL'
+           INS-82892_TRIGGER_OFFSET = '0:01:00.0'
+           INS-82892_CYCLE_DURATION = '0:00:52.5'
+ 
+           \begintext
+ 
+ 
+FPB Mode Timing
+ 
+   The following values define the instrument modes and timing for the CIRS
+   FPB.
+ 
+           \begindata
+ 
+           INS-82893_MODE_NAME      = 'ONE_ORIGINAL'
+           INS-82893_TRIGGER_OFFSET = '0:01:00.0'
+           INS-82893_CYCLE_DURATION = '0:00:52.5'
+ 
+           \begintext
+ 
+ 
+NAIF ID Code to Name Mapping
+----------------------------------------------------------
+ 
+   The following keywords define names for the corresponding ID Codes. See [4]
+   for details.
+ 
+           \begindata
+ 
+           NAIF_BODY_NAME += ( 'CASSINI_CIRS_FP1' )
+           NAIF_BODY_CODE += ( -82890 )
+ 
+           NAIF_BODY_NAME += ( 'CASSINI_CIRS_FP3' )
+           NAIF_BODY_CODE += ( -82891 )
+ 
+           NAIF_BODY_NAME += ( 'CASSINI_CIRS_FP4' )
+           NAIF_BODY_CODE += ( -82892 )
+ 
+           NAIF_BODY_NAME += ( 'CASSINI_CIRS_FPB' )
+           NAIF_BODY_CODE += ( -82893 )
+ 
+           NAIF_BODY_NAME += ( 'CASSINI_CIRS_RAD' )
+           NAIF_BODY_CODE += ( -82898 )
+ 
+           \begintext
+ 
+ 
+Platform ID
+----------------------------------------------------------
+ 
+   The CIRS instrument is mounted on the Remote Sensing Palette, which is
+   connected to the Cassini Spacecraft body. Therefore the value in the
+   keywords below are -82000.
+ 
+           \begindata
+ 
+           INS-82890_PLATFORM_ID = ( -82000 )
+           INS-82891_PLATFORM_ID = ( -82000 )
+           INS-82892_PLATFORM_ID = ( -82000 )
+           INS-82893_PLATFORM_ID = ( -82000 )
+           INS-82898_PLATFORM_ID = ( -82000 )
+ 
+           \begintext
+ 

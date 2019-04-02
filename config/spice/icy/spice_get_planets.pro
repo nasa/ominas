@@ -135,7 +135,6 @@ function spice_get_planets, names, ref, et, $
          ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
          orient[*,*,i] = idgen(3)
 
-;;if(names[i] EQ 'JUPITER') then stop
          catch, failed
          if(failed EQ 0) then cspice_tisbod, ref, id, et[0], tsipm
          catch, /cancel

@@ -160,7 +160,7 @@ function pg_map, dd, md=md, cd=cd, bx=bx, gbx=_gbx, dkx=dkx, ltd=ltd, gd=gd, $
   begin
    _image = dat_data(dd)
    s = size(_image)
-   xsize = s[1] & ysize = s[2]
+   xsize = s[1] & ysize = (s[0] gt 1 ? s[2] : 1)
 
    aux_flags = bytarr(naux)
    image = dblarr(xsize, ysize, naux+1, /nozero)

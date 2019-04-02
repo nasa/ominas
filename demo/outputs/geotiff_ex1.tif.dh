@@ -1,0 +1,9 @@
+/=========================================================================/
+/ OMINAS detached header
+/   () = array index
+/   [] = object index
+/   {} = history index
+/=========================================================================/
+history = -1 / Current history value
+<updates>
+

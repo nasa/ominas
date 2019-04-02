@@ -1,0 +1,125 @@
+/=========================================================================/
+/ OMINAS detached header
+/   () = array index
+/   [] = object index
+/   {} = history index
+/=========================================================================/
+history = 0 / Current history value
+<updates>
+
+/ -------------------------------------------------------------------- /
+/ MAP descriptor -- updated Tue Jan 29 11:41:38 2019
+/ -------------------------------------------------------------------- /
+map_update_time = 2458513.48724537 
+map_tasks = '' 
+map_notes = '' 
+map_name = 'SATURN' 
+map_abbrev = 'MAP' 
+map_tag = 'MD' 
+map_user = '' 
+map_projection = 'RECTANGULAR' 
+map_units(0) = 1.00000000000000 
+map_units(1) = 1.00000000000000 
+map_size(0) = 400 
+map_size(1) = 200 
+map_scale = 1.00000000000000 
+map_origin(0) = 200.000000000000 
+map_origin(1) = 100.000000000000 
+map_center(0) = 0.00000000000000 
+map_center(1) = 0.00000000000000 
+map_range(0) = -1.00000000000000e+100 
+map_range(1) = 1.00000000000000e+100 
+map_range(2) = -3.14159265358979 
+map_range(3) = 3.14159265358979 
+map_radii(0) = 60268000.0000000 
+map_radii(1) = 60268000.0000000 
+map_radii(2) = 54364000.0000000 
+map_graphic = 1 
+map_west = 0 
+map_rotate = 0 
+/ -------------------------------------------------------------------- /
+/ CAMERA descriptor -- updated Tue Jan 29 11:41:38 2019
+/ -------------------------------------------------------------------- /
+cam_update_time = 2458513.48724537 
+cam_tasks = 'pg_repoint' 
+cam_notes = '' 
+cam_name = 'CAS_ISS_NA' 
+cam_abbrev = 'CAM' 
+cam_tag = 'CD' 
+cam_user = '' 
+cam_opaque = 1 
+cam_time = 134582126.693654 
+cam_orient(0) = -0.142660835568404 
+cam_orient(1) = 0.794590277629938 
+cam_orient(2) = 0.590147588905439 
+cam_orient(3) = -0.0953993613238025 
+cam_orient(4) = 0.582431313568916 
+cam_orient(5) = -0.807262489425465 
+cam_orient(6) = 0.985163360998538 
+cam_orient(7) = 0.171464444332828 
+cam_orient(8) = 0.00728673285494579 
+cam_avel(0) = 0.00000000000000 
+cam_avel(1) = 0.00000000000000 
+cam_avel(2) = 0.00000000000000 
+cam_avel(3) = 0.00000000000000 
+cam_avel(4) = 0.00000000000000 
+cam_avel(5) = 0.00000000000000 
+cam_avel(6) = 0.00000000000000 
+cam_avel(7) = 0.00000000000000 
+cam_avel(8) = 0.00000000000000 
+cam_avel(9) = 0.00000000000000 
+cam_avel(10) = 0.00000000000000 
+cam_avel(11) = 0.00000000000000 
+cam_aberration = 0 
+cam_fn_body_to_inertial = 'bod_body_to_inertial_default' 
+cam_fn_inertial_to_body = 'bod_inertial_to_body_default' 
+cam_libv(0) = 0.00000000000000 
+cam_libv(1) = 0.00000000000000 
+cam_libv(2) = 0.00000000000000 
+cam_libv(3) = 0.00000000000000 
+cam_libv(4) = 0.00000000000000 
+cam_libv(5) = 0.00000000000000 
+cam_libv(6) = 0.00000000000000 
+cam_libv(7) = 0.00000000000000 
+cam_libv(8) = 0.00000000000000 
+cam_libv(9) = 0.00000000000000 
+cam_libv(10) = 0.00000000000000 
+cam_libv(11) = 0.00000000000000 
+cam_lib(0) = 0.00000000000000 
+cam_lib(1) = 0.00000000000000 
+cam_lib(2) = 0.00000000000000 
+cam_lib(3) = 0.00000000000000 
+cam_dlibdt(0) = 0.00000000000000 
+cam_dlibdt(1) = 0.00000000000000 
+cam_dlibdt(2) = 0.00000000000000 
+cam_dlibdt(3) = 0.00000000000000 
+cam_pos(0) = -345096997013.650 
+cam_pos(1) = 1185974865899.09 
+cam_pos(2) = 506195801463.096 
+cam_vel(0) = -5602.10041933547 
+cam_vel(1) = 0.00000000000000 
+cam_vel(2) = 0.00000000000000 
+cam_vel(3) = 0.00000000000000 
+cam_vel(4) = 869.941663974052 
+cam_vel(5) = 0.00000000000000 
+cam_vel(6) = 0.00000000000000 
+cam_vel(7) = 0.00000000000000 
+cam_vel(8) = 428.334222959119 
+cam_vel(9) = 0.00000000000000 
+cam_vel(10) = 0.00000000000000 
+cam_vel(11) = 0.00000000000000 
+cam_scale(0) = 5.99070000000000e-06 
+cam_scale(1) = 5.99070000000000e-06 
+cam_oaxis(0) = 511.500000000000 
+cam_oaxis(1) = 511.500000000000 
+cam_size(0) = 1024.00000000000 
+cam_size(1) = 1024.00000000000 
+cam_exposure = 1.20000000000000 
+cam_filters(0) = 'CL1' 
+cam_filters(1) = 'CB1' 
+cam_filters(2) = '' 
+cam_filters(3) = '' 
+cam_fn_psf = 'cas_iss_psf' 
+cam_fn_focal_to_image = 'cam_focal_to_image_linear' 
+cam_fn_body_to_image = '' 
+cam_fn_image_to_focal = 'cam_image_to_focal_linear' 

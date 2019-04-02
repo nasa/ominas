@@ -35,7 +35,7 @@
 ;			the values will be returned as a list, with no separation 
 ;			into nv and nt dimensions.
 ;
-;	cat:		If set, arrays from mulitple input objets are 
+;	cat:		If set, arrays from mulitple input objects are 
 ;			concatenated.
 ;
 ;	sample:		Sampling interval in the nv direction.  Default is 1.

@@ -2,12 +2,9 @@
 ; detect_vicar.pro
 ;
 ;===========================================================================
-function detect_vicar, dd
+function detect_vicar, filename=filename, header=header
 
- filename = dat_filename(dd)
- header = dat_header(dd)
  status = 0
-
 
  ;===============================================
  ; if no header, read the beginning of the file
@@ -17,17 +14,18 @@ function detect_vicar, dd
   begin
    openr, unit, filename, /get_lun, error=error
    if(error NE 0) then return, 0
+   if((fstat(unit)).size LT 20) then return, 0
    record = assoc(unit, bytarr(20,/nozero))
    s = string(record[0])
    close, unit
    free_lun, unit
   end
 
-
  ;===================================
  ; check for vicar label 
  ;===================================
- if(strpos(s[0], 'LBLSIZE') EQ 0) then status=1
+ if ~isa(s,'string') then return,0
+ if(strpos(s[0], 'LBLSIZE') EQ 0) then status = 1
 
 
  return, status

@@ -28,14 +28,18 @@
 ;	name:		Name to use for the calling routine instead of 
 ;			taking it from the traceback list.
 ;
-;	anonymous:	If set, the traaceback list is not used to infer the
+;	anonymous:	If set, the traceback list is not used to infer the
 ;			name of the calling routine.  In this case, a name
-;			is printed nly if explicitly specified using the 'name'
+;			is printed only if explicitly specified using the 'name'
 ;			keyword.
 ;
 ;	continue:	If set, execution is not halted.
 ;
-;	stop:		If set, execution is halted in nv_message.
+;	stop:		If set, execution is halted after a terminal message 
+;			is printed.
+;
+;	exit:		If set, IDL is exited after a terminal message is 
+;			printed.
 ;
 ;	get_message:	If set, the last message sent through nv_message
 ;			is returned in the _string keyword and no other
@@ -78,7 +82,9 @@
 ;				huge outputs.  Your short message will get lost
 ;				in this output, so use 0.9 instead.
 ;
-;
+;	warning:	If set, the output string is prepended with 'Warning:' .
+;			/continue is implied.  Output is suppressed if the
+;			NV_NO_WARNINGS environent variable is set.
 ;
 ;	silent:		Suppressed printing of messages.
 ;
@@ -88,6 +94,11 @@
 ;  OUTPUT: 
 ;	message:	If /get_message, this keyword will return the last
 ;			message sent through nv_message.
+;
+;	get_verbosity:	Returns the current verbosity value.
+;
+;	test_verbose:   1 if nv_message detects a versbose condition for a 
+;			given verbose input, 0 otherwise.
 ;
 ;
 ; ENVIRONMENT VARIABLES:
@@ -108,9 +119,10 @@
 ;=============================================================================
 pro nv_message, string, name=name, anonymous=anonymous, continue=continue, $
              clear=clear, get_message=get_message, format=format, $
-             message=_string, explanation=explanation, $
+             message=_string, explanation=explanation, warning=warning, $
              callback=callback, cb_data_p=cb_data_p, disconnect=disconnect, $
-             cb_tag=cb_tag, verbose=verbose, silent=silent, stop=stop
+             cb_tag=cb_tag, verbose=verbose, silent=silent, stop=stop, $
+             get_verbosity=get_verbosity, test_verbose=test_verbose, exit=exit
 common nv_message_block, last_message, cb_tlp, verbosity
 @core.include
 @nv_block.common
@@ -124,13 +136,15 @@ common nv_message_block, last_message, cb_tlp, verbosity
    if(keyword_set(nv_verbosity)) then verbosity = double(nv_verbosity)
   end
  if(NOT keyword_set(verbosity)) then verbosity = 0
+ get_verbosity = verbosity
 
- ;------------------------------------------------
- ; set verbosity if no string
- ;------------------------------------------------
+ ;--------------------------------------------------
+ ; set verbosity if no string or no test requested
+ ;--------------------------------------------------
  verbosity=(n_elements(verbosity) gt 0) ? verbosity : 0
  silence = 1
- if(NOT defined(string)) then $
+;;; if(NOT defined(string)) then $
+ if((NOT defined(string)) AND (NOT arg_present(test_verbose))) then $
   begin
    if(defined(verbose)) then verbosity = double(verbose[0])
   end $
@@ -145,6 +159,7 @@ common nv_message_block, last_message, cb_tlp, verbosity
  else if(NOT defined(verbose)) then silence = 0
 
  if(keyword_set(silent)) then verbose = 0
+ test_verbose = 1-silence
  if(defined(verbose)) then continue = 1
 
  ;---------------------------------------------------------------
@@ -196,6 +211,13 @@ common nv_message_block, last_message, cb_tlp, verbosity
  ; otherwise, store last message and print to terminal
  ;---------------------------------------------------------------
  if(NOT keyword_set(string)) then return
+ if(keyword_set(warning)) then $
+  begin
+   if(keyword_set(getenv('NV_NO_WARNINGS'))) then silence = 1
+   continue = 1
+   string = '[WARNING] ' + string
+  end
+
 ; last_message = string
 
  if(NOT keyword_set(anonymous)) then $
@@ -211,14 +233,18 @@ common nv_message_block, last_message, cb_tlp, verbosity
 
  if(keyword_set(name)) then string = strupcase(name)+': ' + string
 
+
+
  if((NOT silence) AND (NOT ptr_valid(cb_tlp))) then $
   begin
 ;   message, string, /continue, /noname
    print, string, format=format
+
    if(keyword_set(explanation)) then print, '	' + explanation
    last_message = string
   end
  if(keyword_set(stop)) then stop
+ if(keyword_set(exit)) then exit
  if(NOT keyword_set(continue)) then retall
 
 

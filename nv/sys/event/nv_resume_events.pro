@@ -17,7 +17,9 @@
 ;
 ;
 ; ARGUMENTS:
-;  INPUT: NONE
+;  INPUT: 
+;	flush:		If set, the eent buffer is flushed after resuming
+;			events.
 ;
 ;  OUTPUT: NONE
 ;
@@ -40,10 +42,11 @@
 ;	
 ;-
 ;=============================================================================
-pro nv_resume_events
+pro nv_resume_events, flush=flush
 @nv_notify_block.common
 
  suspended = 0
+ if(keyword_set(flush)) then nv_flush
 
 end
 ;=============================================================================

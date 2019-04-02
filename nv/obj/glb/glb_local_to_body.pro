@@ -13,19 +13,18 @@
 ;
 ;
 ; CALLING SEQUENCE:
-;	body_dir = glb_local_to_body(gbd, body_pts, local_dir)
+;	body_pts = glb_local_to_body(gbd, body_org, local_pts)
 ;
 ;
 ; ARGUMENTS:
 ;  INPUT: 
 ;	gbd:	        Array (nt) of any subclass of GLOBE descriptors.
 ;
-;	body_pts:	Array (nv,3,nt) of column vectors in the body
-;                       frame (representing points on the surface of 
-;                       the globe).
+;	body_org:	Array (nv,3,nt) of column vectors in the body
+;                       frame representing coordinate systm origin points.
 ;
-;       local_dir:      Array (3,nt) of column vectors in the local
-;                       system, giving the direction from each surface point.
+;       local_pts:      Array (nv,3,nt) of column vectors in the local
+;                       system giving the vectors to transform.
 ;
 ;  OUTPUT: NONE
 ;

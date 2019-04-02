@@ -6,7 +6,6 @@ function dh_read_w10n_pds, dd, label, dim, type, min, max, abscissa=abscissa, $
                           nodata=nodata, gff=gff, $
                           sample=sample, returned_samples=returned_samples
 
- if(keyword_set(sample)) then return, 0
  url = dat_filename(dd)
 
  ;-----------------------------------------------------------------------
@@ -19,7 +18,16 @@ function dh_read_w10n_pds, dd, label, dim, type, min, max, abscissa=abscissa, $
  ;-----------------------------------------------------------------------
  ; read data array, subject to /nodata
  ;-----------------------------------------------------------------------
- data = read_w10n_pds(url, label, nodata=nodata, dim=dim, /silent)
+ silent = 1
+ nv_verbosity = getenv('NV_VERBOSITY')
+ if(keyword_set(nv_verbosity)) then begin
+    verbosity = double(nv_verbosity)
+    if(verbosity GE 0.9) then begin
+      silent = 0
+    endif
+ endif
+ data = read_w10n_pds(url, label, nodata=nodata, dim=dim, type=type, sample=sample, $
+                                 returned_samples=returned_samples, silent=silent)
 
  return, data
 end

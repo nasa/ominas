@@ -144,9 +144,9 @@ function pg_photom_globe, dd, outline_ptd=outline_ptd, $
 
  xarray = indices mod ysize
  yarray = fix(indices / ysize) + 1
- ai=array_indices([xsize,ysize],indices,/dim)
- xarray=reform(ai[0,*])
- yarray=reform(ai[1,*])
+ ai = array_indices([xsize,ysize],indices,/dim)
+ xarray = reform(ai[0,*])
+ yarray = reform(ai[1,*])
 
  nn = n_elements(xarray)
 

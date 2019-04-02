@@ -1,20 +1,19 @@
 # The first filetype in this list is treated as a default.
-# detector fn			filetype	action
+# detector fn			filetype
 # (returns T/F)
 
-  detect_mask			MASK		read
-  detect_dh                     DH		ignore
-  detect_occ			OCC		read
-  detect_vicar			VICAR		read
-  detect_fits			FITS		read
-  detect_vgr_cd			VGR_CD		read
-  detect_tdl			TDL		read
-  detect_multi			MULTI		read
-  #detect_isis                   ISIS            read
-  detect_pds			PDS		read
-  detect_pds4			PDS4		read
-  detect_png			PNG		read
-  detect_ext			EXT		read
-  detect_w10n_pds		W10N_PDS	read
-  detect_png                    PNG             read
-
+  detect_mask			MASK	
+#  detect_dh                     DH	
+  detect_occ			OCC	
+  detect_vicar			VICAR	
+  detect_fits			FITS	
+  detect_vgr_cd			VGR_CD	
+  detect_tdl			TDL	
+  detect_multi			MULTI	
+  #detect_isis                   ISIS
+  detect_pdscirstable           PDSCIRSTABLE
+  detect_pds			PDS	
+  detect_pds4			PDS4
+  detect_geotiff                GEOTIFF	
+  detect_ext			EXT	
+  detect_w10n_pds		W10N_PDS

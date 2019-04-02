@@ -57,7 +57,7 @@
 ;
 ; RETURN:
 ;	Newly created or or freshly initialized disk descriptors, depending
-;	on the presence of the dkd keyword.
+;	on the presence of the md keyword.
 ;
 ;
 ; STATUS:

@@ -57,7 +57,7 @@ end
 ; grim_symsize_center
 ;
 ;===============================================================================
-function grim_symsize_center, data
+function grim_symsize_center, data, ptd
  return, -1
 end
 ;===============================================================================
@@ -138,7 +138,7 @@ end
 ; grim_symsize_limb
 ;
 ;===============================================================================
-function grim_symsize_limb, data
+function grim_symsize_limb, data, ptd
  return, -1
 end
 ;===============================================================================
@@ -221,7 +221,7 @@ end
 ; grim_symsize_terminator
 ;
 ;===============================================================================
-function grim_symsize_terminator, data
+function grim_symsize_terminator, data, ptd
  return, -1
 end
 ;===============================================================================
@@ -318,7 +318,7 @@ end
 ; grim_symsize_planet_grid
 ;
 ;===============================================================================
-function grim_symsize_planet_grid, data
+function grim_symsize_planet_grid, data, ptd
  return, -1
 end
 ;===============================================================================
@@ -421,7 +421,7 @@ end
 ; grim_symsize_station
 ;
 ;===============================================================================
-function grim_symsize_station, data
+function grim_symsize_station, data, ptd
  return, -1
 end
 ;===============================================================================
@@ -524,7 +524,7 @@ end
 ; grim_symsize_array
 ;
 ;===============================================================================
-function grim_symsize_array, data
+function grim_symsize_array, data, ptd
  return, -1
 end
 ;===============================================================================
@@ -567,6 +567,7 @@ function grim_compute_star, map=map, clip=clip, hide=hide, $
  nsd = n_elements(sds)
 
  cd = cor_dereference_gd(gd, /cd)
+ od = cor_dereference_gd(gd, /od)
  pd = cor_dereference_gd(gd, /pd)
  rd = cor_dereference_gd(gd, /rd)
 
@@ -592,9 +593,9 @@ function grim_compute_star, map=map, clip=clip, hide=hide, $
  if(keyword_set(data)) then _data = data $
  else _data = {__str_data, name_p:ptr_new(0), mag_p:ptr_new(0)}
  
- *_data.name_p = cor_name(sds)
- *_data.mag_p = str_get_mag(sds)
- data = _data
+; *_data.name_p = cor_name(sds)
+; *_data.mag_p = str_get_mag(sds, od=cd)
+; data = _data
 
 
  ;-------------------------------------
@@ -614,14 +615,18 @@ end
 ; grim_symsize_star
 ;
 ;===============================================================================
-function grim_symsize_star, data
+function grim_symsize_star, data, ptd
  mmax = 16d & mmin = 1d
  smax = 1d & smin = 0.1d
 
- mags = *data.mag_p < mmax > mmin
+ sd = pnt_assoc_xd(ptd)
+ gd = cor_gd(ptd)
+ od = (gd.cd)[0]
+ mags = str_get_mag(sd, od=od) < mmax > mmin
+
  norm = (mmax - mags)/(mmax-mmin)
 
- return, norm*(smax-smin) + smin
+; return, norm*(smax-smin) + smin
 
  max = max(mags) + 2
  return, (max - mags) / max
@@ -638,10 +643,14 @@ function grim_shade_star, data, ptd
  mmax = 16d & mmin = 1d
  smax = 1d & smin = 0.25
 
- mags = *data.mag_p < mmax > mmin
+ sd = pnt_assoc_xd(ptd)
+ gd = cor_gd(ptd)
+ od = (gd.cd)[0]
+ mags = str_get_mag(sd, od=od) < mmax > mmin
+
  norm = (mmax - mags)/(mmax-mmin)
 
- return, norm*(smax-smin) + smin
+; return, norm*(smax-smin) + smin
 
  max = max(mags) + 2
  return, (max - mags) / max
@@ -709,7 +718,7 @@ end
 ; grim_symsize_shadow
 ;
 ;===============================================================================
-function grim_symsize_shadow, data
+function grim_symsize_shadow, data, ptd
  return, -1
 end
 ;===============================================================================
@@ -782,7 +791,7 @@ end
 ; grim_symsize_reflection
 ;
 ;===============================================================================
-function grim_symsize_reflection, data
+function grim_symsize_reflection, data, ptd
  return, -1
 end
 ;===============================================================================
@@ -860,7 +869,7 @@ end
 ; grim_symsize_ring
 ;
 ;===============================================================================
-function grim_symsize_ring, data
+function grim_symsize_ring, data, ptd
  return, -1
 end
 ;===============================================================================
@@ -942,7 +951,7 @@ end
 ; grim_symsize_ring_grid
 ;
 ;===============================================================================
-function grim_symsize_ring_grid, data
+function grim_symsize_ring_grid, data, ptd
  return, -1
 end
 ;===============================================================================

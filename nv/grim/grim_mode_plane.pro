@@ -76,7 +76,7 @@ pro grim_mode_plane_mode, grim_data, data_p
 
  device, cursor_standard = 59
  grim_print, grim_data, $
-          'SELECT PLANE -- LEFT: By Data; RIGHT: Select By Overlay'
+          'SELECT PLANE -- L:By Data R:By Overlay'
 
 end
 ;=============================================================================

@@ -54,6 +54,8 @@
 ;=============================================================================
 function nmax, __array, dir, subscripts=subscripts
 
+ if(NOT keyword_set(dir)) then dir = 0
+
  ;--------------------------------------------
  ; determine size and type of array
  ;--------------------------------------------

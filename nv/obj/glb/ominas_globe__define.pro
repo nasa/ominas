@@ -2,16 +2,40 @@
 ; ominas_globe::init
 ;
 ;=============================================================================
-function ominas_globe::init, ii, crd=crd0, bd=bd0, sld=sld0, gbd=gbd0, $
+function ominas_globe::init, _ii, crd=crd0, bd=bd0, sld=sld0, gbd=gbd0, $
 @glb__keywords_tree.include
 end_keywords
 @core.include
  
+ if(keyword_set(_ii)) then ii = _ii
+ if(NOT keyword_set(ii)) then ii = 0 
+
+
+ ;---------------------------------------------------------------
+ ; set up parent class
+ ;---------------------------------------------------------------
  if(keyword_set(gbd0)) then struct_assign, gbd0, self
  void = self->ominas_solid::init(ii, crd=crd0, bd=bd0, sld=sld0, $
 @sld__keywords_tree.include
 end_keywords)
 
+
+ ;-------------------------------------------------------------------------
+ ; Handle index errors: set index to zero and try again.  This allows a 
+ ; single input to be applied to multiple objects, via multiple calls to
+ ; this method.  In that case, all inputs must be given as single inputs.
+ ;-------------------------------------------------------------------------
+ catch, error
+ if(error NE 0) then $
+  begin
+   ii = 0
+   catch, /cancel
+  end
+
+ 
+ ;---------------------------------------------------------------
+ ; assign initial values
+ ;---------------------------------------------------------------
  self.abbrev = 'GLB'
  self.tag = 'GBD'
  if(keyword_set(lref)) then self.lref=decrapify(lref[ii])
@@ -19,7 +43,6 @@ end_keywords)
  ;----------------------------------------
  ; ellipsoid parameters
  ;----------------------------------------
- self.model = 'ELLIPSOID'
  if(keyword_set(radii)) then self.radii = radii[*,ii]
  if(keyword_set(lora)) then self.lora = decrapify(lora[ii])
 
@@ -34,7 +57,7 @@ end_keywords)
    nj = n_elements(self.J)
    if(_nj GT nj) then $
     begin
-     nv_message, /con, 'Warning -- J contains more terms than allowed, truncating.'
+     nv_message, /warning, 'J contains more terms than allowed, truncating.'
      J = J[0:nj-1,ii]
     end
    _nj = n_elements(J[*,ii])
@@ -59,7 +82,7 @@ end
 ;
 ;
 ; CATEGORY:
-;	NV/LIB/CAM
+;	NV/LIB/GLOBE
 ;
 ;
 ; CALLING SEQUENCE:
@@ -67,17 +90,6 @@ end
 ;
 ;
 ; FIELDS:
-;	sld:	SOLID class descriptor.  
-;
-;		Methods: glb_solid, glb_set_solid
-;
-;
-;	model:	String giving the model.  ELLIPSOID, FACET, or HARMONIC.
-;		Currently only ellipsoids are supported.
-;
-;
-;		Methods: glb_model, glb_set_model
-;
 ;	lref:	Longitude reference note.  Used to describe the longitude
 ;		reference system.
 ;
@@ -122,8 +134,6 @@ pro ominas_globe__define
 
  struct = $
     { ominas_globe, inherits ominas_solid, $
-	model:		 '', $			; ELLIPSOID, FACET, or HARMONIC
-
 	lref:	 	 '', $			; longitude reference note
 
 	;----------------------------------------

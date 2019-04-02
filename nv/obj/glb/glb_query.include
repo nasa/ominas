@@ -2,7 +2,6 @@
 ;  implemented as a .include because arg_present does not propagate to 
 ;  lower-level calls
 
- if(arg_present(model)) then model = glb_model(_xd, cat=cat, condition=condition, /noevent)
  if(arg_present(radii)) then radii = glb_radii(_xd, cat=cat, condition=condition, /noevent)
  if(arg_present(lora)) then lora = glb_lora(_xd, cat=cat, condition=condition, /noevent)
  if(arg_present(lref)) then lref = glb_lref(_xd, cat=cat, condition=condition, /noevent)

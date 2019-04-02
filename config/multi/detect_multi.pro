@@ -2,10 +2,8 @@
 ; detect_multi.pro
 ;
 ;===========================================================================
-function detect_multi, dd
+function detect_multi, filename=filename, header=header
 
- filename = dat_filename(dd)
- header = dat_header(dd)
  status = 0
 
  ;===============================================
@@ -16,6 +14,7 @@ function detect_multi, dd
   begin
    openr, unit, filename, /get_lun, error=error
    if(error NE 0) then return, 0
+   if((fstat(unit)).size LT 11) then return, 0
    record = assoc(unit, bytarr(11,/nozero))
    s = string(record[0])
    close, unit
@@ -26,6 +25,7 @@ function detect_multi, dd
  ;===================================
  ; check for indicator string
  ;===================================
+ if ~isa(s,'string') then return,0
  if(s[0] EQ '___MULTI___') then status = 1
 
 

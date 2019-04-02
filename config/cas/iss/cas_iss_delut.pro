@@ -11,8 +11,11 @@
 ;  into the full 12bit range 0-4095 in a near exponential relationship
 ;
 ;==============================================================================
-function cas_iss_delut, image, label, force=force
+pro cas_iss_delut, dd, force=force
 
+ image = dat_data(dd, /true)
+ label = dat_header(dd)
+ 
  if(NOT keyword_set(label)) then force = 1
 
  ;----------------------------------------------------------
@@ -32,6 +35,6 @@ function cas_iss_delut, image, label, force=force
  ;--------------------------
  nv_message, verb=0.2, 'De-LUT-ing...'
 
- return, lut[image]
+ dat_set_data, dd, lut[image]
 end
 ;==============================================================================

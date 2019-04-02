@@ -199,10 +199,10 @@ pro grpht_apply_correction_primary, grim_data, data, phtd
  ;---------------------------
  ; get data
  ;----------------------------
- limb_ptd = grim_ptd(plane, /limb)
+ limb_ptd = grim_ptd(plane, /limb, /active)
  if(NOT keyword_set(limb_ptd)) then $
   begin
-   grim_message, 'No outline points.'
+   grim_message, 'No active limb points.'
    return
   end
 
@@ -483,6 +483,7 @@ pro gr_phttool_event, event
  ; get pht form base and data structure
  ;-----------------------------------------------
  grim_data = grim_get_data(/primary)
+ if(NOT keyword_set(grim_data)) then return
  data = grim_get_user_data(grim_data, 'GRPHT_DATA')
  phtd = grpht_form_to_phtd(data)
 
@@ -604,6 +605,7 @@ end
 pro grpht_primary_notify, init_data_p
 
  grim_data = grim_get_data(/primary)
+ if(NOT keyword_set(grim_data)) then return
  data = grim_get_user_data(grim_data, 'GRPHT_DATA')
  if(NOT keyword_set(data)) then $
                grim_set_user_data, grim_data, 'GRPHT_DATA', *init_data_p $

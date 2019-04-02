@@ -32,6 +32,8 @@
 ;			of points (nv/np), and only one element in the nt 
 ;			direction.
 ;
+;	nodata:		If set, point-by-pont data arrays are not included.
+;
 ;	pptd:		If given, this points object is used to store the
 ;			result, rather than allocating a new one.
 ;
@@ -48,7 +50,9 @@
 ;	
 ;-
 ;=============================================================================
-function pnt_compress, ptd0, nt=nt, pptd=pptd
+function pnt_compress, ptd0, nt=nt, pptd=pptd, nodata=nodata
+
+ nodata = keyword_set(nodata)
 
  ;--------------------------------
  ; set up compressed arrays
@@ -70,7 +74,7 @@ function pnt_compress, ptd0, nt=nt, pptd=pptd
  vv = dblarr(np,3)
  ff = bytarr(np)
  names = strarr(nptd)
- data = dblarr(ndat,np)
+ if(NOT nodata) then data = dblarr(ndat,np)
 
 
  ;--------------------------------
@@ -85,7 +89,7 @@ function pnt_compress, ptd0, nt=nt, pptd=pptd
      pp[*,jj:jj+nv-1] = p
      vv[jj:jj+nv-1,*] = v
      ff[jj:jj+nv-1] = f
-     data[*,jj:jj+nv-1] = dat
+     if(NOT nodata) then data[*,jj:jj+nv-1] = dat
      names[i] = nam
     end
   jj = jj + nv
@@ -97,7 +101,7 @@ function pnt_compress, ptd0, nt=nt, pptd=pptd
    pp = reform(pp, 2,nv0,nptd, /over)
    vv = reform(vv, nv0,3,nptd, /over)
    ff = reform(ff, nv0,nptd, /over)
-   data = reform(data, ndat,nv0,nptd, /over)
+   if(NOT nodata) then data = reform(data, ndat,nv0,nptd, /over)
   end
 
 

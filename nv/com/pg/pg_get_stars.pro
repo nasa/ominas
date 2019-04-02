@@ -190,7 +190,7 @@ function pg_get_stars, arg1, arg2, sd=_sd, od=od, _extra=keyvals, $
                      override=override, verbatim=verbatim, raw=raw, count=count, $
                               @str__keywords_tree.include
                               @dat__keywords.include
-                              @nv_trs_keywords_include.pro
+                              @dat_trs_keywords_include.pro
                               end_keywords
 
  count = 0
@@ -240,7 +240,7 @@ function pg_get_stars, arg1, arg2, sd=_sd, od=od, _extra=keyvals, $
    ;-----------------------------------------------
    sd = dat_get_value(dd, 'STR_DESCRIPTORS', key1=od, key4=_sd, $
                  key7=time, key8=name, trs=trs, $
-                              @nv_trs_keywords_include.pro
+                              @dat_trs_keywords_include.pro
                               end_keywords)
 
    ;------------------------------------------------------------------------
@@ -290,11 +290,12 @@ function pg_get_stars, arg1, arg2, sd=_sd, od=od, _extra=keyvals, $
    ; override the specified values (name cannot be overridden)
    ;-------------------------------------------------------------------
    if(defined(name)) then _name = name & name = !null
+   if(defined(time)) then _time = time & time = !null
    str_assign, sd, /noevent, $
                      @str__keywords_tree.include
                      end_keywords
     if(defined(_name)) then name = _name
-
+    if(defined(_time)) then time = _time
   end
 
  ;--------------------------------------------------------

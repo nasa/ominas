@@ -53,8 +53,8 @@ function orb_construct_descriptor, gbx, $
 
 ;timer, t=_t
 ; Note: ta and tl not yet implemented.
-if(defined(ta)) then message, /con, 'WARNING: ta not implemented.'
-if(defined(tl)) then message, /con, 'WARNING: tl not implemented.'
+if(defined(ta)) then message, /warning, 'ta not implemented.'
+if(defined(tl)) then message, /warning, 'tl not implemented.'
 
  if(defined(time)) then t = time
  if(NOT defined(t)) then t = bod_time(gbx)

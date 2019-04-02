@@ -84,64 +84,140 @@
 
 
 ;=============================================================================
+; strcat_parm__define
+;
+;=============================================================================
+pro strcat_parm__define
+
+struct = $
+  { strcat_parm, $
+    od:		obj_new(), $	; observer descriptor
+    format:	'', $		; catalog format j2000 or b1950
+    coord:	'', $		; input / output coord. sys j2000 or b1950
+    time:	0d, $
+    jtime:	0d, $
+    path:	'', $		; catalog path
+    names_p:	ptr_new(), $	; requested star names
+    ra1:	0d, $		; FOV bounds
+    ra2:	0d, $		;
+    dec1:	0d, $		;
+    dec2:	0d, $		;
+    faint:	0d, $		; faintest star
+    bright:	0d, $		; brightest star
+    nbright:	0l, $		; number of brightest stars
+    nmax:	0l, $		; max # estimated stars
+    force:	0l$		; force us of this catalog
+  }
+
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; strcat_nbright
+;
+;=============================================================================
+pro strcat_nbright, sd, parm
+
+ if(NOT keyword_set(parm.nbright)) then return
+
+ mags = str_get_mag(sd, od=parm.od)
+
+ n = n_elements(mags)
+ if(n LT parm.nbright) then return
+
+ sd = sd[(sort(mags))[0:parm.nbright-1]]
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; strcat_parm_struct
+;
+;=============================================================================
+function strcat_parm_struct
+
+ parm = {strcat_parm}
+
+ parm.jtime = !values.d_nan
+ parm.names_p = ptr_new('')
+ parm.faint = !values.d_nan
+ parm.bright = !values.d_nan
+
+ return, parm
+end
+;=============================================================================
+
+
+
+;=============================================================================
 ; strcat_get_inputs
 ;
 ;=============================================================================
-pro strcat_get_inputs, dd, env, key, $
-	b1950=b1950, j2000=j2000, time=time, jtime=jtime, $
-	path=path, names=names, $
-	ra1=ra1, ra2=ra2, dec1=dec1, dec2=dec2, $
-	faint=faint, bright=bright, nbright=nbright, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+function strcat_get_inputs, dd, cat, format, remote=remote, $
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
- status = -1
+ parm = strcat_parm_struct()
+
+ env = 'NV_' + cat + '_DATA'
+ key = 'path_' + strlowcase(cat)
 
  ;---------------------------------------------------------
  ; Translator keywords
  ;---------------------------------------------------------
- b1950 = tr_keyword_value(dd, 'b1950')
+ parm.format = format
+ parm.force = dat_keyword_value(dd, 'force')
+ parm.nmax = dat_keyword_value(dd, 'nmax')
 
- jtime = double(tr_keyword_value(dd, 'jtime'))
+ parm.coord = 'j2000'
+ if(keyword_set(dat_keyword_value(dd, 'b1950'))) then coord = 'b1950'
 
- j2000 = tr_keyword_value(dd, 'j2000')
+ _jtime = dat_keyword_value(dd, 'jtime')
+ if(_jtime NE '') then parm.jtime = double(_jtime)
 
- _faint = tr_keyword_value(dd, 'faint')
- if(_faint NE '') then faint = double(_faint)
+ _faint = dat_keyword_value(dd, 'faint')
+ if(_faint NE '') then parm.faint = double(_faint)
 
- _bright = tr_keyword_value(dd, 'bright')
- if(_bright NE '') then bright = double(_bright)
+ _bright = dat_keyword_value(dd, 'bright')
+ if(_bright NE '') then parm.bright = double(_bright)
 
- nbright = long(tr_keyword_value(dd, 'nbright'))
+ parm.nbright = long(dat_keyword_value(dd, 'nbright'))
 
  ;---------------------------------------------------------
  ; Star catalog path
  ;---------------------------------------------------------
- path = tr_keyword_value(dd, key)
- if(NOT keyword_set(path)) then path = getenv(env);
- if(NOT keyword_set(path)) then $
+ if(NOT keyword_set(remote)) then $
   begin
-   nv_message, /cont, 'Warning: ' + env + ' not defined.  No star catalog.'
-   return
+   parm.path = dat_keyword_value(dd, key)
+   if(NOT keyword_set(parm.path)) then parm.path = getenv(env);
+   if(NOT keyword_set(parm.path)) then $
+    begin
+     nv_message, /warning, env + ' not defined.  No star catalog.'
+     return, !null
+    end
   end
-   
+
  ;---------------------------------------------------------
  ; Observer descriptor passed as key1
  ;---------------------------------------------------------
  if(keyword_set(key1)) then ods = key1 
  if(NOT cor_isa(ods[0], 'BODY')) then ods = 0
- if(NOT keyword_set(ods)) then return
+ if(NOT keyword_set(ods)) then return, !null
+ od = ods[0]
 
  ;---------------------------------------------------------
  ; fov and cov 
  ;---------------------------------------------------------
- fov = double(tr_keyword_value(dd, 'fov'))
+ fov = double(dat_keyword_value(dd, 'fov'))
  if(NOT keyword_set(fov)) then fov = 1
 
- cov = double(parse_comma_list(tr_keyword_value(dd, 'cov'), delim=';'))
+ cov = double(parse_comma_list(dat_keyword_value(dd, 'cov'), delim=';'))
  if(keyword_set(cov)) then cov = transpose(cov) $
- else if(NOT keyword_set(cov)) then cov = cam_oaxis(ods[0])
+ else if(NOT keyword_set(cov)) then cov = cam_oaxis(od)
    ;;; this assumes od is a camera.  Not great.
 
  ;---------------------------------------------------------
@@ -151,48 +227,93 @@ pro strcat_get_inputs, dd, env, key, $
   begin
    names = key8
    if(n_elements(names) EQ 1) then $
-        if(strupcase(names[0]) EQ 'SUN') then return
+        if(strupcase(names[0]) EQ 'SUN') then return, !null
+   *parm.names_p = names
   end
 
  ;---------------------------------------------------------
  ; Get jtime 
  ;---------------------------------------------------------
- time = bod_time(ods[0])
- if(NOT keyword_set(jtime)) then $
+ parm.time = bod_time(od)
+ if(NOT finite(parm.jtime)) then $
   begin
-   jtime = time/(365.25d*86400d)      ; assuming camtime is secs past 2000
-   if(keyword__set(b1950)) then jtime = jtime + 50.
+   parm.jtime = parm.time/(365.25d*86400d)      ; assuming camtime is secs past 2000
+   if(parm.coord EQ 'b1950') then parm.jtime = parm.jtime + 50.
   end
 
  ;---------------------------------------------------------
  ; Get ra/dec limits 
  ;---------------------------------------------------------
- ra1 = 0d & ra2 = 2d*!dpi * 0.999
- dec1 = -!dpi/2d * 0.999 & dec2 = -dec1 * 0.999
+ parm.ra1 = 0d & parm.ra2 = 2d*!dpi * 0.999
+ parm.dec1 = -!dpi/2d * 0.999 & parm.dec2 = -parm.dec1 * 0.999
 
  if(keyword_set(fov)) then $
   begin
-   cam_scale = min(cam_scale(ods[0]))
-   cam_size = cam_size(ods[0])
+   cam_scale = min(cam_scale(od))
+   cam_size = cam_size(od)
 
-   radec0 = image_to_radec(ods[0], cov)
+   radec0 = image_to_radec(od, cov)
    cam_fov = min(cam_scale*cam_size)
    field = fov*cam_fov
 
-   ra1 = reduce_angle(radec0[0] + field)
-   ra2 = reduce_angle(radec0[0] - field)
+   parm.ra1 = reduce_angle(radec0[0] + field)
+   parm.ra2 = reduce_angle(radec0[0] - field)
 
-   dec1 = radec0[1] + field
-   dec2 = radec0[1] - field
+   parm.dec1 = radec0[1] + field
+   parm.dec2 = radec0[1] - field
   end $
- else nv_message, /con, $
-      'WARNING: No FOV limits set for star catalog search.', $
+ else nv_message, /warning, $
+      'No FOV limits set for star catalog search.', $
        exp=['Without FOV limits, stars will be returned for the entire sky.', $
             'This may cause the software to run very slowly.']
 
 
- status = 0
+ ;---------------------------------------------------------
+ ; Precess FOV cooordinates if needed if needed
+ ;---------------------------------------------------------
+; strcat_precess, parm
 
+
+ ;---------------------------------------------------------
+ ; sort ra/dec bounds
+ ;---------------------------------------------------------
+ ras = [parm.ra1,parm.ra2]
+ decs = [parm.dec1,parm.dec2]
+ ras = ras[sort(ras)]
+ decs = decs[sort(decs)]
+
+ parm.ra1 = ras[0] & parm.ra2 = ras[1]
+ parm.dec1 = decs[0] & parm.dec2 = decs[1]
+
+
+ ;---------------------------------------------------------
+ ; Convert ra and dec bounds of scene from rad -> deg
+ ;---------------------------------------------------------
+ parm.ra1 = parm.ra1 * 180d / !dpi
+ parm.ra2 = parm.ra2 * 180d / !dpi
+ parm.dec1 = parm.dec1 * 180d / !dpi
+ parm.dec2 = parm.dec2 * 180d / !dpi
+
+
+
+ return, parm
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; strcat_flag
+;
+;
+;=============================================================================
+function strcat_flag, cat
+
+ first = strmid(cat, 0, 1)
+ if((str_isalphanum(first))[0] NE -1) then return, ''
+
+ cat = strmid(cat, 1, 128)
+ return, first
 end
 ;=============================================================================
 
@@ -203,125 +324,97 @@ end
 ;
 ;
 ;=============================================================================
-function strcat_input, dd, keyword, cat, n_obj=n_obj, dim=dim, values=values, status=status, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
+function strcat_input, dd, keyword, cat, format, n_obj=n_obj, dim=dim, values=values, status=status, $
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
 	end_keywords
 
  status = -1
  if(keyword NE 'STR_DESCRIPTORS') then return, ''
 
- ;---------------------------------------------------------
- ; Format catalog name and function names
- ;---------------------------------------------------------
- upcat = strupcase(cat)
- lowcat = strlowcase(cat)
+ if(NOT keyword_set(format)) then format = 'j2000'
+ format = strlowcase(format)
 
- env = 'NV_' + upcat + '_DATA'
- key = 'path_' + lowcat
- fn_get_regions = lowcat + '_get_regions'
- fn_get_stars = lowcat + '_get_stars'
+
+ ;------------------------------------
+ ; parse any catalog flag
+ ;------------------------------------
+ cat = strupcase(cat)
+ flag = strcat_flag(cat)
+ if(flag EQ '+') then remote = 1
+
 
  ;---------------------------------------------------------
- ; Retrieve input data for scene
+ ; Get input data
  ;---------------------------------------------------------
- strcat_get_inputs, dd, env, key, $
-	b1950=b1950, j2000=j2000, time=time, jtime=jtime, $
-	path=path, names=names, $
-	ra1=ra1, ra2=ra2, dec1=dec1, dec2=dec2, $
-	faint=faint, bright=bright, nbright=nbright, stat=stat, $
-@nv_trs_keywords_include.pro
-@nv_trs_keywords1_include.pro
-	end_keywords
+ parm = strcat_get_inputs(dd, cat, format, remote=remote, $
+@dat_trs_keywords_include.pro
+@dat_trs_keywords1_include.pro
+	end_keywords)
+ if(NOT keyword_set(parm)) then return, ''
 
- if(stat NE 0) then return, ''
 
+ ;----------------------------------------------------------------------------
+ ; If we make it here, then we can consider this a success, even if no stars
+ ;----------------------------------------------------------------------------
  status = 0
  n_obj = 0
  dim = [1]
 
- ;---------------------------------------------------------
- ; Convert ra and dec bounds of scene from rad -> deg
- ;---------------------------------------------------------
- ra1 = ra1 * 180d / !dpi
- ra2 = ra2 * 180d / !dpi
- dec1 = dec1 * 180d / !dpi
- dec2 = dec2 * 180d / !dpi
 
  ;---------------------------------------------------------
- ; set ra1 & dec1 as lower bound and ra2 & dec2 as 
- ; upper bound
+ ; Precess cooordinates if needed if needed
  ;---------------------------------------------------------
- ras = [ra1,ra2]
- decs = [dec1,dec2]
- ras = ras[sort(ras)]
- decs = decs[sort(decs)]
+ strcat_precess, parm
 
- ra1 = ras[0] & ra2 = ras[1]
- dec1 = decs[0] & dec2 = decs[1]
 
- ;---------------------------------------------------------
- ; Get the regions/index file for the catalog
- ;---------------------------------------------------------
- regions = call_function(fn_get_regions, ra1, ra2, dec1, dec2, path=path)
+ ;-------------------------------------------------------------
+ ; Get the regions/index file for the catalog if a local file
+ ;-------------------------------------------------------------
+ regions = call_function(cat + '_GET_REGIONS', parm)
  nregions = n_elements(regions)
- if(nregions eq 1 AND regions[0] eq '') then $
-                              nv_message, 'No ' + upcat + ' regions found.'
- nv_message, verb=0.2, 'Number of ' + upcat + ' regions found ' + strtrim(nregions,2)
+ if(NOT keyword_set(regions)) then nv_message, verb=0.5, $
+                                             'No ' + cat + ' regions found.' $
+ else nv_message, verb=0.1, $
+                    'Number of ' + cat + ' regions found ' + strtrim(nregions,2)
+
 
  ;---------------------------------------------------------
- ; Get star descriptors for all stars in regions
+ ; Get star descriptors for all stars in all regions
  ;---------------------------------------------------------
- first = 1
  for i=0, nregions-1 do $
-  begin
-   _sd = call_function(fn_get_stars, dd, regions[i], $
-                       ra1=ra1, ra2=ra2, dec1=dec1, dec2=dec2, $
-                       faint=faint, bright=bright, nbright=nbright, $
-                       b1950=b1950, names=names, mag=mag, jtime=jtime)
-   if(keyword__set(_sd)) then $
-    begin
-      if(first eq 1) then $
-        begin
-         sd = _sd
-	       mags = mag
-         first = 0
-        end $
-       else $
-        begin
-         sd = [sd, _sd]
-         mags = [mags, mag]
-        end
-    end
-  end
+   stars = append_array(sd, call_function(cat + '_GET_STARS', dd, regions[i], parm))
+ if(NOT keyword_set(stars)) then return, ''
 
- if(NOT keyword_set(sd)) then return, 0
+ sd = strcat_construct_descriptors(dd, parm, stars)
+ if(NOT keyword_set(sd)) then return, ''
+
 
  ;--------------------------------------------------------
  ; indicate that light time is included in catalog states
  ;--------------------------------------------------------
  bod_set_aberration, sd, 'LT'
 
+
  ;--------------------------------------------------------
  ; Apply brightness threshold to data
  ;--------------------------------------------------------
- if(keyword__set(nbright) AND keyword__set(mags) AND keyword__set(_sd)) then $
-  begin
-   w = strcat_nbright(mags, nbright)
-   sd = sd[w]
-  end
+; if(keyword_set(parm.nbright)) then sd = strcat_nbright(parm.od, sd, nbright)
+ strcat_nbright, sd, parm
+ n_obj = n_elements(sd)
+
 
  ;---------------------------------------------------------
- ; Return silently if no stars are found
+ ; Return silently if no stars are left
  ;---------------------------------------------------------
- n_obj = n_elements(sd)
  if(n_obj EQ 0) then return, ''
  
- print, 'Total ' + upcat + ' stars found: ', n_obj
+ stcat = stars[0].cat
+ scat = keyword_set(stcat) ? cat + '[' + stcat + ']' : cat
+ nv_message, /con, 'Total ' + scat + ' stars found: ' + strtrim(n_obj, 2)
  
- bod_set_time, sd, time
+ bod_set_time, sd, parm.time
 
- status = 0
  return, sd
 end
 ;===============================================================================

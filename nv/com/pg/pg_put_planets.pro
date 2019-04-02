@@ -74,7 +74,7 @@
 ;=============================================================================
 pro pg_put_planets, dd, trs, pd=_pd, ods=ods, raw=raw, $
 @plt__keywords_tree.include
-@nv_trs_keywords_include.pro
+@dat_trs_keywords_include.pro
 		end_keywords
 
 
@@ -107,7 +107,7 @@ end_keywords
  ; put descriptor
  ;-------------------------------
  dat_put_value, dd, 'PLT_DESCRIPTORS', pd, trs=trs, $
-@nv_trs_keywords_include.pro
+@dat_trs_keywords_include.pro
                              end_keywords
 
  nv_free, pd

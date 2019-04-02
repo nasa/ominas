@@ -2,8 +2,11 @@
 ; ext_get_name
 ;
 ;=============================================================================
-function ext_get_name, filename
+function ext_get_name, filename, write=write
  split_filename, filename, dir, name, ext
- return, 'ext_read_' + strlowcase(ext)
+
+ ff = 'ext_read_'
+ if(keyword_set(write)) then ff = 'ext_write_'
+ return, ff + strlowcase(ext)
 end
 ;=============================================================================

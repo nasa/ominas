@@ -16,7 +16,7 @@ function get_all_ck_files, ckpath
 
    while(NOT done) do $
     begin
-     year_files = file_search(ckpath + '/' + str_pad(strtrim(year,2),2,c='0',align=1) + '*??.bc')
+     year_files = file_search(ckpath + path_sep() + str_pad(strtrim(year,2),2,c='0',align=1) + '*??.bc')
      if(NOT keyword_set(year_files)) then done = 1 $
      else all_files = append_array(all_files, year_files)
      year = (year + 1) mod 100

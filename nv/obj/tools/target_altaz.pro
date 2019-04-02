@@ -63,7 +63,7 @@ function target_altaz, bx, pd, lat, lon, alt
 
  body_pt = glb_globe_to_body(pd, surf_pt)
 
- altaz = glb_local_to_altaz(pd, body_pt, $
+ altaz = glb_local_to_altaz(pd, $
            glb_body_to_local(pd, body_pt, $ 
              bod_inertial_to_body_pos(pd, bod_pos(bx))))
 

@@ -7,8 +7,7 @@
 function xshade, p, shade, map=map, tv=tv, radius=radius, usemap=usemap, $
                            getmap=getmap, color=color, max=max, weight=weight
 
-radius=1d
- if(NOT defined(radius)) then radius = 2d
+ if(NOT keyword_set(radius)) then radius = 1d
  if(NOT defined(weight)) then weight = 0.1d
 
  nlevels = 100d

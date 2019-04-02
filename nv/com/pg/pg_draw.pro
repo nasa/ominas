@@ -38,6 +38,11 @@
 ; KEYWORDS: 
 ;	graphics:	Logical operation to use for drawing.
 ;
+;	suspend:	If set, pg_draw output will be suspended until 
+;			/resume is received.
+;
+;	resume:		Cancels a prior /suspend.
+;
 ;	See pg_draw or pg_draw_vector for more keywords.
 ;
 ;
@@ -64,8 +69,12 @@ pro pg_draw, object_ptd, target_ptd, $
              noshorten=noshorten, solid=solid, $
              fixedheads=fixedheads, winglength=winglength, $
              graphics=graphics, label_color=label_color, $
-             shade_threshold=shade_threshold
-common pg_draw_block, pixmap
+             shade_threshold=shade_threshold, suspend=suspend, resume=resume
+common pg_draw_block, pixmap, ___suspend
+
+ if(keyword_set(suspend)) then ___suspend = 1
+ if(keyword_set(resume)) then ___suspend = 0
+ if(keyword_set(___suspend)) then return
 
  if(windows_output()) then $
  if(keyword_set(graphics)) then $

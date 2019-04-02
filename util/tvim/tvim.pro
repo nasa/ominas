@@ -146,6 +146,8 @@
 ;
 ;-
 ;=============================================================================
+
+
 ;===========================================================================
 ; tvim_zoom_valid
 ;
@@ -299,6 +301,7 @@ pro tvim_set, current=current, $
 	rotate=rotate, $
 	offset=_offset, $
 	force_xsize=force_xsize, force_ysize=force_ysize, $
+	integer_zoom=integer_zoom, $
 	xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, no_coord=no_coord
 common tvim_block, tvd, tvim_top
 
@@ -331,12 +334,41 @@ common tvim_block, tvd, tvim_top
  ;-------------------------
 
  ;- - - - - - - - - - - - -
- ; offset
+ ; integer zoom
  ;- - - - - - - - - - - - -
- x0 = offset[0] + 0.5
+ if(keyword_set(integer_zoom)) then $
+  begin
+   new_zoom = zoom
+
+   w = where((zoom GT 0.5) AND (zoom LT 1))
+   if(w[0] NE -1) then new_zoom[w] = 0.5
+
+   w = where(zoom GT 1)
+   if(w[0] NE -1) then new_zoom[w] = double(round(zoom[w]))
+
+   w = where(zoom LT 1)
+   if(w[0] NE -1) then new_zoom[w] = 1/double(ceil(1/zoom[w]))
+
+   center = [xsize, ysize] + 0.5
+   new_center = center*new_zoom/zoom
+   offset = offset - (center - new_center)
+
+   zoom = new_zoom
+  end
+
+ ;- - - - - - - - - - - - -
+ ; offset, zoom
+ ;- - - - - - - - - - - - -
+;;; x0 = offset[0] + 0.5
+;;; x1 = offset[0] + xsize/zoom[0] - 0.5
+
+;;; y0 = offset[1] + 0.5
+;;; y1 = offset[1] + ysize/zoom[1] - 0.5
+
+ x0 = offset[0] - 0.5
  x1 = offset[0] + xsize/zoom[0] - 0.5
 
- y0 = offset[1] + 0.5
+ y0 = offset[1] - 0.5
  y1 = offset[1] + ysize/zoom[1] - 0.5
 
  xmin = double(offset[0])
@@ -500,7 +532,7 @@ pro tvim, arg1, arg2, draw_pixmap=draw_pixmap, $
 	offset=_offset, base=base, $
 	local_scaling=_local_scaling, no_scale=no_scale, $
 	get_info=get_info, nowin=nowin, $
-	top=top, erase=erase, noplot=noplot, $
+	top=top, erase=erase, noplot=noplot, integer_zoom=integer_zoom, $
 	wnum=_wnum, list=list, pixmap=pixmap, no_wset=no_wset, no_coord=no_coord
 common tvim_block, tvd, tvim_top
 
@@ -735,7 +767,8 @@ common tvim_block, tvd, tvim_top
 ;   if(NOT keyword_set(no_coord)) then $
                  tvim_set, zoom=zoom, order=order, rotate=rotate, offset=offset, $
                  xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, $
-                 force_xsize=force_xsize, force_ysize=force_ysize, no_coord=no_coord
+                 force_xsize=force_xsize, force_ysize=force_ysize, no_coord=no_coord, $
+                 integer_zoom=integer_zoom
    coord_sys=1
   end
 
@@ -809,7 +842,8 @@ common tvim_block, tvd, tvim_top
 ; if((NOT coord_sys) AND (NOT keyword_set(no_coord))) then $
  if(NOT coord_sys) then $
       tvim_set, zoom=zoom, order=order, rotate=rotate, offset=offset, $
-           force_xsize=force_xsize, force_ysize=force_ysize, no_coord=no_coord
+           force_xsize=force_xsize, force_ysize=force_ysize, no_coord=no_coord, $
+           integer_zoom=integer_zoom
 
 
  ;======================================

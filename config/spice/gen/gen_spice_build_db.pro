@@ -13,14 +13,14 @@
 ;
 ;
 ; CALLING SEQUENCE:
-;       gen_spice_build_db, kpath, data 
+;       gen_spice_build_db, kpath, type
 ;
 ;
 ; ARGUMENTS:
 ;  INPUT:
 ;       kpath:          Path of the kernel files
 ;
-;	type:		Type of kernel: 'c' or 'sp'.
+;	type:		Type of kernel: 'c' or 'sp' or 'pc'.
 ;
 ;
 ;  OUTPUT: NONE
@@ -36,8 +36,8 @@
 ;
 ;  RETURN:              Structure that contains:
 ;                       filename:	Kernel filename
-;                       first:		Range start (ET seconds)
-;                       last:		Range end (ET seconds)
+;                       first:		Range start (ET seconds) [not valid for 'pc']
+;                       last:		Range end (ET seconds)   [not valid for 'pc']
 ;                       mtime:		File system date (seconds, OS dependent)
 ;                       lbltime:	LBL file creation date (seconds ET)
 ;                       installtime:	OMINAS install timestamp (Julian date)
@@ -68,6 +68,7 @@
 ; MODIFICATION HISTORY:
 ;       Written by:     V. Haemmerle,  Feb. 2017
 ;	Addapted by:	J.Spitale      Feb. 2017
+;       Modified by:    V. Haemmerle,  Jun. 2018
 ;
 ;-
 ;=============================================================================
@@ -100,7 +101,12 @@ function esbd_kcov, type, file, id, needav, status=status
  cspice_scard, 0L, cover
 
  if(type EQ 'sp') then cspice_spkcov, file, id, cover $
- else cspice_ckcov, file, id, needav, 'SEGMENT', 0.D, 'SCLK', cover
+ else if(type EQ 'c') then cspice_ckcov, file, id, needav, 'SEGMENT', 0.D, 'SCLK', cover $
+ else if(type EQ 'pc') then begin
+   window = [ -6.3d+9, 6.3d+9 ]  ; 1800 to 2200
+   cover.base[cover.data:cover.data+1] = window 
+   cspice_wnvald, winsiz, 2, cover
+ endif
 
  return, cover
 end
@@ -154,7 +160,7 @@ function gen_spice_build_db, _kpath, type, nocheck=nocheck
  ; replace / with _
  ;-------------------------------------
  kpath = file_search(_kpath)
- fix_path = strjoin(strsplit(kpath,'/',/extract),'_')
+ fix_path = strjoin(strsplit(kpath,path_sep(),/extract),'_')
 
  ;-------------------------------------
  ; replace * with x
@@ -260,7 +266,7 @@ function gen_spice_build_db, _kpath, type, nocheck=nocheck
      explanation = $
         ['This database expedites the search for the appropriate kernels.', $
          'It is only updated when kernels are added or deleted from the kernel', $
-         'directory.  The initial creation may take a minute or two.']
+         'directory.  The initial creation may take a few minutes.']
 
    verb = new_db ? 'Creating' : 'Updating'
 ;   nv_message, /con, verb + ' ' + strupcase(type) + ' kernel database...', $
@@ -303,7 +309,8 @@ function gen_spice_build_db, _kpath, type, nocheck=nocheck
      ;----------------------
      ; Find PDS Label time
      ;----------------------
-     creation = gen_spice_read_label(new_files[i])
+     if(type EQ 'pc') then creation = gen_spice_pck_kernel_id(new_files[i]) $
+     else creation = gen_spice_read_label(new_files[i])
      if(keyword_set(creation)) then $
       begin
        cspice_tparse, creation, lbl_time, lbl_error
@@ -350,7 +357,7 @@ function gen_spice_build_db, _kpath, type, nocheck=nocheck
                  cspice_wnfetd, cover[l], k, first, last
  
                  nv_message, /verbose, $
-                  'Segment ' + strtrim(k,2) + ', begin: '+ strtrim(first,2) + ', end: ' + strtrim(first,2)
+                  'Segment ' + strtrim(k,2) + ', begin: '+ strtrim(first,2) + ', end: ' + strtrim(last,2)
 
                  ;----------------------
                  ; add record

@@ -11,7 +11,7 @@
 ;   This example file can be executed from the shell prompt in the ominas/demo
 ;   directory using::
 ;
-;     ominas w10n_pds_example.pro 
+;     ominas w10n_pds_example.pro <--cas> <--vgr> <--gll> <mission=={cas|vgr|gll}>
 ;
 ;    or from within an OMINAS IDL session using::
 ;
@@ -25,7 +25,6 @@
 ;+
 ; READ AND DISPLAY IMAGE
 ;
-; .. image:: A different URL depending on mission
 ;   Missions supported CASSINI ISS, VGR ISS, GLL SSI
 ;
 ;   Use DAT_READ to read the image and then display the image using TVIM.  
@@ -45,8 +44,17 @@
 ;
 ;-
 ;-------------------------------------------------------------------------
-mission = ''
-read, mission, prompt='Enter mission (cas, vgr, gll): '
+mission = ominas_value('mission')
+if(keyword_set(ominas_value('cas'))) then mission = 'cas'
+if(keyword_set(ominas_value('vgr'))) then mission = 'vgr'
+if(keyword_set(ominas_value('gll'))) then mission = 'gll'
+
+if(NOT keyword_set(mission)) then $
+ begin &$
+  mission = '' &$
+  read, mission, prompt='Enter mission (cas, vgr, gll): ' &$
+ end
+
 if (mission eq 'cas') then url_mission = 'CASSINI ISS' $
 else if (mission eq 'vgr') then url_mission = 'VOYAGER ISS' $
 else if (mission eq 'gll') then url_mission = 'GALILEO SSI' $
@@ -211,12 +219,22 @@ plabels=[cor_name(pd), $
 ;+
 ; DRAW EVERYTHING
 ;
+; Cassini result:
+; 
 ; .. image:: graphics/jupiter_limb_initial.jpeg
 ;
 ; Now we can do a nice simple call to PG_DRAW to draw everything::
 ;
 ;     pg_draw, object_ptd, $
 ;               col=colors, psy=psyms, psi=psizes, csi=csizes, pl=plabels
+;               
+; Voyager image:
+;
+; .. image:: graphics/w10n_pds_vgr.png
+; 
+; Galileo result:
+;
+; .. image:: graphics/w10n_pds_gll.png
 ;
 ;-
 ;-------------------------------------------------------------------------

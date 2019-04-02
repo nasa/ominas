@@ -58,6 +58,8 @@ pro rim, files, keywords=keywords
 
  if(NOT keyword_set(files)) then return
 
+ sep = path_sep()
+
  ;---------------------------------------------------------
  ; resolve any file specifications and determine filetypes
  ;---------------------------------------------------------
@@ -65,7 +67,7 @@ pro rim, files, keywords=keywords
   begin
    for i=0, n_elements(files)-1 do $
     begin
-     if(strpos(files[i], '/') EQ -1) then files[i] = pwd() + '/' + files[i]
+     if(strpos(files[i], sep) EQ -1) then files[i] = pwd() + sep + files[i]
      ff = file_search(files[i])
      if(keyword_set(ff)) then _files = append_array(_files, ff)
     end
@@ -80,7 +82,7 @@ pro rim, files, keywords=keywords
    if(w[0] EQ -1) then return
    files = files[w]
 
-   w = where(strpos(files,'/') NE -1)
+   w = where(strpos(files,sep) NE -1)
    if(w[0] EQ -1) then return
    files = files[w]
 

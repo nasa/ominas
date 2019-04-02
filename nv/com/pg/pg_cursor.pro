@@ -90,6 +90,9 @@
 ;	Ring photometry is not yet implemented.
 ;
 ;
+; SEE ALSO: pg_measure
+;
+;
 ; MODIFICATION HISTORY:
 ; 	Written by:	Spitale, 3/2002
 ;	

@@ -2,20 +2,20 @@
 ; detect_png.pro
 ;
 ;===========================================================================
-function detect_png, dd
+function detect_png, filename=filename, header=header
 
- filename = dat_filename(dd)
  status=0
 
  ;==============================
  ; open the file
  ;==============================
  openr, unit, filename, /get_lun, error=error
- if(error NE 0) then nv_message, /anonymous, !err_string
+ if(error NE 0) then return,0
 
  ;=================================
  ; read the first 8 bytes
  ;=================================
+ if((fstat(unit)).size LT 8) then return, 0
  b=bytarr(8)
  readu,unit,b
  ;==============================

@@ -6,7 +6,9 @@
 ;
 ; PURPOSE:
 ;	Attempts to detect the instrument for a data set by calling the 
-;	detectors in the instrument detectors table.
+;	detectors in the instrument detectors table.  Detectors that 
+; 	crash are ignored and a warning is issued.  This behavior is disabled 
+;	if $NV_DEBUG is set.
 ;
 ;
 ; CATEGORY:
@@ -64,22 +66,34 @@ function dat_detect_instrument, dd
 
 
  ;==============================================================
- ; call instrument detectors of the specified filetype until 
- ; non-null string is returned
+ ; Call instrument detectors of the specified filetype until 
+ ; non-null string is returned.
+ ;
+ ; Crashes in the detects are handled by issuing a warning and 
+ ; contnuing to the next detector.
  ;==============================================================
+ catch_errors = NOT keyword_set(getenv('NV_DEBUG'))
  s = size(table)
  n_ins = s[1]
  for i=0, n_ins-1 do $
   begin
    detect_fn = table[i,0]
-   string = call_function(detect_fn, dd)
-   if(string NE '') then return, string
+
+   if(NOT catch_errors) then err = 0 $
+   else catch, err
+   if(err EQ 0) then string = call_function(detect_fn, dd) $
+   else nv_message, /warning, $
+           'Instrument detector ' + strupcase(detect_fn) + ' crashed; ignoring.'
+   catch, /cancel
+
+   if(keyword_set(string)) then return, string
   end
 
 
  ;==============================================================
  ; Instrument is DEFAULT if none detected
  ;==============================================================
+ nv_message, verb=0.9, 'No instrument detected; setting to DEFAULT.'
  return, 'DEFAULT'
 end
 ;===========================================================================

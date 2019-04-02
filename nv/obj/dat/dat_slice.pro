@@ -26,7 +26,8 @@
 ; KEYWORDS:
 ;  INPUT: NONE
 ;
-;  OUTPUT: NONE
+;  OUTPUT: 
+;	dd0: 	Surce data descriptor.
 ;
 ;
 ; RETURN: 
@@ -47,6 +48,7 @@ function dat_slice, dd, dd0=dd0, noevent=noevent
  nv_notify, dd, type = 1, noevent=noevent
  _dd = cor_dereference(dd)
 
+ dd0 = !null
  if(NOT ptr_valid(_dd.slice_struct.slice_p)) then return, 0
 
  handle_value, _dd.slice_struct.dd0_h, dd0

@@ -3,7 +3,7 @@
 ;
 ;
 ;===============================================================================
-function caller, n
+function caller, n, all=all
 
  if(NOT keyword_set(n)) then n = 0
 
@@ -13,7 +13,8 @@ function caller, n
  s = strcompress(s[w])
  junk = str_nnsplit(s, ' ', rem=rem)
  callers = str_nnsplit(rem, ' ')
- 
+ if(keyword_set(all)) then return, str_cull(callers)
+
  return, callers[n+2]
 end
 ;===============================================================================
