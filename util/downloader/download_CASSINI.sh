@@ -28,9 +28,15 @@ ts=`eval echo "~/.ominas/timestamps/"`
 
 for dir in "${dirs[@]}"
 do
+ #echo ${wget} "${baseurl}${dir}/ --localdir=${1}/$dir/ --absolute --timestamps=$ts $@"
  ${wget} "${baseurl}${dir}/ --localdir=${1}/$dir/ --absolute --timestamps=$ts $@"
 done
 
+echo "Downloading PSFs"
+echo ${wget} "https://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v4.1/calib/xpsf/ --localdir=${1}/xpsf/ -absolute --timestamps=$ts $@"
+${wget} "https://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/coiss_0011_v4.1/calib/xpsf/ --localdir=${1}/xpsf/ --absolute --timestamps=$ts $@"
+
+exit
 #special treatment directories (spk and ck, which are large)
 echo "Downloading spks"
 ${wget} "${baseurl}spk/ --localdir=${1}/spk/ $@ --absolute --timestamps=$ts " # --xpattern=(\.bsp$)|(\.bsp\.lbl$)"
