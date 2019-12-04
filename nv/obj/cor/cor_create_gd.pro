@@ -122,7 +122,7 @@ end
 ; cor_create_gd
 ;
 ;=============================================================================
-function cor_create_gd, _xds, gd=_gd, explicit=explicit, _extra=gdx
+function cor_create_gd, _xds, gd=_gd, explicit=explicit, array=array, _extra=gdx
 
  if(keyword_set(_gd)) then gd = _gd
  if(keyword_set(_xds)) then xds = _xds
@@ -172,12 +172,19 @@ function cor_create_gd, _xds, gd=_gd, explicit=explicit, _extra=gdx
  for i=0, n_elements(tags)-1 do $
   begin
    w = where(all_tags EQ tags[i])
-   new_gd = append_struct(new_gd, create_struct(tags[i], unique(xds[w])))
+   if(NOT keyword_set(array)) then $ 
+         new_gd = append_struct(new_gd, create_struct(tags[i], unique(xds[w]))) $
+   else for j=0, n_elements(w)-1 do $
+      new_gd = append_array(new_gd, create_struct(tags[i], unique(xds[w[j]])))
   end
 
  return, new_gd
 end
 ;=============================================================================
+
+
+
+
 
 
 

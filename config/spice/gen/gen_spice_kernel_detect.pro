@@ -188,7 +188,8 @@ function gen_spice_kernel_detect, dd, kpath, type, $
  if(keyword_set(_djd)) then djd = _djd
  dsec = djd * 86400d 
 
- if((NOT keyword_set(all)) AND  (NOT keyword_set(time))) then $
+; if((NOT keyword_set(all)) AND  (NOT keyword_set(time))) then $
+ if((NOT keyword_set(all)) AND  (NOT defined(time))) then $
     nv_message, name='gen_spice_kernel_detect', 'Must specify /all or time.'
 
  ;--------------------------------

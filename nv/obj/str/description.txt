@@ -1,0 +1,49 @@
+STAR Object Class
+=================
+
+ The STAR object class describes stellar objects.  It is an immediate subclass 
+ of GLOBE.
+
+
+Coordinate systems
+------------------
+ - Inertial
+	Cartesian coordinate system used as the celestial reference frame.
+
+ - Body
+	Rotating cartesian coordinate system centered on and fixed to the body.
+	This coordinate system is inherited from BODY.  Most stars will not have
+	body coordinate information.
+
+ - globe
+	Rotating spherical coordinate system defined with respect to the 
+	surface of the star.  This coordinate system is inherited from GLOBE.
+	Most stars will not have surface coordinate information.
+
+
+Data objects
+------------
+ - orientation matrix
+	The orientation matrix is inherited from BODY.  Th b2 axis corresponds
+	to the normal to the rotation axis and the b0 axis gives the zero
+	direction of longitude as shown.  This is usually a unitary matrix.
+
+				| b2 --> rotation axis, latitude = pi/2
+				|
+				|
+				|_______
+			       /        b1
+			      /
+			     / b0 --> longitude = 0
+
+
+ - position vector
+	The position vector is inherited from BODY.  It gives the position of
+	the star center with respect to the inertial coordinate system.
+
+
+ - star descriptor
+	The star descriptor is the class structure for the STAR class.  
+	See star_descriptor__define.
+ 
+

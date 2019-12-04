@@ -14,12 +14,14 @@
 ;
 ;
 ; CALLING SEQUENCE:
-;	new_xd = nv_clone(xd)
+;	new_xd = nv_clone(xd, n)
 ;
 ;
 ; ARGUMENTS:
 ;  INPUT:
 ;	xd:	 Object to clone.  May be any pointer or structure.
+;
+;	n:	 Number of clones to create.  Default is 1.
 ;
 ;  OUTPUT: NONE
 ;
@@ -135,10 +137,50 @@ end
 
 
 ;=============================================================================
+; nv_clone_single
+;
+;=============================================================================
+function nv_clone_single, xd_0, noevent=noevent, protect=protect
+@core.include
+ nv_notify, xd_0, type = 1, noevent=noevent
+
+ xd = xd_0
+ nv_clone_recurse, xd, protect=protect
+ return, xd
+end
+;=============================================================================
+
+
+
+;=============================================================================
 ; nv_clone
 ;
 ;=============================================================================
-function nv_clone, xd_0, noevent=noevent, protect=protect
+function nv_clone, xd_0, n, noevent=noevent, protect=protect
+@core.include
+ nv_notify, xd_0, type = 1, noevent=noevent
+
+ if(NOT keyword_set(n)) then n = 1
+
+ xd = replicate(xd_0, n)
+ for i=0, n-1 do xd[i] = nv_clone_single(xd_0, noevent=noevent, protect=protect)
+
+ return, xd
+end
+;=============================================================================
+
+
+
+
+
+
+
+
+;=============================================================================
+; nv_clone
+;
+;=============================================================================
+function ___nv_clone, xd_0, n, noevent=noevent, protect=protect
 @core.include
  nv_notify, xd_0, type = 1, noevent=noevent
 

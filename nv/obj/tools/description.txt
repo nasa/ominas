@@ -1,0 +1,5 @@
+OMINAS Tools
+============
+
+ This is a collection of miscellaneous utilities and programs that use the OMINAS
+ geometry library.

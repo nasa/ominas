@@ -715,7 +715,7 @@ function si_get, dd, keyword, prefix, inst, od=od, time=__time, names=names, sta
  ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  ; get time if needed
  ;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- if((NOT keyword_set(time)) AND keyword_set(od)) then $
+ if((NOT defined(time)) AND keyword_set(od)) then $
   begin
    if(NOT cor_isa(od, 'BODY')) then $
     begin
@@ -809,8 +809,6 @@ function si_get, dd, keyword, prefix, inst, od=od, time=__time, names=names, sta
  endcase
 
  if(NOT keyword_set(result)) then status = -1
-	
-
  return, result
 end
 ;=============================================================================
@@ -896,6 +894,7 @@ common spice_input_block, last_prefix
  ;-----------------------------------------------
  for i=0, ndd-1 do $
   begin
+
    if(defined(time)) then _time = time[i]
 
    result = append_array(result, si_get(dd[i], $

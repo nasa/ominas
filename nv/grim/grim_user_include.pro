@@ -30,7 +30,8 @@ end
 ;
 ;=============================================================================
 pro grim_add_user_points, grn=grn, user_ptd, tag, update=update, $
-                  color=color, fn_color=fn_color, fn_shade=fn_shade, psym=psym, thick=thick, line=line, symsize=symsize, $
+                  color=color, fn_color=fn_color, fn_shade=fn_shade, psym=psym, $
+                  thick=thick, line=line, symsize=symsize, $
                   shade_threshold=shade_threshold, $
                   fn_graphics=fn_graphics, xgraphics=xgraphics, xradius=xradius, $
                   nodraw=nodraw, inactive=inactive, $
@@ -45,6 +46,15 @@ pro grim_add_user_points, grn=grn, user_ptd, tag, update=update, $
  if(NOT defined(grn)) then if(keyword_set(plane)) then grn = plane.grn
  grim_data = grim_get_data(grn=grn)
  if(NOT keyword_set(plane)) then plane = grim_get_plane(grim_data)
+
+ pp = pnt_points(user_ptd)
+ vv = pnt_vectors(user_ptd)
+ if(NOT keyword_set(pp)) then $
+  if(keyword_set(vv)) then $
+   begin
+    pp = inertial_to_image_pos(grim_xd(plane, /cd), vv)
+    pnt_set_points, user_ptd, pp
+   end
 
  pn = plane.pn
 

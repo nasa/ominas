@@ -5,9 +5,8 @@
 ;
 ;
 ; PURPOSE:
-;	Remove the item with index i from the given list and return the
-;	new list.  If the index is not in the list, then return the original
-;	list unchanged.
+;	Removes the items with indices i from the given list and returns the
+;	new list.  If an index is not in the list, then it is ignored.
 ;
 ;
 ; CATEGORY:

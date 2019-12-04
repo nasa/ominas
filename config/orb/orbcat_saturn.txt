@@ -1,0 +1,92 @@
+#=============================================================================
+# Propellers
+#=============================================================================
+
+;-----------------------
+; Bleriot
+;-----------------------
+name = Bleriot
+  epoch = 	2.1942150e+08				# sec past j2000
+  sma = 	134906960.				# m            
+  ecc =		0.	
+  inc =		0.					# deg
+  lan = 	0.					# deg
+  lp =		0.					# deg	
+  ml =		125.42389				# deg
+  dmldt =	616.7816567				# deg/day
+
+;-----------------------
+; Wright
+;-----------------------
+name = Wright
+  epoch = 	1.7782263e+08				# sec past j2000
+  sma = 	134082400.				# m            
+  ecc =		0.	
+  inc =		0.					# deg
+  lan = 	0.					# deg
+  lp =		0.					# deg	
+  ml =		327.52251				# deg
+  dmldt =	622.536					# deg/day
+
+
+;-----------------------
+; Curtiss
+;-----------------------
+name = Curtiss
+  epoch = 	2.1939978e+08				# sec past j2000
+  sma = 	133898960.				# m            
+  ecc =		0.	
+  inc =		0.					# deg
+  lan = 	0.					# deg
+  lp =		0.					# deg	
+  ml =		185.94262				# deg
+  dmldt =	623.7473152				# deg/day
+
+
+;-----------------------
+; Lindberg
+;-----------------------
+name = Lindberg
+  epoch = 	2.1940574e+08				# sec past j2000
+  sma = 	133970990.				# m            
+  ecc =		0.	
+  inc =		0.					# deg
+  lan = 	0.					# deg
+  lp =		0.					# deg	
+  ml =		175.35736				# deg
+  dmldt =	623.3173191				# deg/day
+
+
+;-----------------------
+; Earhart
+;-----------------------
+name = Earhart
+  epoch = 	2.1942270e+08				# sec past j2000
+  sma = 	133798980.				# m            
+  ecc =		0.	
+  inc =		0.					# deg
+  lan = 	0.					# deg
+  lp =		0.					# deg	
+  ml =		117.32133				# deg
+  dmldt =	624.5285781				# deg/day
+
+
+;-----------------------
+; Santos-Dumont
+;-----------------------
+name = Santos-Dumont
+  epoch = 	2.1941485e+08				# sec past j2000
+  sma = 	134524810.				# m            
+  ecc =		0.	
+  inc =		0.					# deg
+  lan = 	0.					# deg
+  lp =		0.					# deg	
+  ml =		159.55811				# deg
+  dmldt =	619.4581265				# deg/day
+
+
+
+
+
+
+

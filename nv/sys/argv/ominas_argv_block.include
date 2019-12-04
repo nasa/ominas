@@ -1,0 +1,2 @@
+common ominas_ominas_argv_block, ___argv, ___keywords, ___values
+if(NOT defined(___argv)) then ___argv = command_line_args()

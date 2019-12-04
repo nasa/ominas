@@ -39,6 +39,7 @@ end_keywords)
  self.abbrev = 'BOD'
  self.tag = 'BD'
 
+;;;self.time = !values.d_nan
  self.opaque = 1
  if(defined(opaque)) then self.opaque = decrapify(opaque[ii])
  if(keyword_set(time)) then self.time = decrapify(time[ii])

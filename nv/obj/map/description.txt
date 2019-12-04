@@ -1,0 +1,34 @@
+MAP Object Class
+================
+					  
+ The MAP object class describes map projections.  The following projections are
+ currently supported:
+	rectangular
+	orthographic
+	stereographic
+	mercator
+
+ MAP is an immediate subclass of CORE.
+
+
+Coordinate systems
+------------------
+ - Image
+	Cartesian coordinate system specfiying locations in a
+	two-dimensional image as (x,y), with origin (0,0) at the lower left
+	corner (minimum sample, maximum line) of the image and x and y
+	increasing in the increasing sample and decreasing line directions,
+	respectively.
+
+ - map
+	Latitude/longitude coodinate system specfiying locations on the surface. 
+
+
+ - map descriptor
+	The map descriptor is the class structure for the MAP class.  
+	See map_descriptor__define.
+
+
+
+
+

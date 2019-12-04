@@ -82,11 +82,6 @@ function cam_psf, cd, _x, _y, noevent=noevent
 
 
  if(NOT keyword_set(_cd[0].fn_psf)) then return, 0
-
- psf = call_function(_cd[0].fn_psf, cd, x, y)
- if(NOT keyword_set(psf)) then return, 0
-
- if(keyword_set(nx)) then psf = reform(psf, nx, ny, /over)
- return, psf
+ return, call_function(_cd[0].fn_psf, cd, x, y)
 end
 ;===========================================================================

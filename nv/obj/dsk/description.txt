@@ -1,0 +1,58 @@
+DISK Object Class
+=================
+
+ The DISK object class describes the shapes of objects that are roughly
+ disk-shaped.  Currently, it describes a flat object whose inner and outer 
+ edges are keplarian ellipses, but this may be generalized in the future.  
+ It is an immediate subclass of SOLID.
+
+
+Coordinate systems
+------------------
+ - Inertial
+	Cartesian coordinate system used as the celestial reference frame.
+
+ - Body
+	Cartesian coordinate system centered on and fixed to the body.  This
+	coordinate system is inherited from BODY.
+
+ - Disk
+	Cylindrical coordinate system defined with respect to a disk. 
+	Vectors are given as [radius, true anomaly, altitude] columns vectors
+	with respect to the plane whose orientation and reference direction 
+	are specified by the disk orientation matrix.  The reference direction 
+	(X-axis of the orientation matrix) points toward periapse.
+
+
+Data objects
+------------
+ - orientation matrix
+	The orientation matrix is inherited from BODY.  The b2 axis corresponds
+	to the normal to the plane of the disk and the b0 axis gives the
+	periapse direction as shown.
+
+
+				| b2 -> disk normal
+				|
+				|
+				|_______
+			       /        b1
+			      /
+			     / b0 -> periapse
+
+ - frame descriptor
+	DISK parameters involving out-of-plane require a BODY descriptor to 
+	establish the reference node, implemented as the 'frame_bd' keyword
+	argument to the reevant methods.
+
+
+ - position vector
+	The position vector is inherited from BODY.  It gives the position of
+	the disk center with respect to the inertial coordinate system.
+
+
+ - disk descriptor
+	The disk descriptor is the class structure for the DISK class.  
+	See disk_descriptor__define.
+
+

@@ -30,6 +30,51 @@ end
 
 
 ;=============================================================================
+; grim_mode_navigate_get_body
+;
+;=============================================================================
+function grim_mode_navigate_get_body, active=active, grim_data, plane=plane, $
+                 cd, xy, points_ptd, curves_ptd, user_ptd, $
+                 name=name, body_pt=body_pt, inertial_pt=inertial_pt
+
+
+ name = ''
+
+ if(keyword_set(active)) then $
+  begin
+   ptd = grim_ptd(plane, /active)
+   if(keyword_set(ptd)) then $
+    begin
+     name = 'ACTIVE'
+     vv = pnt_vectors(ptd, /cat)
+     inertial_pt = reform(total(vv,1)/(n_elements(vv)/3), 1, 3)
+     bx = nv_clone(grim_xd(plane, /cd))
+     bod_set_pos, bx, inertial_pt
+    end
+  end $
+ else $
+  begin 
+   surf_pts = grim_image_to_surface(grim_data, plane, xy[*,0], $
+				       bx=bx, names=names, body_pts=body_pts)
+   if(keyword_set(surf_pts)) then $
+    begin
+     name = names[0]
+     bx = bx[0]
+     body_pt = body_pts[0,*]
+     inertial_pt = bod_body_to_inertial_pos(bx, body_pt)
+    end
+  end 
+
+ grim_draw_vectors, cd, curves_ptd, points_ptd, user_ptd
+
+ if(NOT keyword_set(name)) then return, 0
+ return, bx
+end
+;=============================================================================
+
+
+
+;=============================================================================
 ; grim_mode_navigate_get_points
 ;
 ;=============================================================================
@@ -106,10 +151,102 @@ end
 
 
 ;=============================================================================
+; grim_mode_navigate_reposition_xz_active
+;
+;=============================================================================
+pro grim_mode_navigate_reposition_xz_active, data, xarr, yarr, pixmap, win_num
+ grim_mode_navigate_reposition_xz, /active, data, xarr, yarr, pixmap, win_num
+end
+;=============================================================================
+
+
+
+;=============================================================================
+; grim_mode_navigate_reposition_track_active
+;
+;=============================================================================
+pro grim_mode_navigate_reposition_track_active, data, xarr, yarr, pixmap, win_num
+common grim_mode_navigate_reposition_track_active_block, bx, name, inertial_pt0
+
+ grim_data = data.grim_data
+ plane = grim_get_plane(grim_data)
+
+ curves_ptd = data.curves_ptd
+ points_ptd = data.points_ptd
+ user_ptd = data.user_ptd
+ cd = data.cd
+
+ cd0 = grim_xd(plane, /cd)
+ nv_copy, cd, cd0
+
+ xy = (convert_coord(double(xarr), double(yarr), /device, /to_data))[0:1,*]
+
+
+ ;-------------------------------------------
+ ; get initial points
+ ;-------------------------------------------
+ if(p_mag(xy[*,1]-xy[*,0]) EQ 0) then $
+  begin
+   bx = grim_mode_navigate_get_body(/active, grim_data, plane=plane, $
+                 cd, xy, points_ptd, curves_ptd, user_ptd, $
+                 name=name, inertial_pt=inertial_pt0)
+   return
+  end
+ if(NOT keyword_set(name)) then return
+
+
+
+ ;------------------------------------------------------------------------------
+ ; reposition cd such that:
+ ;  - initial point stays fixed in the image plane
+ ;  - cd distance from initial point stays constant
+ ;------------------------------------------------------------------------------
+rate = 2d*!dpi/500  ; rad/pixel
+
+ dxy = xy[*,1]-xy[*,0]
+ dphi = -dxy[0]*rate
+ dtheta = dxy[1]*rate
+
+
+ ;- - - - - - - - - - - - - - - - - - - -
+ ; rotate cd position about bx center
+ ;- - - - - - - - - - - - - - - - - - - -
+ pos = bod_pos(cd)
+
+ pos_body = bod_inertial_to_body_pos(bx, pos)
+ orient = bod_orient(bx)
+ xx = [[1],[0],[0]]
+ zz = [[0],[0],[1]]
+
+ pos_body = v_rotate(pos_body, xx, sin(dtheta), cos(dtheta))
+ pos_body = v_rotate(pos_body, zz, sin(dphi), cos(dphi))
+
+ bod_set_pos, cd, bod_body_to_inertial_pos(bx, pos_body)
+
+
+ ;- - - - - - - - - - - - - - - - - - - -
+ ; repoint cd 
+ ;- - - - - - - - - - - - - - - - - - - -
+ vcent0 = v_unit(bod_pos(bx) - bod_pos(cd0))
+ vcent = v_unit(bod_pos(bx) - bod_pos(cd))
+
+ M = v_rot(vcent0, vcent)
+ bod_set_orient, cd, M##bod_orient(cd0)
+
+
+ grim_draw_vectors, cd, curves_ptd, points_ptd, user_ptd
+
+;;;;; nv_free, bx
+end
+;=============================================================================
+
+
+
+;=============================================================================
 ; grim_mode_navigate_reposition_xz
 ;
 ;=============================================================================
-pro grim_mode_navigate_reposition_xz, data, xarr, yarr, pixmap, win_num
+pro grim_mode_navigate_reposition_xz, data, xarr, yarr, pixmap, win_num, active=active
 common grim_mode_navigate_reposition_xz_block, name, bx, inertial_pt0
 
  grim_data = data.grim_data
@@ -130,19 +267,9 @@ common grim_mode_navigate_reposition_xz_block, name, bx, inertial_pt0
  ;-------------------------------------------
  if(p_mag(xy[*,1]-xy[*,0]) EQ 0) then $
   begin
-   name = ''
-   surf_pts = grim_image_to_surface(grim_data, plane, xy[*,0], $
-                                         bx=bx, names=names, body_pts=body_pts)
-   if(keyword_set(surf_pts)) then $
-    begin
-     name = names[0]
-     bx = bx[0]
-
-     body_pt0 = body_pts[0,*]
-     inertial_pt0 = bod_body_to_inertial_pos(bx, body_pt0)
-
-     grim_draw_vectors, cd, curves_ptd, points_ptd, user_ptd
-    end
+   bx = grim_mode_navigate_get_body(active=active, grim_data, plane=plane, $
+                 cd, xy, points_ptd, curves_ptd, user_ptd, $
+                 name=name, inertial_pt=inertial_pt0)
    return
   end
  if(NOT keyword_set(name)) then return
@@ -157,6 +284,8 @@ common grim_mode_navigate_reposition_xz_block, name, bx, inertial_pt0
  grim_mode_navigate_reposition, $
           cd, cd0, curves_ptd, points_ptd, user_ptd, $
                                  tracking, xarr, yarr, axes=-[speed,0,speed]
+
+;;;; if(keyword_set(active)) then nv_free, bx
 end
 ;=============================================================================
 
@@ -188,27 +317,20 @@ common grim_mode_navigate_reposition_track_block, name, bx, body_pt0
  ;-------------------------------------------
  if(p_mag(xy[*,1]-xy[*,0]) EQ 0) then $
   begin
-   name = ''
-   surf_pts = grim_image_to_surface(grim_data, plane, xy[*,0], $
-                                         bx=bx, names=names, body_pts=body_pts)
-   if(keyword_set(surf_pts)) then $
-    begin
-     name = names[0]
-     body_pt0 = body_pts[0,*]
-     bx = bx[0]
-     grim_draw_vectors, cd, curves_ptd, points_ptd, user_ptd
-    end
+   bx = grim_mode_navigate_get_body(grim_data, plane=plane, $
+                 cd, xy, points_ptd, curves_ptd, user_ptd, $
+                 name=name, body_pt=body_pt0)
    return
   end
  if(NOT keyword_set(name)) then return
 
 
- ;-------------------------------------------------------------------------
+ ;------------------------------------------------------------------------------
  ; reposition cd such that:
  ;  - bx center stays fixed in the image plane
  ;  - cd altitude above bx stays constant
- ;  - body_pt maps to xy[*,1] in image plane
- ;-------------------------------------------------------------------------
+ ;  - body_pt maps to xy[*,1] in image plane (i.e., body_pt stays under cursor)
+ ;------------------------------------------------------------------------------
 
  ;- - - - - - - - - - - - - - - - - - - -
  ; get body intercept point
@@ -335,7 +457,7 @@ end
 ;
 ;=============================================================================
 pro grim_mode_navigate_reposition_y_event, event
-common grim_mode_navigate_reposition_y_block, name, bx, surf_pt0, body_pt0
+common grim_mode_navigate_reposition_y_block, name, bx, inertial_pt0
 
  grim_data = grim_get_data(event.top)
  plane = grim_get_plane(grim_data)
@@ -351,6 +473,7 @@ common grim_mode_navigate_reposition_y_block, name, bx, surf_pt0, body_pt0
  wnum = data.wnum
  pixmap = data.pixmap
  erase_pixmap = data.erase_pixmap
+ active = data.active
 
  ;---------------------------------------------------------------
  ; quit and restore main handler if not wheel or motion event
@@ -375,29 +498,23 @@ common grim_mode_navigate_reposition_y_block, name, bx, surf_pt0, body_pt0
  p0 = (convert_coord(double(event.x), double(event.y), /device, /to_data))[0:1]
 
  ;-------------------------------------------
- ; get initial point on first call
+ ; get body on first call
  ;-------------------------------------------
  if(NOT keyword_set(bx)) then $
   begin
-   surf_pts = grim_image_to_surface(grim_data, plane, p0[*,0], $
-                                         bx=bx, names=names, body_pts=body_pts)
-   if(NOT keyword_set(names)) then return
-   name = names[0]
-   surf_pt0 = surf_pts[0,*]
-   body_pt0 = body_pts[0,*]
-   bx = bx[0]
-
+   bx = grim_mode_navigate_get_body(active=active, grim_data, plane=plane, $
+                 cd, p0, points_ptd, curves_ptd, user_ptd, $
+                 name=name, inertial_pt=inertial_pt0)
    return
   end
- if(keyword_set(name)) then if(name EQ 'SKY') then return
+ if(NOT keyword_set(name)) then return
+ if(name EQ 'SKY') then return
 
 
  ;---------------------------------------------------------------
  ; determine speed
  ;---------------------------------------------------------------
- surf_pt = body_to_surface(bx, $
-             bod_inertial_to_body_pos(bx, bod_pos(cd)))
- alt = surf_pt[2]
+ alt = v_mag(bod_pos(cd) - inertial_pt0)
  speed = alt[0]*0.1
 
 
@@ -419,7 +536,7 @@ common grim_mode_navigate_reposition_y_block, name, bx, surf_pt0, body_pt0
  grim_mode_navigate_draw, wnum, pixmap, erase_pixmap, cd, $
                                        curves_ptd, points_ptd, user_ptd
 
-
+;;;; if(keyword_set(active)) then nv_free, bx
 end
 ;=============================================================================
 
@@ -429,8 +546,9 @@ end
 ; grim_mode_navigate_reposition_y
 ;
 ;=============================================================================
-pro grim_mode_navigate_reposition_y, grim_data
+pro grim_mode_navigate_reposition_y, grim_data, active=active
 
+ active = keyword_set(active)
  plane = grim_get_plane(grim_data)
 
  grim_mode_navigate_get_points, grim_data, $
@@ -461,6 +579,7 @@ pro grim_mode_navigate_reposition_y, grim_data
 
  *grim_data.misc_data_p = $
           {cd:cd, $
+           active:active, $
            curves_ptd:curves_ptd, $
            points_ptd:points_ptd, $
            user_ptd:user_ptd, $
@@ -571,12 +690,17 @@ pro grim_mode_navigate_mouse_event, event, data
  ; scroll wheel -- adjust distance
  ;---------------------------------------
  if(event.type EQ 7) then $
-  if(event.modifiers EQ 1) then $
-   begin
-    grim_refresh, grim_data, plane=plane, /use_pixmap, /no_objects
-    grim_mode_navigate_reposition_y, grim_data
-    return
-   end
+  begin
+   active = 0
+   if(event.modifiers EQ 3) then active = 1 $
+   else if(event.modifiers NE 1) then return
+
+   grim_refresh, grim_data, plane=plane, /use_pixmap, /no_objects
+   grim_mode_navigate_reposition_y, grim_data, active=active
+
+   return
+  end
+
  if(event.type NE 0) then return
 
 
@@ -609,10 +733,16 @@ pro grim_mode_navigate_mouse_event, event, data
  grim_refresh, grim_data, plane=plane, /use_pixmap, /noglass, $
                                              overlay_color=ctgray(0.25)
 
+
+ ;- - - - - - - - - - - - - - - - - - -
+ ; activation mode
+ ;- - - - - - - - - - - - - - - - - - -
+ if(event.modifiers EQ 3) then $
+     fn = event.press EQ 1 ? 'reposition_xz_active' : 'reposition_track_active' $
  ;- - - - - - - - - - - - - - - - - - -
  ; reposition mode
  ;- - - - - - - - - - - - - - - - - - -
- if(event.modifiers EQ 1) then $
+ else if(event.modifiers EQ 1) then $
         fn = event.press EQ 1 ? 'reposition_xz' : 'reposition_track' $
  ;- - - - - - - - - - - - - - - - - - -
  ; reorient mode
@@ -621,6 +751,8 @@ pro grim_mode_navigate_mouse_event, event, data
 
  if(keyword_set(fn)) then $
        pp = tvline(p0=p0, fn_draw='grim_mode_navigate_'+fn, fn_data=fn_data)
+
+
 
  nv_copy, grim_xd(plane, /cd), cd
  nv_free, [cd, points_ptd, curves_ptd]			;;;;;
@@ -658,7 +790,7 @@ end
 ;	   Left:	Repoint the camera by dragging the cursor.
 ;
 ;	   Right:	Twists the camera by dragging the cursor about 
-;			an axis  corresponding to the initial cursor 
+;			an axis corresponding to the initial cursor 
 ;			position.
 ;
 ;	 <Shift>:
@@ -667,12 +799,17 @@ end
 ;			depends on the initial object under the cursor.
 ;
 ;	   Right:	Repositions and reorients the camera
-;			simultaneosly by tracking the object under 
+;			simultaneously by tracking the object under 
 ;			the cursor.
 ;
 ;	   Wheel:	Repositions the camera in the Y (optic axis) 
 ;			direction.  Speed depends on the initial object 
 ;			under the cursor.
+;
+;
+;	 <Shift+Ctrl>:	Same as <Shift> functions, except applied to 
+;			active points.
+;	   
 ;
 ;	 <Ctrl>:
 ;	   Left:	Repositions the camera directly above the selected

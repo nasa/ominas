@@ -202,7 +202,6 @@ function pg_get_stars, arg1, arg2, sd=_sd, od=od, _extra=keyvals, $
                           trs=trs, free=free, $
                           @dat__keywords.include
                           end_keywords
-
  ndd = n_elements(dd)
 
  ;---------------------------------------------------------------------
@@ -222,8 +221,9 @@ function pg_get_stars, arg1, arg2, sd=_sd, od=od, _extra=keyvals, $
  if(keyword__set(override)) then $
   begin
    n = n_elements(name)
+   if(n EQ 0) then n = ndd
 
-   if(keyword_set(dd)) then gd = cor_create_gd(dd, gd=gd)
+   if(keyword_set(dd)) then gd = cor_create_gd(dd, gd=gd, /array)
    sd = str_create_descriptors(n, $
                      @str__keywords_tree.include
                      end_keywords)

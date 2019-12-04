@@ -1,0 +1,68 @@
+GLOBE Object Class
+==================
+
+ The GLOBE object class describes the shapes of planet-like objects.  
+ Currently, it describes a triaxial ellipsoid, but this may be generalized 
+ in the future.  It is an immediate subclass of SOLID.
+
+
+Coordinate systems
+------------------
+ - Inertial
+	Cartesian coordinate system used as the celestial reference frame.
+
+ - Body
+	Cartesian coordinate system centered on and fixed to the body.  This
+	coordinate system is inherited from BODY.
+
+ - Globe
+	Rotating spherical coordinate system defined with respect to the 
+	surface of the body.  Vectors are given as [planetocentric latitude,
+	east planetocentric longitude, altitude from local radius].  The 
+	prime meridian is defined by the b0 body axis (see diagram below).  
+	This longitude reference is not constrained by the glb package.  The 
+	'lref' field in the globe descriptor can be used to identify the 
+	particular longitude system so that other programs can perform 
+	conversions among longitude systems if desired.
+
+ - Graphic
+	Analogous to the globe coordinate system except that latitudes
+	and longtudes are planetographic.
+
+ - Local
+	Rotating cartesian coordinate system defined by a point on the 
+	surface of a globe.  Axis 0 points toward local east, axis 1 
+	toward local north, and axis 2 toward local zenith.
+
+ - Altaz
+	Rotatng spherical representation of the local coordinate system.
+	Component 0 is the elevation of a vector from local horizontal, 
+	component 1 is the azimuth of the vector from local north, increasing
+	westward, and component 2 is the length of the vector.
+
+
+Data objects
+------------
+ - orientation matrix
+	The orientation matrix is inherited from BODY.  The b2 axis corresponds
+	to latitude=pi/2 and the b0 axis corresponds to longitude=0, as shown.
+
+
+				 b2 --> latitude = pi/2
+				| 
+				|  / b1
+				| /
+				|/
+				 ------- b0 --> longitude = 0
+			
+
+
+ - position vector
+	The position vector is inherited from BODY.  It gives the position of
+	the body center with respect to the inertial coordinate system.
+
+
+ - globe descriptor
+	The globe descriptor is the class structure for the GLOBE class.  
+	See globe_descriptor__define.
+

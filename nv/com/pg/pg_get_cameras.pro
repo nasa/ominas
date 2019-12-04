@@ -113,6 +113,7 @@ function pg_get_cameras, arg1, arg2, cd=_cd, od=od, pd=pd, _extra=keyvals, $
                           trs=trs, free=free, $
                           @dat__keywords.include
                           end_keywords
+ ndd = n_elements(dd)
 
  ;---------------------------------------------------------------------
  ; add selection keywords to translator keywords and filter out any
@@ -135,8 +136,9 @@ function pg_get_cameras, arg1, arg2, cd=_cd, od=od, pd=pd, _extra=keyvals, $
  if(keyword_set(override)) then $
   begin
    n = n_elements(name)
+   if(n EQ 0) then n = ndd
 
-   if(keyword_set(dd)) then gd = cor_create_gd(dd, gd=gd)
+   if(keyword_set(dd)) then gd = cor_create_gd(dd, gd=gd, /array)
    cd = cam_create_descriptors(n, $
                @cam__keywords_tree.include
                end_keywords)

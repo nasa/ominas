@@ -1,0 +1,6 @@
+p Image Vector Math Package
+===========================
+
+ This package performs basic vector operations on arrays of 2-element "image"
+ vectors.  Array dimensions are always 2 x np x nt. 
+  

@@ -1,0 +1,98 @@
+SPICE kernel database routines
+==============================
+V. Haemmerle - Feb 2017
+
+
+Kernel Databases
+----------------
+
+Stored in the ~/.ominas directory (.ominas directory under
+the users home directory) are two types of kernel databases.
+Camera kernels (CKs) and Spacecraft and Planetary ephemeris
+kernels (SPKs) each have databases specified by directory:
+
+spice_ck_database.<encoded path of ck directory>
+spice_spk_database.<encoded path of spk directory>
+
+The encoded path is the actual path of the kernels
+with interior "/" replaced by "_" to avoid file directory
+structure issues.  The path can include a wildcard, 
+i.e. can span several subdirectories.  In this case the 
+wildcard "*" is replaced by a "x".  When a wildcard is 
+included in a path for kernels, the database contains
+files for all applicable directories.
+
+------------------
+Example:
+
+If SPKs have the following structure...
+
+/user/kernels/cas/spk/ephem
+/user/kernels/cas/spk/tour
+
+One would specify the path as "/user/kernels/cas/spk/*"
+and the database would be
+
+spice_spk_database.user_kernels_cas_spk_x
+
+------------------
+
+The kernel database contains full-path names for all
+files in the kernel path.  It includes the range
+each file covers (ET seconds for SPK, Spacecraft clock
+ticks for CK) for valid kernel files, otherwise they
+contain the value -1.  For each file there is time
+information (if available, -1 if not) about the creation
+date of the file to use in kernel load ordering.  SPICE
+uses later loaded kernels to handle times which are
+defined in multiple kernel files.  The current
+implemetation has three times, the file system time
+returned by the operating system, the creation time
+read from a PDS label file, and a time read from the
+OMINAS installation timestamps file which attemps to
+store the time on the file from the source location.
+
+
+Kernel database creation
+------------------------
+
+The IDL methods to create them are
+
+spice_ck_build_db
+spice_spk_build_db
+
+Each has two arguments, the path of the kernels and
+an optional return of a structure of database contents.
+
+Since the range times stored in the database correspond
+to the internal times in the kernels, no leapsecond
+or sclk kernels are needed to create them.  However,
+the ICY library needs to be installed with dlm_register.
+
+
+Ordered Kernel files
+--------------------
+In order to retrieve an ordered list of kernel files
+to load for the SPICE calculations, two functions exist,
+one for each type of kernel:
+
+files = spice_ck_detect( ckpath, sc=xxx, time=xxx)
+files = spice_spk_detect( kpath, time=xxx )
+
+Both routines accept time as ET seconds as the time
+to use to deterimine kernel coverage.  This means
+that a leapseconds kernel and a sclk kernel needs
+to be loaded for the spice_ck_detect routine.  The
+CK routine also needs the NAIF spacecraft ID.  If
+no files are found an empty string is returned.
+
+Files returned are in order of creation according
+to the following.
+
+Once files are selected by applicability to the time
+input, values for the three different time systems
+are checked.  If PDS Label times exist for all files then
+the PDS Label time is used, if they don't exist for
+all the selected files then OMINAS timestamps are
+used if they exist for all selected files.  If not,
+operating system times are used.

@@ -1,0 +1,47 @@
+RING Object Class
+=================
+
+ The RING object class describes planetary rings.  It is an immediate
+ subclass of DISK.
+
+
+Coordinate systems
+------------------
+ - Inertial
+	Cartesian coordinate system used as the celestial reference frame.
+
+ - Body
+	Cartesian coordinate system centered on and fixed to the body.  This
+	coordinate system is inherited from BODY.
+
+ - Disk
+	Cylindrical coordinate system defined with respect to the ringplane.
+	This coordinate system is inherited from DISK.
+
+
+Data objects
+------------
+ - orientation matrix
+	The orientation matrix is inherited from BODY.  Th b2 axis corresponds
+	to the normal to the plane of the ring and the b0 axis gives the zero
+	direction of disk longitude as shown.
+
+				| b2 --> ringplane normal
+				|
+				|
+				|_______
+			       /        b1
+			      /
+			     / b0 --> disk longitude=0
+
+
+ -  position vector
+	The position vector is inherited from BODY.  It gives the position of
+	the ring center with respect to the inertial coordinate system.
+
+
+ - ring descriptor
+	The ring descriptor is the class structure for the RING class.  
+	See ring_descriptor__define.
+
+

@@ -1,0 +1,23 @@
+POINT object
+============
+
+  The POINT object describes an array of points. A single POINT object contains 
+  an array of image points and their corresponding inertial vectors, if 
+  applicable.  In addition, there is a flag array providing a bit-mask for each
+  point.
+
+  The points array is (2,nv,nt) and the vectors array is (nv,3,nt), where nv is
+  the number of points or vectors and nt is the number of timesteps.  There is
+  a one-to-one correspondence between image points and inertial vectors.
+
+  The flags array is long (nv,nt), with one flag word for each point. 
+  This allows for 32 1-bit flags per point.  The flag masks are defined in
+  pgs_include.pro.
+
+  The data array and tags are determined by the program.  Generally, the data
+  array is (nv,nd) or (nv,nt,nd), where nd is the number of different
+  data values per point.  The tags array is generally a string array (nd), 
+  whose purpose is to allow other programs to find these output values
+  without requiring the user to deal with long argument lists.
+
+

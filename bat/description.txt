@@ -1,0 +1,55 @@
+OMINAS batch files
+------------------
+ OMINAS provides several IDL batch files that allow the user to run some
+ OMINAS programs directly from the unix command line.  The batch files are 
+ run as follows:
+
+ % ominas <name>.bat -args [args]
+
+ The user will likely wish to create the following aliases (or let the
+ installer do it):
+
+	alias grim              'idl grim.bat -args'
+	alias brim              'idl brim.bat -args'
+	alias rim               'idl rim.bat -args'
+
+ Command-line arguments are separated into direct arguments and keyword-value
+ pairs.  Keyword-value pairs are designed to parse like IDL keyword arguments:
+ arguments containing '=' or a single occurrence of '/', as the first character
+ are treated as keyword-value pairs, with '/' causing the value to be set
+ to 1, as in IDL.  Data types of values are inferred from their contents.  
+ If a value consists of only numeric characters, then it is converted to int,
+ and so on.  Values containing commas are separated into arrays of values.
+ Keyword value pairs are passed directly to the IDL program, so typically 
+ any keywords (including abbreviation) accepted by the program may be input 
+ from the unix command line, to the extent that they can be represented
+ using this simpified syntax.
+
+ Direct arguments are returned to the batch file and are gernerally treated as 
+ a list of filenames.  Direct arguments ending with '@' are treated as names
+ of file-list files, i.e., their contents are appended to the direct arguments
+ and used as if given directly on the command line.  Note that the shell
+ can handle only relatively short argument lists, so if you specify a file
+ specification that expands to more than, say, 200 filenames, you may get an
+ error.  In that case, protect the file specification with single quotes to
+ force the shell to pass the file specification rather than its expansion to 
+ the IDL program, which is generally written to expand the file specification
+ internally.
+
+ Examples
+  1) To open a group of images in grim and ovlerlay saturn's limb and 
+     terminator, type:
+
+     % grim 'N1489*.IMG' over=limb:saturn,term:saturn
+
+
+  2) Same as above, except reading the filenames from a file and different
+     view parameters:
+
+     % grim files.txt@ over=limb:saturn,term:saturn z=0.5 /order
+
+
+ See each batch file for a complete description of its usage.
+
+
+

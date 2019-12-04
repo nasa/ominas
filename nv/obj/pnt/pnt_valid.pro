@@ -66,6 +66,9 @@ function pnt_valid, ptd0, noevent=noevent
  w = where(ptr_valid(_ptd.points_p))
  if(w[0] NE -1) then valid[w] = 1
 
+w = where(ptr_valid(_ptd.vectors_p))
+if(w[0] NE -1) then valid[w] = 1
+
  _valid = bytarr(n)
  _valid[_w] = valid
 

@@ -150,6 +150,7 @@ function pg_get_rings, arg1, arg2, rd=_rd, pd=pd, od=od, _extra=keyvals, $
                           trs=trs, free=free, $
                           @dat__keywords.include
                           end_keywords
+ ndd = n_elements(dd)
 
  ;---------------------------------------------------------------------
  ; add selection keywords to translator keywords and filter out any
@@ -169,8 +170,9 @@ function pg_get_rings, arg1, arg2, rd=_rd, pd=pd, od=od, _extra=keyvals, $
  if(keyword__set(override)) then $
   begin
    n = n_elements(name)
+   if(n EQ 0) then n = ndd
 
-   if(keyword_set(dd)) then gd = cor_create_gd(dd, gd=gd)
+   if(keyword_set(dd)) then gd = cor_create_gd(dd, gd=gd, /array)
    rd = rng_create_descriptors(n, $
                             @rng__keywords_tree.include
                             end_keywords)

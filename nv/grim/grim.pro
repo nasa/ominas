@@ -3353,8 +3353,8 @@ function grim_menu_desc, cursor_modes=cursor_modes
            '0\Header               \grim_menu_view_header_event', $
            '0\Notes                \grim_menu_notes_event', $
            '0\---------------------\+*grim_menu_delim_event', $ 
-           '0\Toggle Image         \+*grim_menu_toggle_image_event' , $
-           '0\Toggle Image/Overlays \+*grim_menu_toggle_image_overlays_event' , $
+           '0\Toggle Image         \!+*grim_menu_toggle_image_event' , $
+           '0\Toggle Image/Overlays \!+*grim_menu_toggle_image_overlays_event' , $
            '0\Toggle Context       \+*grim_menu_context_event' , $
            '0\Toggle Axes          \*grim_menu_axes_event' , $
            '0\---------------------\+*grim_menu_delim_event', $ 

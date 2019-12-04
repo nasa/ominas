@@ -1,0 +1,6 @@
+v Column Vector Math Package
+============================
+
+ This package performs basic vector operations on arrays of 3-element "column"
+ vectors.  Array dimensions are always nv x 3 x nt. 
+  

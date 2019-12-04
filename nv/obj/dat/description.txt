@@ -1,0 +1,331 @@
+DATA OBJECT
+===========
+
+ The DATA object describes a data set and how it is accessed and manipulated.  It 
+ includes a associated user-defined header array and a "detached header" (see
+ below).  Data arrays may be maintained in various ways: load immediately,
+ load when accessed, load only when accessed, store compressed, load only
+ select samples, etc.  The data descriptor maintains a history of the data array 
+ and header, so changes may be undone.  The data object also describes how 
+ geometry descriptors are managed.
+
+ Data sets are read and written via DAT_READ and DAT_WRITE.  These programs
+ use I/O routines specified in the I/O table to perform their functions.  
+ DAT_READ also reads the tranlators tables and concatenates them into a master 
+ table for a given DATA descriptor.  DAT_GET_VALUE and DAT_SET_VALUE use the 
+ master translators table to read and write geometry descriptors.  This system 
+ isolates the data arrays from the user-configured source, and the geometry from 
+ its user-configured source.
+
+
+
+ I/O System 
+ ----------
+ The purpose of the DATA I/O system is to maintain the separation between 
+ the core OMINAS data processing code and the external data sources.  Most 
+ of the functionality of the I/O system is devoted to parsing the 
+ configuration tables and making sure that the appropriate user-specified
+ routines are called.
+
+ The DATA bject explicitly implements the OMINAS requirement of general
+ applicability, which encompasses the following two principle :
+
+ Instrument Independence
+  OMINAS maintains the clear distinction between the code that is dependent upon
+  the circumstances of the data collection and archival process and the code
+  that performs analysis on the data set.  For example, a program that computes
+  the limb of a planet should not contain explicit code that attempts to read
+  SPICE kernels in order to determine the encounter geometry.  Under OMINAS, this
+  information is obtained by user-written translators and provided as an input
+  to the program.  The DATA object provides the framework for this process.
+
+ Filetype Independence
+  Programs written under OMINAS take their input data in the form of IDL arrays,
+  so the organization of the original data file is irrelevant.  The DATA object
+  provides a mechanism for detecting filetypes using the appropriate 
+  user-written routines to read and write data files.
+
+
+
+Reading and Writing Data files
+------------------------------
+ Under OMINAS, data files are generally read using the DAT_READ function.
+ DAT_READ looks up the names of the input and output functions in the I/O table
+ and uses the input function to read the data file.  Then it calls
+ DAT_CREATE_DESCRIPTORS to create one or more data descriptors.
+
+ Data files are written using the DAT_WRITE procedure, which calls the output
+ function in the data descriptor to write the data.
+
+
+Reading and Writing Ancillary Information
+------------------------------------------
+ Ancillary information (e.g., a state vector) is input and output using 
+ the DAT_GET_VALUE and DAT_PUT_VALUE routines.  DAT_GET_VALUE calls user-
+ written procedures called a translators that know how to obtain the requested 
+ information (keywords). The translator would be different depending on 
+ spacecraft mission and the source of the data (e.g. SEDR, SPICE, or some other 
+ ancillary information source).
+
+
+Configuration Tables
+--------------------
+ In all OMINAS configuration tables, lines beginning with '#' are ignored.  
+ Lines can be continued across multiple lines using a backslash '\'.  Table
+ file names are specfied using environment variables, as given below.  Multiple
+ table are specified using colons as delimiters.  In that case all such tables
+ are concatenated into a master table.  
+
+
+ Filetype Detectors Table
+
+  The name of the filetype detectors table is taken from the NV_FTP_DETECT
+  environment variable.  The table has three columns: the name of the detector 
+  function, the filetype string, and the action respectively.  To detect the
+  filetype, each function in the table is called with the filename as the
+  only argument until true is returned.  If the action is 'IGNORE', DAT_READ
+  aborts the operation and returns without reading a file.  Otherwise, the
+  filetype string corresponding to that entry in the table is used in the data 
+  descriptor.
+
+  example:
+
+	# detector fn			filetype	action
+	# (returns T/F)
+
+	detect_vicar			VICAR		read
+	detect_fits			FITS		read
+
+
+
+ I/O Table
+
+  The name of the I/O table is taken from the NV_IO environment variable.   The
+  table has four columns:  The first column is the filetype string as given in
+  the filetype detectors table; the second two columns give the names of the
+  input and output functions respectively; the fourth column gives name of 
+  a keyword function.  
+  example:
+
+	# filetype   input function   output function   keyword function
+	#		
+
+	VICAR        dh_read_vicar    dh_write_vicar    dh_vicpar
+	FITS         dh_read_fits     dh_write_fits     dh_sxpar
+
+
+  DAT_READ ad DAT_WRITE use the output functions for file I/O.  The definitions 
+  of those functioss are as follows: 
+
+    function <input_fn>, $
+	dd, $                             ; Data descriptor; contains filename,
+                                          ;  possibly scene geometry
+	header, $                         ; Output; header array
+	dim, $                            ; Output; dimensions of data array
+	type, $                           ; Output; data type
+	min, max, $                       ; Output; data extrema
+	abscissa=abscissa, $              ; Output; optional abscissa array
+	gff=gff, $                        ; Output: optional generic file 
+                                          ;  format descriptor
+	nodata=nodata, $                  ; if set, no data are read 
+	sample=sample, $                  ; Requested data samples 
+	returned_samples=returned_samples ; Output: optional samples actually 
+                                          ;  returned
+
+    pro <output_fn>, dd, filename, data, header, abscissa=abscissa, nodata=nodata
+	dd, $                             ; Data descriptor; contains default
+                                          ;  filename, data, abscissa, header; 
+                                          ;  possibly scene geometry
+	filename, $                       ; File name
+	data, $                           ; Data array
+	header, $                         ; Header array
+	abscissa=abscissa, $              ; Optional abscissa array
+	nodata=nodata                     ; if set, no data are written 
+
+
+ Instrument Detectors Table
+
+  The name of the instrument detectors table is taken from the NV_INS_DETECT
+  environment variable.  The table has two columns.  The first column is the
+  name of a detector function and the second is the a filetype string.  Only
+  functions whose file type in the table matches that of the data file are
+  called.  To detect the instrument, each function is called with the data 
+  descriptor as the only argument until a string other than the null string 
+  is returned.  This returned string is the taken as the instrument name.
+
+  example:
+
+	# detector fn			filetype
+	# (returns instrument string)
+
+	  detect_vgr_iss		VICAR
+	  detect_cas_iss		VICAR
+	  detect_mirac			FITS
+	  detect_gll_ssi		VICAR
+
+
+
+ Translators Table
+
+  The name of the translators table is taken from the NV_TRANSLATORS environment
+  variable.  The table has four columns.  The first column is the instrument
+  string as returned by the instrument detector function.  The second two
+  columns give the names of the input and output translators respectively.  The
+  fourth column gives arguments for the translator functions in the form of
+  keyword=value pars.  Each of the translator columns may contain more than 
+  one translator for each instrument string using multiple lines as shown in the 
+  example.  Note the use of dashes to mark blank columns.
+
+  Keyword inputs in the translators table  use a syntax similar to that used 
+  in calls to IDL routines.  Note the examples in the table below.  The 
+  keywords on a given line are available to both the input and the output 
+  translators specified on that line.  They are passed to the translators with no
+  processing by OMINAS.  
+
+  Translator function are defined as follows (The input translator returns a
+  list of object descriptors):
+
+	function <input_translator>, $
+		dd, $			; Data descriptor
+		keyword, $		; Describes data being requested
+		values=values, $	; Current list of value returned by  
+		                        ;  previous translators in the table
+		status=status		; Output: 0 = success, -1 = failure.
+
+	pro <output_translator>, $
+		dd, $			; Data descriptor
+		keyword, $		; Describes data being written
+		value, $		; Descriptors to write  
+		status=status		; Output: 0 = success, -1 = failure.
+
+
+  example translators table:
+
+	# instrument	input			output			args
+	# string	translator		translator
+
+ 	 COMMON		dh_std_input		dh_std_output
+	    -		station_input		    -
+	    -		array_input		    -
+	    -		ring_input		    -
+	    -		orb_input 		    -			suffix=-orb
+
+	  VGR1_ISSNA	dh_vgr_issna_input	dh_vgr_issna_output
+		-  	strcat_vgr_issna_input		-
+	  VGR1_ISSWA	dh_vgr_issna_input	dh_vgr_issna_output
+		-  	strcat_vgr_issna_input		-
+	  VGR2_ISSNA	dh_vgr_issna_input	dh_vgr_issna_output
+		-  	strcat_vgr_issna_input		-
+	  VGR2_ISSWA	dh_vgr_issna_input	dh_vgr_issna_output
+		-  	strcat_vgr_issna_input		-
+	  MIRAC		dh_mirac_input		dh_mirac_output
+	  GLL_SSI	dh_gll_ssi_input	dh_gll_ssi_output
+	  GLL_NIMS	dh_gll_nims_input	dh_gll_nims_output
+ 	  CAS_ISSWA	dh_std_input		dh_std_output		format=CAS
+		-       ring_input			-
+		-  	strcat_gsc_input		-		/j2000
+
+
+  Translators are called in the order they appear in the table, unless asociated
+  with the COMMON instrument string.  Those translators are always called first.
+  Any translators asscciated with the DEFAULT instrument are called only if no
+  other instrument strings are matched.
+   
+
+
+ Transforms Table
+
+  The name of the transforms table is taken from the NV_TRANSFORMS environment
+  variable.  The table has three columns.  The first column is the instrument
+  string as returned by the instrument detector function.  The second two
+  columns give the names of the input and output transforms respectively.  Each
+  of the translator columns may contain more than one transform function for 
+  each instrument string using multiple lines as shown in the example.  Note the 
+  use of dashes to mark blank columns.
+
+  If the NV_TRANSFORMS variable is undefined, then a transforms table is not 
+  used.
+
+  example:
+
+	# instrument	input			output
+	# string	tranform		transform
+
+ 	  CAS_ISSWA	cas_delut		cas_relut	
+
+
+Detached Header 
+===============
+
+A detached header is a text file used to store ancillary information for a 
+data set in a standard, machine-independent format.  Detached headers can be 
+useful (1) when there is no other standard format available for storing the 
+ancillary data, as would be the case for a map projection generated by OMINAS; 
+or (2) for isolating one's updates from all external sources.  In the latter 
+case, all of the ancillary information, regardless of its original source, 
+would be stored in a detached header, along with all updates to that data.  
+Different analyses on the same data set can be pursued using two different 
+detached headers, for example.  Also, the detached header keeps track of the
+update history.
+
+  Detached header layout
+  ----------------------
+  A detached header consists of two or more sections, separated by a line
+  containing the section name enclosed in angle brackets, i.e., '<updates>'. 
+  The first section, which starts at the first line of the detached header 
+  and is not preceded by a section label, contains global information such 
+  as the current history number of the file.  The second section, labeled
+  '<updates>', contains update information.  Any number of later sections 
+  may be added by the user.
+
+
+
+  Detached header syntax
+  ----------------------
+  The syntax for each line of the detached header is as follows:
+
+		keyword(i)[o]{h} = value / comment
+
+  'keyword' and 'value' are  strings of any length consisting of any
+  characters except for "*", "(", ")", "[", "]", "{", "}", "<", ">", and "/".
+  If 'value' represents a string value, then it must be enclosed in single
+  quotes.  'comment' is a string of any length consisting of any characters.
+
+  'i' is the element index and denotes elements of an array.
+
+  'o' is the object index and denotes different objects described by the same
+  keyword parameters.
+
+  'h' is the history index and denotes different updates of a keyword parameter.
+
+  The element, object, and history indices default to 0 if not present.
+
+  Examples:
+   The following examples illustrate the the above syntax:
+
+	cam_name = 'VGR1_ISS_NA'		/ i=0, o=0, h=0
+	cam_name(1) = 'VGR1_ISS_NA'		/ i=1, o=0, h=0
+	cam_name[2] = 'VGR1_ISS_NA'		/ i=0, o=2, h=0
+	cam_name(1){3} = 'VGR1_ISS_NA'		/ i=1, o=0, h=3
+
+
+
+ Reserved Keywords
+ -----------------
+  The following keywords are reserved:
+
+	history		Value of greatest history index.
+	utime		Julian date of most recent update for a particular
+			history index. 
+	updates		Separates global section from the update section.
+
+
+   
+  Detached header translators
+  ---------------------------
+  Detached headers are read and written in OMINAS using the translators
+  DH_STD_INPUT and DH_STD_OUTPUT.  These translators read or write geometry
+  descriptor data to or from a detached header.  The keywords used in the 
+  detached header are derived from the object cass names and object structure
+  field names.
+

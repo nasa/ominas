@@ -157,7 +157,7 @@ function pg_get_maps, arg1, arg2, md=_md, gbx=gbx, dkx=dkx, bx=bx, _extra=keyval
      name = cor_name(bx)
     end
 
-   if(keyword_set(dd)) then gd = cor_create_gd(dd, gd=gd)
+   if(keyword_set(dd)) then gd = cor_create_gd(dd, gd=gd, /array)
    md = map_create_descriptors(n, $
                   @map__keywords_tree.include
                   end_keywords)

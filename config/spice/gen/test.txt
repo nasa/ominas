@@ -1,0 +1,70 @@
+pd = pg_get_planets()
+pd = pg_get_planets(inst='CAS_ISS_NA')
+pd = pg_get_planets(time=3d7)
+pd = pg_get_planets(name='SATURN')
+pd = pg_get_planets(inst='CAS_ISS_NA', time=3d7)
+pd = pg_get_planets(inst='CAS_ISS_NA', name='SATURN')
+pd = pg_get_planets(time=3d7, name='MOON')
+
+cd = pg_get_cameras(inst='CAS_ISS_NA')
+cd = pg_get_cameras(inst='CAS_ISS_NA', time=5*3.5d7)	
+
+
+
+grim ~/projects/maps/enceladus/EN_120828_DLR_south_equator.vic \
+   over=planet_grid,station,array
+
+
+
+
+
+;pd = pg_get_planets(bod_time=100)
+
+
+
+
+
+files = getenv('OMINAS_DIR') + $
+  '/demo/data/'+['CM_1559100372_1_ir_eg.cub','CM_1503358311_1_ir_eg.cub']
+
+dd = dat_read(files)
+
+cd0 = pg_get_cameras(dd[0])
+cd1 = pg_get_cameras(dd[1])
+cd0 = pg_get_cameras(dd[0])		;fail
+
+
+
+
+
+
+;==============================================================================
+; 
+;  And no data at all....  Poor old lonely GRIM. 
+;
+;==============================================================================
+;grim, /new, inst='CAS_ISS_NA', cam_trs='time=5*3.5d7', $
+;         over=['planet_center', 'limb', 'terminator', 'ring']
+
+
+cd=pg_get_cameras(inst='CAS_ISS_NA', time=5*3.5d7)
+grim, /new, cd=cd, over=['planet_center', 'limb', 'terminator', 'ring']
+
+
+
+ominas
+
+dd = dat_read('./data/N1350122987_2.IMG', im)
+
+grim, im, z=0.1, /order
+
+
+cd = pg_get_cameras(dd);, pos=tr([3.4809398e+11,6.1035525e+11,2.5319814e+11]))
+pd = pg_get_planets(dd, od=cd, name='JUPITER')
+
+limb_ptd = pg_limb(cd=cd, gbx=pd)
+pg_hide, limb_ptd, cd=cd, bx=pd
+graft, limb_ptd
+
+
+

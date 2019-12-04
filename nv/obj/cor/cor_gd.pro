@@ -34,7 +34,11 @@
 ;  INPUT: 
 ;	<x>d:	Standard descriptor keywords.  Setting a keyword causes 
 ;		the corresponding field of the generic descriptor to be 
-;		returned instead of the generic descriptor.
+;		returned instead of the generic descriptor.  
+;
+;	nocull: If set, a retuned array of descriptors will contain null
+;		objects corresponding to inputs that contain no generic
+;		descriptors.
 ;
 ;	noevent:
 ;		If set, no event is generated.
@@ -53,7 +57,7 @@
 ;	
 ;-
 ;=============================================================================
-function cor_gd, crd0, name=name, noevent=noevent, _ref_extra=keys
+function cor_gd, crd0, name=name, nocull=nocull, noevent=noevent, _ref_extra=keys
 
  if(NOT keyword_set(crd0)) then return, !null
  n = n_elements(crd0)
@@ -78,9 +82,10 @@ function cor_gd, crd0, name=name, noevent=noevent, _ref_extra=keys
  for i=0, n-1 do $
   begin
    gd = _cor_gd(_crd0[i])
-   xds = append_array(xds, cor_dereference_gd(gd, name=name, _extra=keys))
+   if(NOT keyword_set(gd)) AND (keyword_set(nocull)) then $
+                                        xds = append_array(xds, obj_new(), /def) $
+   else xds = append_array(xds, cor_dereference_gd(gd, name=name, _extra=keys))
   end
-
 
  return, xds
 end

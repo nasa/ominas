@@ -1,0 +1,15 @@
+;==============================================================================
+; kmks.include
+;
+;==============================================================================
+@mks.include
+
+const_g = const_G / 1d9			; J m/kg2 --> J km/kg2
+const_c = const_c / 1d3			; m/s --> km/s
+const_sigma = const_sigma * 1d6		; W/m2/K4 --> W/km2/K4
+const_h = const_h / 1d6			; kg m2/s --> kg km2/s
+
+
+
+
+

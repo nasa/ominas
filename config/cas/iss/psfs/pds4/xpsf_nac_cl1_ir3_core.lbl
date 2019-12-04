@@ -1,0 +1,487 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<font face="Arial">
+<head>
+<title>volumes/COISS_0xxx/COISS_0011/calib/xpsf/xpsf_nac_cl1_ir3_core.lbl</title>
+</head>
+<body>
+<style>
+tr.border_bottom td {
+border-top:1pt solid black; border-bottom:1pt solid black;
+}
+a.button {
+-webkit-border-radius: 8;
+-moz-border-radius: 8;
+border-radius: 8px;
+font-family: Arial;
+color: #ffffff;
+font-size: 12px;
+background: #72a7cf;
+padding: 2px 5px 2px 5px;
+border: solid #507591 1px;
+text-decoration: none;
+}
+a.button:hover {
+background: #507591;
+}
+a.button:active {
+background: #507591;
+}
+a.button:visited {
+color: #ffffff;
+}
+a.button:link {
+color: #ffffff;
+}
+em {
+font-size: 32px;
+font-style: normal;
+font-weight: bold;
+color: #72a7cf;
+}
+pre {
+font-size: 14px;
+font-family: monospace;
+display: block;
+margin: 1em 0;
+color: #000000;
+}
+/* unvisited link */
+a:link {
+color: #547b99;
+}
+/* visited link */
+a:visited {
+color:  #72a7cf;
+}
+/* mouse over link */
+a:hover {
+color: #85c3f2;
+}
+/* selected link */
+a:active {
+color: #85c3f2;
+</style>
+<a name="top"></a>
+<table width="100%">
+<tr>
+<td align="left">
+<font size="2">
+<a href="//pds-rings.seti.org">PDS Ring-Moon Systems Node</a> |
+<a href="/viewmaster/">Viewmaster</a>
+<font>
+</td>
+<td align="right">
+<font size="2">
+<a href="/cgi-bin/comments/form.pl" class="button">Questions/Feedback</a>
+</font>
+</td>
+</tr>
+</table>
+<hr/>
+<!-- Product View -->
+<div align="left">
+<img src="/icons-local/blue/png-200/document_label.png"
+alt="29560"
+width="200"
+height="200" align="right">
+<!-- File Hierarchy -->
+<table border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td align="left" style="min-width:460px">
+<a href="/viewmaster/volumes">
+<img src="/icons-local/blue/png-50/document_viewmaster.png"
+alt="19059"
+width="50"
+height="37">
+volumes</a>/
+</td>
+<td align="left" valign="bottom" style="padding-left:8px;">
+<font size="3">
+<em>PDS volumes</em> in Viewmaster
+</font>
+</td>
+</tr>
+<tr>
+<td align="left" style="min-width:460px">
+&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="/viewmaster/volumes/COISS_0xxx">
+<img src="/icons-local/blue/png-50/folder_volumes_open.png"
+alt="20703"
+width="50"
+height="37">
+COISS_0xxx</a>/
+</td>
+<td align="left" valign="bottom" style="padding-left:8px;">
+<font size="3">
+Cassini ISS calibration data collection, software v3.9.1
+</font>
+</td>
+</tr>
+<tr>
+<td align="left" style="min-width:460px">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011">
+<img src="/icons-local/blue/png-50/document_volume_open.png"
+alt="17516"
+width="50"
+height="37">
+COISS_0011</a>/
+</td>
+<td align="left" valign="bottom" style="padding-left:8px;">
+<font size="3">
+Cassini ISS calibration data, software v3.9.1
+</font>
+</td>
+</tr>
+<tr>
+<td align="left" style="min-width:460px">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011/calib">
+<img src="/icons-local/blue/png-50/folder_binary_open.png"
+alt="21815"
+width="50"
+height="37">
+calib</a>/
+</td>
+<td align="left" valign="bottom" style="padding-left:8px;">
+<font size="3">
+Calibration files
+</font>
+</td>
+</tr>
+<tr>
+<td align="left" style="min-width:460px">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011/calib/xpsf">
+<img src="/icons-local/blue/png-50/folder_binary_open.png"
+alt="21815"
+width="50"
+height="37">
+xpsf</a>/
+</td>
+<td align="left" valign="bottom" style="padding-left:8px;">
+<font size="3">
+Calibration files
+</font>
+</td>
+</tr>
+<tr>
+<td align="left" style="min-width:460px">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="/icons-local/blue/png-50/document_label.png"
+alt="21028"
+width="50"
+height="50">
+xpsf_nac_cl1_ir3_core.lbl
+</td>
+<td align="left" valign="bottom" style="padding-left:8px;">
+<font size="3">
+PDS3 label
+</font>
+</td>
+</tr>
+</font>
+</table>
+</div>
+<!-- Version History -->
+<hr/>
+<div>
+<p>Volume history:
+<ul>
+<li>
+<b>
+Current version
+</b>
+[released 2018-10-09]
+</li>
+<li>
+<a href="/viewmaster/volumes/COISS_0xxx_v4/COISS_0011/calib/xpsf/xpsf_nac_cl1_ir3_core.lbl">
+Version 4 (superseded)</a>
+[released 2018-08-06]
+</li>
+<li>
+<a href="/viewmaster/volumes/COISS_0xxx_v3/COISS_0011/calib">
+Version 3 (superseded)</a>
+[released 2016-10-05]
+</li>
+<li>
+<a href="/viewmaster/volumes/COISS_0xxx_v2/COISS_0011/calib">
+Version 2 (superseded)</a>
+[released 2009-03-30]
+</li>
+<li>
+<a href="/viewmaster/volumes/COISS_0xxx_v1/COISS_0011/calib">
+Version 1 (superseded)</a>
+[released 2005-07-14]
+</li>
+</ul>
+</p>
+</div>
+<!-- Navigation -->
+<hr/>
+<div>
+<font size="2">
+<p><b>Jump to</b>: [
+<a href="#top">Top</a> |
+Directory
+<a href="#page1">1</a> |
+<font color="silver">2</font> |
+<font color="silver">3</font> |
+<font color="silver">4</font> |
+<font color="silver">5</font> |
+<font color="silver">6</font> |
+<font color="silver">7</font> |
+<font color="silver">8</font> |
+<font color="silver">Related files</font> |
+<a href="#content">Product label</a>
+]
+</p>
+<!-- Root Directory -->
+<p><b>This directory in</b>:
+<b></b> [
+<b>
+volumes</b>
+]
+<b>&nbsp;&nbsp;Archives for:</b> [
+<a href="/viewmaster/archives-volumes/COISS_0xxx/COISS_0011.tar.gz">
+volumes</a>
+]
+<b>&nbsp;&nbsp;Versions:</b> [
+<b>
+latest</b>
+|
+<a href="/viewmaster/volumes/COISS_0xxx_v4/COISS_0011/calib/xpsf/xpsf_nac_cl1_ir3_core.lbl">
+previous</a>
+|
+<font color="silver">
+next</font>
+]
+</p>
+<!-- View Options -->
+<p align="left">
+<b>View options</b>:
+[
+<font color="silver">
+<b>List view</b>                        <!-- Current selection -->
+|
+Small grid
+|
+Large grid
+</font>
+]
+&nbsp;&nbsp;&nbsp;
+[
+<font color="silver">
+<b>Single directory</b>             <!-- Current selection -->
+|
+2
+|
+3
+|
+4
+|
+5
+|
+6
+|
+7
+|
+8
+</font>
+]
+&nbsp;&nbsp;&nbsp;
+[
+<font color="silver">
+Directory dividers
+<b>on</b>                               <!-- Current selection -->
+|
+off
+</font>
+]
+</p>
+<p align="left">
+<font color="silver">
+<table border="1" cellpadding="1" cellspacing="1">
+<b>Filename filter</b>: [<font face="Courier">&nbsp;&nbsp;</font>]
+</p>
+</div>
+<!-- Begin table div -->
+<div align="center">
+<table border="0" cellpadding="4" cellspacing="0" width="100%">
+<!-- Navigation through hierarchy -->
+<!-- Navigation through hierarchy, within table -->
+<tr bgcolor="#e2edf5" class="border_bottom">
+<td colspan="7" align="left" valign="center">
+<a name="volumes-COISS_0xxx-COISS_0011-calib-xpsf"></a>
+<a name="page1"></a>
+<a href="/viewmaster/volumes">
+volumes</a>/
+<a href="/viewmaster/volumes/COISS_0xxx">
+COISS_0xxx</a>/
+<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011">
+COISS_0011</a>/
+<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011/calib">
+calib</a>/
+<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011/calib/xpsf">
+xpsf</a>/
+</td>
+<td align="right">
+<font size="2">[<a href="#top">Top</a>]</font>
+</td>
+</tr>
+<!-- Header for first table only -->
+<!-- Navigation through neighbors -->
+<!-- Navigation through neighbors, within table -->
+<tr bgcolor="#e2edf5" class="border_bottom">
+<td colspan="8" align="center" valign="center">
+...
+<font color="black">
+<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011/calib/xpsf/xpsf_nac_cl1_ir3.lbl">xpsf_nac_cl1_ir3.lbl</a>
+</font>
+&nbsp;
+<b>xpsf_nac_cl1_ir3_core.lbl</b>
+&nbsp;
+<font color="black">
+<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011/calib/xpsf/xpsf_nac_cl1_mt1.lbl">xpsf_nac_cl1_mt1.lbl</a>
+</font>
+...
+</td>
+</tr>
+<!-- Table header -->
+<tr bgcolor="#72a7cf" class="border_bottom">
+<th align="left"></th>    <!-- for icon or browse -->
+<th align="left">Filename</th>
+<th align="left"></th>
+<th align="left">Size</th>
+<th align="left">Modified</th>
+<th align="left">Description</th>
+<th align="right" colspan="2">
+<font color="black">
+<a href="/help/checksums.html"
+target="_blank">MD5 Checksum</a>
+</font>
+</th>
+</tr>
+<!-- Table rows, grouped -->
+<!-- Column 1 (icon or browse) -->
+<tr bgcolor="ffffff">
+<td rowspan="1" valign="center" align="left">
+<img src="/icons-local/blue/png-50/document_label.png"
+alt="xpsf_nac_cl1_ir3_core"
+width="50"
+height="50"
+align="left">
+</td>
+<!-- Column 2 (Volume Set, Volume or Filename) -->
+<td align="left">
+<a href="/holdings/volumes/COISS_0xxx/COISS_0011/calib/xpsf/xpsf_nac_cl1_ir3_core.lbl">xpsf_nac_cl1_ir3_core.lbl</a>
+</td>
+<!-- Column 3 (additional links if any) -->
+<td align="left">
+<font size=2>
+[<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011/calib/xpsf/xpsf_nac_cl1_ir3_core.lbl">details</a>]
+</font>
+</td>
+<!-- Version (for Volume Sets and Volumes only) -->
+<!-- Size -->
+<td align="left">
+668 bytes
+</td>
+<!-- Date -->
+<td align="left">
+2018-08-05
+</td>
+<!-- Description -->
+<!-- Checksum (Filenames only) -->
+<td align="left">
+PDS3 label
+</td>
+<td align="right" colspan="2">
+<code>
+a7247009e802c69b67d5fd9e046f54b3
+</code>
+</td>
+</tr>
+<!-- Column 1 (icon or browse) -->
+<tr bgcolor="eeeeee">
+<td rowspan="1" valign="center" align="left">
+<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011/calib/xpsf/xpsf_nac_cl1_ir3_core.img"}}>
+<img src="/icons-local/blue/png-50/document_image.png"
+alt="xpsf_nac_cl1_ir3_core"
+width="50"
+height="50"
+align="left"></a>
+</td>
+<!-- Column 2 (Volume Set, Volume or Filename) -->
+<td align="left">
+<a href="/holdings/volumes/COISS_0xxx/COISS_0011/calib/xpsf/xpsf_nac_cl1_ir3_core.img">xpsf_nac_cl1_ir3_core.img</a>
+</td>
+<!-- Column 3 (additional links if any) -->
+<td align="left">
+<font size=2>
+[<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011/calib/xpsf/xpsf_nac_cl1_ir3_core.img">details</a>]
+</font>
+</td>
+<!-- Version (for Volume Sets and Volumes only) -->
+<!-- Size -->
+<td align="left">
+64 MB
+</td>
+<!-- Date -->
+<td align="left">
+2018-08-05
+</td>
+<!-- Description -->
+<!-- Checksum (Filenames only) -->
+<td align="left">
+Binary image file
+</td>
+<td align="right" colspan="2">
+<code>
+481af1c4428d5f059253ae40801f0254
+</code>
+</td>
+</tr>
+</table>
+</div>
+<!-- Info page if any -->
+<hr>
+<div align="left">
+<font color="black">
+<a name="content"></a>
+<h2>xpsf_nac_cl1_ir3_core.lbl</h2>
+</font>
+<pre><font size="3" color="black">
+PDS_VERSION_ID = PDS3
+
+/* FILE CHARACTERISTICS */
+
+RECORD_TYPE = FIXED_LENGTH
+RECORD_BYTES = 16000
+FILE_RECORDS = 4000
+
+/* POINTERS TO DATA OBJECTS */
+
+^IMAGE = ("<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011/calib/xpsf/xpsf_nac_cl1_ir3_core.img">xpsf_nac_cl1_ir3_core.img</a>",1)
+
+/* IDENTIFICATION DATA ELEMENTS */
+
+DATA_SET_ID = "CO-CAL-ISSNA/ISSWA-2-EDR-V4.0"
+INSTRUMENT_HOST_NAME = "CASSINI ORBITER"
+INSTRUMENT_NAME = "IMAGING SCIENCE SUBSYSTEM NARROW ANGLE"
+PRODUCT_CREATION_TIME = "2018-217T12:00:00.000Z"
+PRODUCT_ID = "<a href="/viewmaster/volumes/COISS_0xxx/COISS_0011/calib/xpsf/xpsf_nac_cl1_ir3_core.img">xpsf_nac_cl1_ir3_core.img</a>"
+OBJECT = IMAGE
+      LINES = 4000
+      LINE_SAMPLES = 4000
+      SAMPLE_BITS = 32
+      SAMPLE_TYPE = IEEE_REAL
+      DESCRIPTION = 'ISS NAC CORE PSF'
+END_OBJECT = IMAGE
+END
+</font></pre>
+</div>
+</body>
+</font>
+</html>

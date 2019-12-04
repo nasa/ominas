@@ -1,0 +1,68 @@
+###############################################################################
+# demo.kernels
+#
+###############################################################################
+
+# generic kernels (should always be loaded first)
+$DEMO_SPICE_LSK/naif0012.tls
+
+# used for jupiter_example.pro
+$DEMO_SPICE_CK/001011_001014ra.bc
+
+# used for mosaic_example.pro
+$DEMO_SPICE_CK/001103_001105ra.bc
+$DEMO_SPICE_CK/001105_001108.bc
+$DEMO_SPICE_CK/001026_001029ra.bc
+$DEMO_SPICE_CK/001029_001031ra.bc
+
+# used for processing Jupiter imagery
+$DEMO_SPICE_PCK/cpck14Dec2001.tpc
+$DEMO_SPICE_SPK/010420R_SCPSE_EP1_JP83.bsp
+
+# generic kernels for cas/cas iss / vims
+$DEMO_SPICE_FK/cas_v37.tf
+$DEMO_SPICE_IK/cas_iss_v08.ti
+$DEMO_SPICE_SCK/cas00083.tsc
+$DEMO_SPICE_IK/cas_vims_v06.ti
+
+# used for processing VIMS examples (for CM_1477456632_1_ir_eg.cub, 2004-300)
+$DEMO_SPICE_SPK/050105RB_SCPSE_04247_04336.bsp
+$DEMO_SPICE_CK/04296_04301ra.bc
+$DEMO_SPICE_CK/04275_04305ca_ISS.bc
+
+# used for processing VIMS examples (for CM_1504754217_1_ir_eg.cub, 2005-250)
+$DEMO_SPICE_SPK/050909BP_SCPSE_05248_05273.bsp
+$DEMO_SPICE_CK/05247_05252ra.bc
+$DEMO_SPICE_CK/05244_05273ca_ISS.bc
+
+# used for processing VIMS examples (for CM_1559100372_1_ir_eg.cub, 2007-149)
+$DEMO_SPICE_SPK/070705R_SCPSE_07140_07155.bsp
+$DEMO_SPICE_CK/07148_07149ra.bc
+$DEMO_SPICE_CK/07147_07152ra.bc
+$DEMO_SPICE_CK/07121_07151ca_ISS.bc
+
+# used for processing VIMS examples (for CM_1503358311_1_ir_eg.cub, 2005-233)
+$DEMO_SPICE_SPK/050922R_SCPSE_05225_05245.bsp
+$DEMO_SPICE_CK/05232_05233ra.bc
+$DEMO_SPICE_CK/05232_05237ra.bc
+$DEMO_SPICE_CK/05213_05243ca_ISS.bc
+
+# used for multimission_example.pro
+$DEMO_SPICE_SPK/vgr1_sat337.bsp
+$DEMO_SPICE_SPK/voyager_1.ST+1991_a54418u.merged.bsp
+#$DEMO_SPICE_SPK/de403s.bsp
+$DEMO_SPICE_SPK/sat337.bsp
+$DEMO_SPICE_SCK/vg100019.tsc
+$DEMO_SPICE_IK/vg1_issna_v02.ti
+$DEMO_SPICE_FK/vg1_v02.tf
+$DEMO_SPICE_CK/vg1_sat_qmw_na.bc
+$DEMO_SPICE_CK/vgr1_super.bc
+
+$DEMO_SPICE_SPK/s980326b.bsp
+$DEMO_SPICE_SCK/mk00062a.tsc
+$DEMO_SPICE_CK/ckg01ajh.plt
+
+# used for stars_example
+$DEMO_SPICE_SPK/040909R_SCPSE_01066_04199.bsp
+$DEMO_SPICE_CK/04032_04060ca_ISS.bc
+

@@ -1,0 +1,26 @@
+OMINAS Core
+==========
+
+The core OMINAS code is independent of data sources and file types.  Those
+details are configured based on the intended purpose of a particular OMINAS
+installation.  For example, the Cassini ISS installation contains configuration
+code that reads and writes VICAR image files and SPICE kernels.  These I/O
+functions are implemented by the OMINAS core I/O system.
+
+The separation between the data processing and I/O is maintained by a
+portion of the OMINAS system called NV.  NV uses application-specific
+configuration tables to determine how to transform ancillary data from 
+external sources into the standard data objects recognized in OMINAS.
+
+The OMINAS object library defines and manipulates the the basic data objects
+used to describe the various entities -- cameras, planets, rings, etc., -- of
+interest to the user.  
+
+The typical OMINAS user will operate at the command level, which consists of the
+image display program tvim, the NV I/O commands nv_read and nv_write, and a set
+of programs based on the underlying object library and utility routines
+referred to as PG.  
+
+The graphical interface to OMINAS is called GRIM.  Although it's designed to be
+used along with the command line like a fancy TVIM, GRIM may be used on its own.
+

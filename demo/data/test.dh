@@ -1,0 +1,26 @@
+history = -1 / Current history value
+<updates>
+utime = 2457514.491944 / Julian day of update - Thu May  5 11:48:24 2016
+map_radii(0) = 1.00000000000000
+map_radii(1) = 1.00000000000000
+map_radii(2) = 1.00000000000000
+map_size(0) = 800
+map_size(1) = 400
+map_units(0) = 1.00000000000000
+map_units(1) = 1.00000000000000
+map_center(0) = 0.00000000000000
+map_center(1) = 0.00000000000000
+map_origin(0) = 400.000000000000
+map_origin(1) = 200.000000000000
+map_offset(0) = 0.00000000000000
+map_offset(1) = 0.00000000000000
+map_rotate = 0
+map_graphic = 0
+map_scale = 1.00000000000000
+map_type = 'RECTANGULAR'
+map_fn_image_to_map = 'map_image_to_map_RECTANGULAR'
+map_fn_map_to_image = 'map_map_to_image_RECTANGULAR'
+map_name = 'JUPITER'
+map_user = ''
+map_tasks = ''
+

@@ -47,7 +47,7 @@ function surface_to_inertial_pos, bx, p
 
  if(NOT keyword_set(p)) then return, 0
 
- return, bod_body_to_inertial(bx, $
+ return, bod_body_to_inertial_pos(bx, $
            surface_to_body(bx, p))
 end
 ;===========================================================================

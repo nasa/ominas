@@ -1,0 +1,30 @@
+CORE Object Class
+=================
+
+ The CORE object class is the superclass of all other object classes.  In 
+ addition to storing some fundamental properties like "name", CORE manages
+ the task list, user data arrays, and the generic descriptor.
+
+
+Data objects
+------------
+ - core descriptor
+	The core descriptor is the class structure for the CORE class.  
+	See core_descriptor__define.
+
+
+ - task list
+	The core descriptor maintains a list of the names of every program 
+	that has modified this descriptor.  A program that modifies the 
+	descriptor should call cor_add_task to add its name to the list 
+	immediately after it has modified the descriptor.  Tasks cannot be 
+	removed from the list.
+
+
+ - user data
+	The core descriptor maintains a list of user-generated named
+	data objects.
+
+ - generic desscriptor
+	Structure containing references to all assciated descriptors.
+

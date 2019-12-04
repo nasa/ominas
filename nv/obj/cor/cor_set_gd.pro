@@ -58,8 +58,46 @@
 ;	
 ;-
 ;=============================================================================
-pro cor_set_gd, crd0, gd, xds=xds, noevent=noevent, _ref_extra=keys
+pro cor_set_gd, crd0, gd, xds=xds, noevent=noevent, _extra=gdx
 @core.include
+
+ if(NOT keyword_set(crd0)) then return
+
+ _crd0 = cor_dereference(crd0)
+
+ ;------------------------------------------------------------------
+ ; If no descriptor keywords, and no xds given, then overwrite gd
+ ;------------------------------------------------------------------
+ if(keyword_set(gd) AND $
+      NOT keyword_set(xds)AND $
+           NOT keyword_set(gdx)) then _cor_set_gd, _crd0, gd $
+
+ ;------------------------------------------------------------------
+ ; otherwise, append inputs to existing gd
+ ;------------------------------------------------------------------
+ else $
+  begin
+   if(keyword_set(gd)) then xds = append_array(xds, cor_dereference_gd(gd))	;;;
+   gd0 = _cor_gd(_crd0)
+
+   new_gd = cor_create_gd(xds, gd=gd0, _extra=gdx)
+
+   if(keyword_set(new_gd)) then _cor_set_gd, _crd0, new_gd
+  end
+
+
+ cor_rereference, crd0, _crd0
+ nv_notify, crd0, type = 0, noevent=noevent
+ nv_notify, /flush, noevent=noevent
+end
+;===========================================================================
+
+
+
+;=============================================================================
+pro ___cor_set_gd, crd0, gd, xds=xds, noevent=noevent, _ref_extra=keys
+@core.include
+;;;; should this be _extra instead of _ref_extra?
 
  _crd0 = cor_dereference(crd0)
  n = n_elements(_crd0)
@@ -89,3 +127,8 @@ pro cor_set_gd, crd0, gd, xds=xds, noevent=noevent, _ref_extra=keys
  nv_notify, /flush, noevent=noevent
 end
 ;===========================================================================
+
+
+
+
+

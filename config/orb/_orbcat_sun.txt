@@ -1,0 +1,14 @@
+#-----------------------------------------------------------------
+# 17P/Holmes; from http://cfa-www.harvard.edu/iau/Ephemerides/Comets/0017P.html
+#-----------------------------------------------------------------
+name = 17P/Holmes
+#  epoch_jed =	2454400.5				# 
+  epoch =	246715200d				# sec past j2000
+  sma = 	5.4276209e+11				# m            
+  ecc =		0.432564	
+  inc =		19.1126					# deg
+  lan = 	326.8646				# deg
+  ap =		24.2712					# deg
+  dmldt =	0.1431946				# deg/day
+  ppt_jed = 	2454225.0277				# jed
+

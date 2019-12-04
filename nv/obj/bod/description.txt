@@ -1,0 +1,69 @@
+BODY Object Class
+=================
+
+ The BODY object class describes the position and orientation of a rigid body
+ in space.  It is an immediate subclass of CORE.
+
+
+Coordinate systems
+------------------
+ - Inertial
+	Cartesian coordinate system used as the celestial reference frame.
+
+ - Body
+	Cartesian coordinate system centered on and fixed to the body.
+
+ - Radec
+	Polar coordinate system centered on and fixed to the body.  Vectors
+	are given as [ra, dec, r], where ra = right ascension, 
+	dec = declination, and r = radial distance.
+
+
+Data objects
+------------
+ - orientation matrix
+	The orientation matrix transforms vectors given in the body coordinate
+	system to vectors given in the inertial coordinate system (using the 
+	IDL ## matrix operator).  Its form is
+
+				 b0x  b1x  b2x 
+				 b0y  b1y  b2y 
+				 b0z  b1z  b2z , 
+
+	where the body axis vectors are b0=[b0x,b0y,b0z], b1=[b1x,b1y,b1z],
+	and b2=[b2x,b2y,b2z], with components given with respect to the
+	inertial system.
+
+
+				 b2
+				| 
+				|  / b1
+				| /
+				|/
+				 ------- b0
+
+	The interpretation of the body coordinate axes depends on the
+	superclass of of which it is a part.
+			
+
+
+ - position vector
+	The position vector gives the position of the body, with components 
+	in the inertial coordinate system.
+
+
+ - body descriptor
+	The body descriptor is the class structure for the BODY class.  
+	See body_descriptor__define.
+
+
+
+Coordinate Transformation Variations
+------------------------------------
+Methods are provided to transform between adjacent coordinate systems, e.g., 
+inertial<-->body, body<-->radec.  The basic methods transform pure vectors (i.e.,
+they perform rotations).  However, two alternate forms are provided to transform
+position and velocity vectors.  Those variants include a translation in addition
+to the rotation.  They are identical; separate methods are provided for clarity.
+
+

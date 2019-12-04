@@ -1,0 +1,59 @@
+CAMERA Object Class
+===================
+						  
+ The CAMERA object class describes instruments that produce raster images.
+ Linear, radial, and polynomial distortion models are built in, but any 
+ distortion model may be specified.  CAMERA is an immediate subclass of BODY.
+
+
+Coordinate systems
+------------------
+ - Inertial
+	Cartesian coordinate system used as the celestial reference frame.
+
+ - Body
+	Cartesian coordinate system centered on and fixed to the body.  
+	Inherited from BODY.
+
+ - Focal Plane
+	Cartesian coordinate system specifying locations in the
+	focal plane as (p,q), where p and q are given in radians, and the
+	distance from the origin to the point (p,q) is equal to the angle
+	between the optic axis and a vector from the camera position to 
+	the point.
+
+ - Image
+	Cartesian coordinate system specfiying locations in a
+	two-dimensional image as (x,y), with origin (0,0) at the lower left
+	corner (minimum sample, maximum line) of the image and x and y
+	increasing in the increasing sample and decreasing line directions,
+	respectively.
+
+
+
+Data objects
+------------
+ - orientation matrix
+	The orientation matrix is inherited from BODY.  The b1 axis corresponds
+	to the camera optic axis and the b0 and b2 axes points in the image
+	x and y directions respectively.
+
+
+				 b2 = image y direction
+				| 
+				|  / b1 = optic axis
+				| /
+				|/
+				 ------- b0 = image x direction
+			
+
+
+ - position vector
+	The position vector is inherited from BODY.  It gives the position of
+	the camera with respect to the inertial coordinate system.
+
+
+ - camera descriptor
+	The camera descriptor is the class structure for the CAMERA class.  
+	See camera_descriptor__define.
+

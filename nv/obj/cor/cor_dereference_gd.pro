@@ -18,20 +18,21 @@
 ;
 ; ARGUMENTS:
 ;  INPUT:
-;	gd:	Generic descriptor or object containing a generic descriptor.
+;	gd:	 Generic descriptor or object containing a generic descriptor.
 ;
-;	name:	If given, only descriptors whose names appear in this array
-;		will be returned.  If no descriptor keywords are
-;		speciied (see below), then all fields are searched for
-;		descriptors with these names.
+;	name:	 If given, only descriptors whose names appear in this array
+;		 will be returned.  If no descriptor keywords are
+;		 speciied (see below), then all fields are searched for
+;		 descriptors with these names.
 ;
 ;  OUTPUT: NONE
 ;
 ;
 ; KEYWORDS:
 ;  INPUT: 
-;	<x>d:	Standard descriptor keywords.  Setting a keyword causes the
-;		corresponding field of the generic descriptor to be returned.
+;	<x>d:	 Standard descriptor keywords.  Setting a keyword causes the
+;		 corresponding field of the generic descriptor to be returned.
+;
 ;
 ;  OUTPUT: NONE
 ;
@@ -60,15 +61,17 @@ function cor_dereference_gd, arg, name=name, _ref_extra=keys
  ; if no keywords, just return all xds
  ;--------------------------------------
  if((NOT keyword_set(name)) AND (NOT keyword_set(keys))) then $
-  for j=0, n_elements(gd)-1 do $
-   begin
-    tags = tag_names(gd[j])
-    ntags = n_elements(tags)
+  begin
+   for j=0, n_elements(gd)-1 do $
+    begin
+     tags = tag_names(gd[j])
+     ntags = n_elements(tags)
 
-    for i=0, ntags-1 do $
+     for i=0, ntags-1 do $
              if(keyword_set(gd[j].(i))) then xds = append_array(xds, gd[j].(i))
-    return, xds
-   end
+    end
+   return, xds
+  end
 
 
  ;-----------------------------------

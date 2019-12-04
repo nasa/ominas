@@ -1,0 +1,38 @@
+Composite Transformation Routines
+=================================
+
+The composite transformations have two purposes.  The first is to package the
+most common composite transformations to simplify coding.  The second is to
+facilitate the generalization of certain transformations across different types
+of objects.  For example, camera and map descriptors may be interchanged in all
+of the composite transformations involving image points.
+
+
+Surface coordinate systems:
+---------------------------
+A surface coordinate system is a coordinate system describing positions in space
+relative to the surface of a body, with the components organized in a specific
+way.  It is a three-component system consisting of a pair of angles (e.g., 
+latitude, longitude), and an "altitude".  The angles coordinates are centric, 
+that is, defined as angles relative to the center of the coodinate system.  At 
+present, three OMINAS objects use coordinate systems that fit this description: 
+GLOBE, DISK, and BODY.  For GLOBE and DISK their main coordinate systems are 
+surface systems; in the case of BODY, the surafce coordinate system is the 
+radec system.
+
+Composite transformations involving the surface coordinate system may be used
+interchangeably with any analogous transformation involving a specific
+coordinate system that satisfies the definition of a surface system, as long as
+the appropriate object descriptor is involved.  For example, the composite
+transformation body_to_surface may be used in place of glb_body_to_globe as long
+as a GLOBE descriptor is used.  If a DISK descriptor is used instead, then
+surface_to_body may be used in place of dsk_body_to_disk.
+
+Therefore, code that uses surface transformations can be applied to any objects
+whose coordinate systems comply with the definition of the surface system. 
+PROJECT_MAP is an example of such a program.
+
+Also, the surface coordinate system provides a direct link between surface
+coordinate systems and the map coordinate system: transformations between
+surface systems and the map system are achieved by simply copying, and
+discarding (or zeroing out) the altitude coordinate.

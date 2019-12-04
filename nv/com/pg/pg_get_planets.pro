@@ -181,8 +181,9 @@ function pg_get_planets, arg1, arg2, pd=_pd, od=od, sd=sd, _extra=keyvals, $
  if(keyword_set(override)) then $
   begin
    n = n_elements(name)
+   if(n EQ 0) then n = ndd
 
-   if(keyword_set(dd)) then gd = cor_create_gd(dd, gd=gd)
+   if(keyword_set(dd)) then gd = cor_create_gd(dd, gd=gd, /array)
    pd = plt_create_descriptors(n, $
                @plt__keywords_tree.include
                end_keywords)

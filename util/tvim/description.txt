@@ -1,0 +1,6 @@
+TVIM Image Display System
+=========================
+
+ The TVIM system manages data coordinate systems for display windows so that
+ overlays drawn using PLOTS will always be properly aligned with the displayed
+ image regardless of the viewing parameters.  

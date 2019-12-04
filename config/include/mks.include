@@ -1,0 +1,23 @@
+;==============================================================================
+; mks.include
+;
+;==============================================================================
+nv_message, /anonymous, /con, $
+  "WARNING: mks.include is obsolete.  " + $
+      "You should obtain constants using const_get('mks') instead."
+
+
+const_G 	=	6.670d-11	; Gravitational constant J m/kg2
+;const_c		=	2.9979250d8	; Speed of light m/s2
+const_c		=	2.99792458d8	; Speed of light m/s2; from cspice_clight()
+const_sigma	=	5.669656d-8	; Stefan-Boltzmann constant W/m2/K4
+const_k		=	1.38062d-23	; Boltzmann's constant
+const_h		=	6.62620d-34	; Planck's constant
+
+to_m		=	1d		; convert lengths to meters
+to_km		=	1d-3		; convert lengths to km
+to_cm		=	1d2		; convert lengths to cm
+
+
+
+

@@ -1,0 +1,93 @@
+SEDR Translator Package
+=======================
+
+  The SEDR software is a collection of IDL functions and procedures that
+allow the software to retrieve Voyager ephemeris data into NV camera,
+planet and ring descriptors as well as an nv translator to do this when
+there is no detached header for an image.
+
+
+DATA
+====
+
+  The SEDR data are in several files and are expected to be in a directory
+pointed to by the NV_SEDR_DATA environment variable:
+
+      'planet'.sdr2_idl             SEDR2 file
+      'planet'.sdr2_idx             SEDR2 index of sctime
+      'planet'.sdru_idl             SEDRUPD file
+      'planet'.sdru_idx             SEDRUPD index of sctime
+      bodyconst.dat_idl             Body Constants file
+      bodyconst.dat_idx             Body Constants index of Target ID
+
+where 'planet' is one of jupiter, saturn, uranus or neptune, sctime is
+the Voyager FDS multiplied by 100, Target ID is the Voyager ID for a
+body (which is 10*Sat_number + Planet_number).  The *.sdr2_idl files
+contain records of a structure described by the file SEDR2__DEFINE.PRO,
+the *.sdru_idl records are described by the file SEDRUPD__DEFINE.PRO and
+the bodyconst.dat_idl file records are described in BCONS__DEFINE.PRO.
+The data is in J2000 coordinates, the angles are in degrees (lora is
+degrees west longitude) and the dimensions are in km.  Each Voyager image
+has a SEDR2 record which contains predict pointing information.  Some
+images have updated information.  This is contained in the SEDRUPD records.
+This will contain new elements to replace those in the SEDR2 record.
+The source (JPL VICAR program which updated the info) is also listed in
+the SEDRUPD record as one of 'DAVI', 'NAV ', 'FARE', 'NAV2', 'NEAR', 'AMOS'.
+There can be more than one update for an image.  The ME-matrix of the
+SEDRUPD record is already assumed to be one-way Light-travel time corrected
+while the original SEDR2 value is not.
+
+
+Create
+======
+
+  In the create subdirectory are procedures and a log file used to create
+the SEDR data files from the original VMS indexed file counterparts.  To
+be as simple as possible, the structures in the new files are identical
+to the original VMS ones execpt in the fact that floats are in XDR format
+and integers are in Network byte order (big-endian).  This is so that the
+data files can be platform independent.  The routines sedr_unpack_sedr2, 
+sedr_unpack_sedrupd and sedr_unpack_bcons are used to convert this format
+to the host platform integer and floating format.  The files were then
+ftp'ed in binary format to other platforms.
+
+
+Usage
+=====
+
+  The following procedures and functions are likely to be used by users:
+
+  Procedure                     Purpose
+
+   sedr_list		List sources for a given sctime
+   sedr_read		Read a SEDR2+(SEDRUPD) record into a SEDR2 structure
+   vicar_vgrkey		Returns Voyager keywords from VICAR header
+
+   sedr_vgr_input	Voyager translator returns predict SEDR at B1950
+
+  More information about these routines are in doc_sedr.txt.
+
+
+  The following procedures and functions are likely to be used by programmers:
+
+  Procedure                     Purpose
+
+   bcons__define		Defines Body Constant structure
+   sedr2__define		Defines SEDR structure
+   sedrupd__define		Defines SEDR update structure
+
+   sedr_get_bcons		Reads a BCONS record from a file
+   sedr_get_sedr2		Reads a SEDR2 record from a SDR2 file
+   sedr_get_sedrupd		Reads a SEDRUPD record from a SDRU file
+
+   sedr_unpack_bcons		Unpacks a BCONS record
+   sedr_unpack_sedr2		Unpacks a SEDR2 record
+   sedr_unpack_sedrupd		Unpacks a SEDRUPD record
+
+   sedr_buildcm			Builds C-matrix or ME-matrix from euler angles
+   sedr_time			Converts SEDR time to secs past 1950
+   sedr_to_nv			Converts SEDR C-matrix to NV cam_orient format
+
+   sedr_vgr_cameras		Generates NV camera keywords from SEDR
+   sedr_vgr_planets		Generates NV planet keywords from SEDR
+   sedr_vgr_rings		Generates NV ring keywords from SEDR

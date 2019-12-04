@@ -1,0 +1,42 @@
+SOLID Object Class
+==================
+
+ The SOLID object class describes common attributes of three-dimensional bodies.  
+ It is an immediate subclass of BODY.
+
+
+Coordinate systems
+------------------
+ - Inertial
+	Cartesian coordinate system used as the celestial reference frame.
+
+ - Body
+	Cartesian coordinate system centered on and fixed to the body.  This
+	coordinate system is inherited from BODY.
+
+
+Data objects
+------------
+ - orientation matrix
+	The orientation matrix is inherited from BODY.  The b2 axis corresponds
+	to latitude=pi/2 and the b0 axis corresponds to longitude=0, as shown.
+
+
+				 b2 --> latitude = pi/2
+				| 
+				|  / b1
+				| /
+				|/
+				 ------- b0 --> longitude = 0
+			
+
+
+ - position vector
+	The position vector is inherited from BODY.  It gives the position of
+	the body center with respect to the inertial coordinate system.
+
+
+ - solid descriptor
+	The solid descriptor is the class structure for the SOLID class.  
+	See solid_descriptor__define.
+

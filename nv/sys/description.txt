@@ -1,0 +1,230 @@
+OMINAS Core I/O System 
+=====================
+
+ The purpose of the OMINAS I/O system is to maintain the separation between 
+ the core OMINAS data processing code and the external data sources.  Most 
+ of the functionality of the NV system is devoted to parsing the 
+ configuration tables and making sure that the appropriate user-specified
+ routines are called.
+
+ The NV system explicitly implements the OMINAS requirement of general
+ applicability, which encompasses the following two principle :
+
+ Instrument Independence
+  NV maintains the clear distinction between the code that is dependent upon
+  the circumstances of the data collection and archival process and the code
+  that performs analysis on the data set.  For example, a program that computes
+  the limb of a planet should not contain explicit code that attempts to read
+  SPICE kernels in order to determine the encounter geometry.  Under NV, this
+  information is obtained by user-written translators and provided as an input
+  to the program.  NV provides the framework for this process.
+
+ Filetype Independence
+  Programs written under NV take their input data in the form of IDL arrays,
+  so the organization of the original data file is irrelevant.  NV provides a 
+  mechanism for detecting filetypes and using the appropriate user-written 
+  routines to read and write data files.
+
+
+
+Reading and Writing Data files
+------------------------------
+ Under NV, data files are generally read using the nv_read function.
+ nv_read looks up the names of the input and output functions in the I/O table
+ and uses the input function to read the data file.  Then it calls
+ nv_init_descriptor to create a data descriptor.
+
+ Data files are written using the nv_write procedure, which calls the output
+ function in the data descriptor to write the data.
+
+
+Reading and Writing Ancillary Information
+------------------------------------------
+ Ancillary information (e.g., a state vector) is input and output using 
+ the nv_get_value and  nv_put_value routines.  nv_get_value calls a user-
+ written procedure called a translator that knows how to get the requested 
+ information (keywords). The translator would be different depending on 
+ spacecraft mission and the source of the data (e.g. SEDR, SPICE, detached 
+ header or some other ancillary information source).
+
+
+Data Descriptor
+---------------
+ In NV, data is packaged in an object called a data descriptor.  The data
+ descriptor contains the following information:
+
+  data		    The data array.  An example would be an image array.
+
+  header	    An optional data array containing associated information
+	  	    pertaining to the data set.  This could be a VICAR label
+		    or FITS header, for example.
+
+  filetype	    String identifying the type of data file for the I/O
+		    and filetype detectors tables.
+
+  input_fn	    Name of the input function from the I/O table.
+
+  output_fn	    Name of the output function from the I/O table.
+
+  instrument	    String identifying the instrument in the translator and
+		    instrument detectors tables.
+
+  input_translator  Name of the input translator from the translators table.
+
+  output_translator Name of the output translator from the translators table.
+
+  input_transform   Name of the input transform from the transforms table.
+
+  output_transform  Name of the output transform from the transforms table.
+
+  udata		    Optional data array defined by the user.
+
+  id_string	    Unique string used to identify this data descriptor.  
+		    nv_read sets this string to the base filename.
+
+
+ The data descriptor is created and initialized by the routine
+ nv_init_descriptor, which sets the initial values in the data descriptor and
+ attempts to detect the instrument and lookup the corresponding translators.  
+
+ Programs may only access fields of the data descriptor using the following
+ access routines:
+
+		nv_data
+		nv_set_data
+		nv_header
+		nv_set_header
+		nv_udata
+		nv_set_udata
+		nv_free_udata
+		nv_id_string
+
+ See the documentation for each routine for more details.
+
+
+
+Configuration Tables
+--------------------
+ In all NV configuration tables, lines beginning with '#' are ignored.  Lines
+ can be continued across multiple lines using a backslash '\'.
+
+
+ Filetype Detectors Table
+
+  The name of the filetype detectors table is taken from the NV_FTP_DETECT
+  environment variable.  The table has two columns.  The first column is the
+  name of a detector function and the second is the filetype string.  To detect
+  the filetype, each function in the table is called with the filename as the
+  only argument until true is returned.  The filetype string corresponding to
+  that entry in the table is used.
+
+  example:
+
+	# detector fn			filetype	
+	# (returns T/F)
+
+	  detect_vicar			VICAR
+	  detect_fits			FITS
+	  detect_pds			PDS
+
+
+
+ I/O Table
+
+  The name of the I/O table is taken from the NV_IO environment variable.   The
+  table has three columns.  The first column is the filetype string as given in
+  the filetype detectors table.  The second two columns give the names of the
+  input and output functions respectively.
+
+  example:
+
+	# filetype	input function	output function
+	#		
+
+	  VICAR		dh_read_vicar	dh_write_vicar
+	  FITS		dh_read_fits	dh_write_fits
+	  PDS		dh_read_pds	dh_write_pds
+
+
+
+ Instrument Detectors Table
+
+  The name of the instrument detectors table is taken from the NV_INS_DETECT
+  environment variable.  The table has two columns.  The first column is the
+  name of a detector function and the second is the a filetype string.  Only
+  functions whose filetype in the table matches that of the data file are
+  called.  To detect the instrument, each function is called with the header
+  and udata as arguments until a string other than the null string is returned. 
+  This returned string is the taken as the instrument name.
+
+  example:
+
+	# detector fn			filetype
+	# (returns instrument string)
+
+	  detect_vgr			VICAR
+	  detect_mirac			FITS
+	  detect_gll			VICAR
+
+
+
+ Translators Table
+
+  The name of the translators table is taken from the NV_TRANSLATORS environment
+  variable.  The table has three columns.  The first column is the instrument
+  string as returned by the instrument detector function.  The second two
+  columns give the names of the input and output translators respectively.  Each
+  of the translator columns may contain more than one translator for each
+  instrument string using multiple lines as shown in the example.  Note the use
+  of dashes to mark blank columns.
+
+  Keyword inputs may be passed to the translators in the translators table 
+  using a syntax similar to that used in calls to IDL routines.  Note the
+  examples in the table below.  The keywords on a given line are available to 
+  both the input and the output translators specified on that line.
+
+  example:
+
+	# instrument	input			output
+	# string	translator		translator
+
+	  VGR1_ISSNA	dh_vgr_issna_input	dh_vgr_issna_output
+		-  	strcat_vgr_issna_input		-
+	  VGR1_ISSWA	dh_vgr_issna_input	dh_vgr_issna_output
+		-  	strcat_vgr_issna_input		-
+	  VGR2_ISSNA	dh_vgr_issna_input	dh_vgr_issna_output
+		-  	strcat_vgr_issna_input		-
+	  VGR2_ISSWA	dh_vgr_issna_input	dh_vgr_issna_output
+		-  	strcat_vgr_issna_input		-
+	  MIRAC		dh_mirac_input		dh_mirac_output
+	  GLL_SSI	dh_gll_ssi_input	dh_gll_ssi_output
+	  GLL_NIMS	dh_gll_nims_input	dh_gll_nims_output
+ 	  CAS_ISSWA	dh_std_input		dh_std_output	format=CAS
+		-       ring_input			-
+		-  	strcat_gsc_input		-	/j2000
+
+
+
+ Transforms Table
+
+  The name of the transforms table is taken from the NV_TRANSFORMS environment
+  variable.  The table has three columns.  The first column is the instrument
+  string as returned by the instrument detector function.  The second two
+  columns give the names of the input and output transforms respectively.  Each
+  of the translator columns may contain more than one transform function for 
+  each instrument string using multiple lines as shown in the example.  Note the 
+  use of dashes to mark blank columns.
+
+  If the NV_TRANSFORMS variable is undefined, then a transforms table is not 
+  used.
+
+  example:
+
+	# instrument	input			output
+	# string	tranform		transform
+
+ 	  CAS_ISSWA	cas_delut		cas_relut	
+
+
+
+

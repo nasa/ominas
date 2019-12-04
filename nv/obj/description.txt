@@ -1,0 +1,330 @@
+OMINAS Object Library
+=====================
+
+ The OMINAS object library implements an object-oriented description of various
+ geometrical objects to be used by higher level programs.  A specific
+ object, e.g., "CAMERA", is built as a subclass of a more general object, like
+ "BODY". Information about a particular object is stored in an IDL object 
+ referred to as an object descriptor (e.g., camera descriptor, planet
+ descriptor).  
+
+ One of the primary drivers in the object library is speed.  Unless carefully
+ written, IDL code can be extremely slow.  Routines in the object library use
+ massive array operations to achieve performance comparable to analogous
+ routines written in C, though they generally use more memory.  The use of
+ massive array operations in writing efficient IDL code is discussed later in
+ this document.
+
+ The object descriptor was originally implemented as a structure.  Structures 
+ provide very fast dereferencing compared to IDL objects because a loop is 
+ not required.  Also, OMINAS' original development occurred at a time when 
+ the IDL object type was relatively new, so structures offered a more stable 
+ data type, allowing OMINAS to remain backward compatible to IDL 5.3.  
+
+ In the current implementation of OMINAS, the object descriptor is a true IDL 
+ object.  This allows various programs to operate on the same 
+ stack object, but it forces the object library routines to perform a loop to 
+ dereference an array of descriptors (i.e., convert between
+ arrays of pointers and arrays of structures), so that internal operations can
+ be performed efficiently.  The dereferencing is performed using the 
+ nv_dereference and nv_rereference routines.  Object methods typically perform 
+ that conversion once on the inputs, and then again on the outputs.  In between, 
+ they operate directly on the object structures.
+ 
+ Although the object library is based on IDL objects, the methods are implemented 
+ as regular IDL procedures and functions rather than object methods because IDL
+ object methods cannot operate on arrays of objects.  In other words, in the 
+ call "xd.method()", xd must be a scalar.  That constraint is too restrictive
+ for OMINAS because it forces external loops to be used, preventing more
+ effiecient internal vectorized operations.  Also, it would force the user to 
+ write loops on the command line.  For example:
+
+ 	IDL> for i=0, n_elements(xd)-1 do print, xd.name()
+
+			vs
+
+ 	IDL> print, cor_name(xd)
+
+ The obvious drawback with OMINAS' method scheme is that it is left to the 
+ programmer to respect the object-oriented rules of the library, whereas 
+ IDL objects leave the programmer no choice.  The importance of working 
+ within the object-oriented framework cannot be overstressed.  Its compromise 
+ can only end in sadness and pain.
+
+
+ Descriptor Naming Conventions
+
+  The following naming convention is used for descriptor arguments to all
+  OMINAS programs, as well as generic descriptor tag names:
+
+	gd   :	Generic descriptor.
+	dd   :	DATA descriptor.
+	ptd  :	POINT descriptor.
+	od   : 	Observer descriptor.
+	cd   :	CAMERA descriptor.  Some programs which accept a camera
+		descriptor will also accept a map descriptor for this argument.
+	md   :	MAP descriptor.
+	pd   :	PLANET descriptor.
+	rd   :	RING descriptor.
+	sd   :	STAR descriptor.
+	bd   :	BODY descriptor.
+	sld  :	SOLID descriptor.
+	gbd  :	GLOBE descriptor.
+	dkd  :	DISK descriptor.
+	crd  :	CORE descriptor.
+	std  :	STATION descriptor.
+	ard  :	ARRAY descriptor.
+	sund :	STAR descriptor for the sun or other illumination source.
+	xd   :	Arbitrary descriptor (note sme older programs use 'od' ("object
+		descriptor") this purpose.  These should be changed to 'xd'.
+
+  For arbitrary subclasses, the 'd' is replaced with 'x'; e.g., 'bx' refers
+  to any sublass BODY.
+
+
+
+Method conventions
+------------------
+ Init methods
+   Every class contains an init method, which is used to create and initialize one 
+   or more objects descriptors.  The init method fills in initial values in the object
+   descriptor and calls the init method for the immediate superclass if one exists.  
+   Init methods are named <type>_CREATE_DESCRIPTORS, where <class> is the object 
+   class abbreviation.  Init methods are implemented as functions that accept as 
+   their only argument an integer specifying the number of descriptors to be created.  
+   Alternatively, existing descriptors can be provided through a keyword named for the 
+   appropriate class, in which case the given descriptors are initialized rather than 
+   creating new ones.  The superclass descriptor is provided through a keyword named for that class decsriptor.  Because each init method calls
+   that class, the keyword arguments for the init method include all quantities that 
+   will be needed for this class and all of its superclasses.  
+
+
+ Access methods
+   Most classes contain access methods, which provide access to fields of the
+   class structure such that the caller has no knowledge of the internal
+   organization of the class descriptor.  The simplest access method would
+   simply set or return the value of one field of the class descriptor.  A more
+   sophisticated access method could be used to enforce internal consistency
+   between related fields in a class descriptor.  Access methods trigger read or 
+   write events depending on their function.  Access method naming is standardized as 
+   follows: 
+
+   Retrieval: 
+     Methods for retrieving a quantity from a descriptor are named 
+     <class>_<parm>, where <class> is the object class abbreviation, and 
+     <parm> is the name of the parameter to be retrieved.  Retrieval methods 
+     are implemented as functions that accept the relevant descriptor (or 
+     array of descriptors) as their first argument and return the value (or 
+     values) of the desired quantity.  All retrieval methods accept the "noevent"
+     keyword, which suppreses the generation of an event.  If a class requires 
+     additional input information, then it is given as the second argument.
+
+   Replacement:
+     Methods for replacing a quantity in a descriptor are named 
+     <class>_set_<parm>, where <class> is the object class abbreviation, and 
+     <parm> is the name of the parameter to be retrieved.  Replacement 
+     methods are implemented as procedures that accept the relevant descriptor 
+     (or array of descriptors) as their first argument and the value (or 
+     values) of the desired quantity as the second argument.  All replacement
+     methods accept the "noevent" keyword, which suppreses the generation of an 
+     event.  If a class requires additional input information, then it is 
+     given as the third argument.
+
+   Derivation:
+     Methods that derive a quantity not directly stored in a descriptor are 
+     named <class>_get_<parm>, where <class> is the object class abbreviation, 
+     <parm> is the name of the parameter to be retrieved.  Derivation methods 
+     are implemented as functions that accept the relevant descriptor (or 
+     list of descriptors) as their first argument and return the value (or 
+     values) of the desired quantity.  If a class requires additional 
+     input information (e.g., the frame_bd argument in the DISK class), then it 
+     is given as the second argument.  Note that the naming of some miscellaneous 
+     methods conflicts with this convention (see below).
+
+
+ Query/assign methods
+  Each class contains methods for query and assignment of multiple object fields.  
+  These methods are named <class>_query and <class>_assign.  Query and assign methods
+  are implemented as procedures that accept the relevant descriptor (or array of 
+  descriptors) as their first argument and keywords specifying the names of fields
+  to either retrieve or replace.  Besides simplifying code, these methods improve
+  efficiency by dereferencing and rereferencing the given objects only once, rather 
+  than once per field, as with the individual retrieval and replacement methods.  
+  All query and assign methods accept the "noevent" keyword, which suppreses the 
+  generation of events.  
+
+
+ Transformation methods
+   Many classes are used to describe physical objects that are associated with
+   various coordinate systems.  For example, the CAMERA class has a body-fixed
+   cartesian coordinate system, a focal-plane coordinate system, and an
+   image-space coordinate system.  Those classes provide routines, called
+   transformation methods, which perform the transformations between the
+   class-specific coordinate systems, as well as to and from the inertial
+   coordinate system, which is common to all such classes.
+
+   Transformation methods perform all of the transformations between the
+   "adjacent" coordinate systems, that is, coordinate systems that are related
+   by the simplest transformation.  As an example, adjacent coordinate systems
+   for the CAMERA class are illustrated in the following diagram, with '<->' 
+   meaning 'adjacent to':
+
+		 Inertial <-> Body <-> Focal <-> Image
+
+   Transformations between non-adjacent coordinate systems are achieved by
+   composing transformations between two or more adjacent systems.
+
+   Transformation methods are named <class>_<src>_to_<dst>, where <class> is 
+   the object class abbreviation, <src> is the name of the coordinate system of 
+   the input points, and <dst> is the name of the coordinate system of the output 
+   points.  Transformation methods are implemented as functions that accept the 
+   relevant descriptor (or array of descrptors) as their first argument and the 
+   input points as their second argument.  If additional information is required
+   to describe the reference system (e.g., DISK), then it is supplied as a
+   keyword.  Transformation methods return the points represented in the
+   new frame.  
+
+   There are two types of objects that may be transformed: pure vectors and
+   position vectors.
+
+   By convention, the transformation methods operate on arrays of objects
+   with dimensions in an object direction, a timestep direction, and an
+   element direction.  The specific ordering of the dimensions is determined
+   by the type of object in question.  For 3-space vectors, the dimensions are
+   nv x 3 x nt, where nv stands for "number of vectors" and nt stands for
+   "number of timesteps", which really means number of objects.  The element 
+   direction is second because these are column vectors and are multiplied in
+   matrix expressions using the "##" operator.  
+
+   Note that in object library code and documentation, vectors and matrices 
+   are discussed as they are printed by IDL.  Thus, for example, a vector 
+   with dimensions 1x3 is referred to as a column vector, and the j-th
+   element of the i-th row of the matrix M (written Mij in matrix notation) is
+   addressed as M[j,i] in the object library.  
+
+   For image points, the dimensions are 2 x nv x nt.  The element direction is
+   first because IDL plotting routines expect arrays of points to be arranged 
+   in this way.
+
+   Transformation methods also take an array of nt class descriptors relevant 
+   to the particular transformation.  Each class descriptor is used for every
+   object in the corresponding timestep. 
+
+
+ State methods
+   Many classes contain methods whose purpose is to change the state of the
+   entire class descriptor in some self-consistent manner.  An example would be
+   the time evolution of the descriptor using its time derivatives.
+
+
+ Miscellaneous methods
+   Some classes contain methods for performing miscellaneous tasks, like
+   tracing a ray at a globe.  There is no naming / interface convention for
+   these routines.  Some of these routines have names similar to the 
+   Derivation methods described above.
+
+
+ Special CORE methods
+   As CORE its at the root of the object tree, it defines some special methods
+   for object management: cor_class_info, cor_isa, cor_replicate, cor_select, 
+   cor_tree.
+
+   Object library routines use generic access methods, so descriptor inputs 
+   are rather forgiving.  For example, any routine requiring a body descriptor
+   will accept any subclass of BODY, so a camera descriptor may be provided
+   directly to bod_pos instead of first calling cam_body.  
+
+
+
+
+
+
+
+
+
+OMINAS Classes
+-------------
+ The following diagram illustrates the relationships among the existing OMINAS
+ object classes.
+
+
+
+                  STATION  PLANET STAR RING  CAMERA  MAP
+                       \     \     |     |      |     |  
+                         \     \   |     |      |     |  
+                           \    GLOBE  DISK     |     |
+                             \     \     |      |     |
+                               \     \   |      |     |
+                                 \     SOLID   /     /
+                                   \     |   /     /
+                    POINT   DATA     \   | /     /  ARRAY
+                       \      \        BODY    /     /
+                         \      \        |   /     /
+                           \      \      | /     /
+                             --------- CORE ----
+
+
+
+ CORE is a superclass of all other classes and contains information and
+ functionality that is meant to be common to all classes.  It keeps track of
+ the name of an object, the name of the user, and a 'task list', which records
+ the names of routines that have modified the descriptor.
+
+ BODY describes the position and orientation of rigid bodies in space.  It is a
+ superclass of all other current classes except CORE and MAP.
+
+ SOLID manages common attributes of three-dimensional bodies: photometric
+ properties, mass, etc.
+
+ GLOBE describes the shapes of planet-like objects.  Currently, it describes a
+ triaxial ellipsoid, but this may be generalized in the future.  It is a
+ superclass of PLANET and STAR.
+
+ DISK describes the shapes of objects that are disk-like.  Currently,
+ it describes a perfectly flat object with inner and outer edges specified as 
+ Keplerian ellipses, but this may be generalized in the future.  It is a
+ superclass of RING.
+
+ PLANET describes substellar objects like planets and satellites.
+
+ STAR describes stars (including the sun).
+
+ RING describes planetary rings.
+
+ CAMERA describes instruments that produce raster images.
+
+ MAP describes map projections.
+
+ STATION describes bodies that are rigidly attached to other bodies.
+
+ For more information on a particular class, see its documentation.
+
+
+Object Descriptor Events
+------------------------
+ Events are reported by the object methods any time a descriptor field is
+ directly dereferenced, except when the object is created and initialized.
+ If a field is modified, the event is reported AFTER the descriptor has been
+ modified.  If the field is read, the event is reported BEFORE the descriptor
+ is used.  See nv_description.txt for a more detailed description of data 
+ events.
+
+
+Cloning, Copying, and freeing descriptors
+-----------------------------------------
+ NV_CLONE and NV_COPY are provided for the purpose of cloning (allocating making a new  
+ copy with no common references) and copying (copying fields from one descriptor to
+ another).  NV_FREE descends into an object and frees every pointer and object that it
+ encounters.  Fields in an object can be protected from NV_CLONE and NV_FREE by 
+ prefixeng their name with "__PROTECT__".
+
+
+Other Sublibraries 
+------------------
+
+ Tools Library 
+  The tools library contains routines that perform higher-level functions
+  based on the object library.  Some more common composite transformations
+  are included in this library.
+
+

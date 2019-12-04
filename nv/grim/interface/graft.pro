@@ -150,8 +150,29 @@ pro graft, arg, $
  ; parse argument
  ;----------------------------------------
  type = size(arg, /type)
+
+
  if(type EQ 11) then ptd = arg $
  else ptd = pnt_create_descriptors(points=arg)
+
+
+ if(type EQ 11) then ptd = arg $
+ else $
+  begin
+   dim = size(arg, /dim)
+   ndim = n_elements(dim)
+
+   error = 0
+   if(dim[0] EQ 2) then pp = arg $
+   else if(ndim EQ 1) then error = 1 $
+   else if(dim[1] NE 3) then error = 1 $
+   else vv = arg
+
+   if(error) then nv_message, 'Invalid input.'
+
+   ptd = pnt_create_descriptors(points=pp, vectors=vv, name=name)
+  end
+
  if(keyword_set(name)) then ptd = pnt_compress(ptd)
 
 

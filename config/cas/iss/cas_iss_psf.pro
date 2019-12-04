@@ -1,8 +1,8 @@
 ;==============================================================================
-; ccpsf_filename_vicar
+; ccpsf_filename_pds
 ;
 ;==============================================================================
-function ccpsf_filename_vicar, dir, inst, filters, size=size, default=default
+function ccpsf_filename_pds, dir, inst, filters, size=size, default=default
 
  default = 0
 
@@ -31,10 +31,10 @@ end
 
 
 ;==============================================================================
-; ccpsf_read_vicar
+; ccpsf_read_pds
 ;
 ;==============================================================================
-function ccpsf_read_vicar, fname, size
+function ccpsf_read_pds, fname, size
 
 
 
@@ -102,11 +102,12 @@ end
 ;  Uses old .dat files
 ;
 ;==============================================================================
-function cas_iss_psf, cd, x, y, format=format
+function cas_iss_psf, cd, x, y, source=source
+;return, 0
 
- if(NOT keyword_set(format)) then format = 'dat'
- format = strlowcase(format)
-;format='vicar'
+ if(NOT keyword_set(source)) then source = 'dat'
+ source = strlowcase(source)
+;source='pds'
 
  if((NOT keyword_set(x)) AND (NOT keyword_set(y))) then full = 1 $
  else if(NOT keyword_set(y)) then y = dblarr(n_elements(x))
@@ -127,10 +128,10 @@ function cas_iss_psf, cd, x, y, format=format
   end
 
  dir = getenv('CAS_FILTERS')
- if(NOT keyword_set(dir)) then dir = getenv('OMINAS_CAS') + '/iss/psfs/' + format
+ if(NOT keyword_set(dir)) then dir = getenv('OMINAS_CAS') + '/iss/psfs/' + source
  dir = dir + sep
 
- ff = call_function('ccpsf_filename_' + format, dir, inst, filters, size=size, default=default)
+ ff = call_function('ccpsf_filename_' + source, dir, inst, filters, size=size, default=default)
  if(NOT keyword_set(ff)) then $
   begin
    nv_message, /con, $
@@ -148,7 +149,7 @@ function cas_iss_psf, cd, x, y, format=format
  ;--------------------------------------------
  ; read data file
  ;--------------------------------------------
- dat = call_function('ccpsf_read_' + format, ff[0], size[0])
+ dat = call_function('ccpsf_read_' + source, ff[0], size[0])
  if(keyword_set(full)) then return, dat
 
  cx = size/2 & cy = size/2

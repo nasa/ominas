@@ -1,0 +1,103 @@
+PDS_VERSION_ID         = PDS3
+RECORD_TYPE            = STREAM
+OBJECT                 = TEXT
+  PUBLICATION_DATE     = 2018-08-03
+  INTERCHANGE_FORMAT   = ASCII
+  NOTE                 = "Description of xpsf directory contents."
+END_OBJECT             = TEXT
+END
+
+xPSF Directory:
+---------------
+
+This directory contains VICAR-format images corresponding to the
+filter-specific point spread functions for the ISS Narrow and Wide-
+Angle Cameras.
+
+File naming convention:
+
+   xpsf_[cam]_[filt1]_[filt2].IMG:
+      Contains the final xPSF (1024x1024) @ 1px resolution in VICAR 
+      format
+
+   xpsf_[cam]_[filt1]_[filt2]_core.IMG:
+      Contains the core of the PSF (4000x4000 for NAC, 2000x2000 for 
+      WAC) @ 0.1px resolution in VICAR format
+
+The following notes are adapted from the README.TXT file describing
+the extended PSF analysis and resulting data files produced by Daiana
+DiNino, 2009. Original PSF analysis by Emma Birath, 2006. Extended
+wings reduction by Bob West, 2018. Additional cleanup and WAC
+core-to-xPSF conversion for select filters by Ben Knowles, 2018.
+
+
+-----------------------------------------------------
+-----------------------------------------------------
+                EXTENDED-PSF PROJECT                
+-----------------------------------------------------
+-----------------------------------------------------
+
+GOAL: Use satellite images to extend point spread function out to 
+512 pixels from center for all Cassini ISS filters.  
+
+ANALYSIS: 
+----------
+We had PSF models that extended to only 200 pixels from the center of
+the PSF for the NAC filters and 100 pixels for the WAC filters (from
+the original PSF analysis by Emma Birath, 2006).
+
+In order to extend the PSF model to larger radii, WITHOUT modifying
+the core of the PSF, we:
+
+1) analytically extrapolated the existing PSF models;
+2) selected icy satellite images at phase-angle less than 30 degrees
+   (for NAC filters) and less than 45 degrees (for WAC filters) and
+   diameters from a few tens of pixels to a couple of hundred pixels
+   (LOSSLESS compression only);
+3) performed standard image calibration (using CISSCAL v3.6beta);
+4) ran an IDL code that:
+    - finds centroid (to take care of the fact that in general the
+      satellite image will not be at the center of the image)
+    - calculates S/N and fits S/N as a function of distance (from Moon
+      center). The resulting S/N is used to weight the contribution of
+      each image to the improvement of the PSF. Pixels where the S/N
+      is less than 1.9 are assigned a weight of 0.
+    - removes background noise (using MR software)
+    - iteratively (max = 3) deconvolves each denoised-image with
+      previously known PSF (using MR software), then applies a cut-off
+      to each obtained deconvolved-image and convolves back each
+      deconvolved-image with the known PSF. Finally modifies the PSF
+      by comparing each obtained convolved image with the original
+      denoised-image and weighting this ratio according to the S/N.
+5) ran an IDL code that:
+    - sums the deconvolved images (obtained in general with the third
+      iteration of the previous code) and uses the radial profile of
+      this summed image compared to an ideal radial profile to further
+      correct the PSF. One or two iterations are usually enough.
+6) created final VICAR files (two for each filters): one containing
+   the whole extended PSF at the resolution of 1 pixels and one
+   containing the core of the PSF at the resolution of 0.1 pixels. All
+   files are currently stored in xpsf/
+
+NOTES:
+------
+  * The final PSF vicar files are oriented the same way as the source
+    VICAR images
+    
+  * No suitable satellite images were found for the following filter
+    combinations (for which we have the core of the PSF though):
+     WAC_CB2_CL2, WAC_CB3_CL2, WAC_CL1_HAL, WAC_IR2_CL2,
+     WAC_IR2_IR1, WAC_IR4_CL2, WAC_IR5_CL2, WAC_MT2_CL2,
+     WAC_MT3_CL2
+    For these filters, extended PSFs were created by finding the
+    average ratio of the core to the overlapping region of the xpsf for
+    filters where both were available, applying this to the core data,
+    and then filling in the extended region with an average of the
+    existing WAC xpsfs, scaled to the above at the borders.
+    
+  * No core or extended PSFs yet available for:
+     NAC_CL1_CB1, NAC_CL1_MT3, NAC_UV2_CL2
+
+  * Subsequent analysis of Titan images by Bob West suggested extended
+    wings too high for all filters. A correction has been applied to
+    account for this.
