@@ -62,13 +62,17 @@ compile_opt idl2,logical_predicate
 ldir='~/ominas_data/sar'
 spawn,'eval echo '+ldir,res
 ldir=res
-img=ldir+path_sep()+'BIFQI22N068_D045_T003S01_V02.IMG'
-if ~file_test(img,/read) then begin
+img=ldir+path_sep()+'BIFQI22N068_D045_T003S01_V*.IMG'
+fs=file_search(img,count=c)
+if (c eq 0) then begin
   print,'SAR file needed for the demo not found. Downloading it from PDS...'
-  p=pp_wget('http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/CORADR_0045/DATA/BIDR/BIFQI22N068_D045_T003S01_V02.ZIP',localdir=ldir)
+  ;p=pp_wget('http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/CORADR_0045/DATA/BIDR/BIFQI22N068_D045_T003S01_V02.ZIP',localdir=ldir)
+  p=pp_wget('http://pds-imaging.jpl.nasa.gov/data/cassini/cassini_orbiter/CORADR_0045/DATA/BIDR/',pattern='BIFQI22N068_D045_T003S01_V.*\.ZIP',localdir=ldir,/lm)
   p.geturl
-  print,'ZIP file downloaded, decompressing it...'
-  file_unzip,ldir+path_sep()+'BIFQI22N068_D045_T003S01_V02.ZIP',/verbose
+  fn=(p.timestamps.keys())[0]
+  print,fn+' downloaded, decompressing it...'
+  file_unzip,ldir+path_sep()+fn,/verbose
+  img=ldir+path_sep()+file_basename(fn,'.ZIP')+'.IMG'
 endif
 
 

@@ -248,6 +248,14 @@ if strmatch(self.baseurl,'*/') then begin ;if url is a directory
       links=stregex(indl,re1,/boolean)
       if total(links,/integer) eq 0 then begin
         re2='<a[^>]*[[:blank:]]+href[[:blank:]]*="([^"]+)"[^>]*>.*<td[^>]*>[[:blank:]]*([[:alnum:] :-]{10,19})[[:blank:]]*</td>'
+        links=stregex(indl,re2,/boolean)
+        if total(links,/integer) eq 0 then begin
+          datere='(([[:digit:]]{1,2}[ -/]([[:digit:]]{1,2}|([[:alpha:]]{3}))[ -/][[:digit:]]{2,4})|([[:digit:]]{2,4}[ -/]([[:digit:]]{1,2}|[[:alpha:]]{3})[ -/][[:digit:]]{1,2}))';|(([[:alpha:]]{3})|([[:digit:]]{1,2})[ -/]([[:digit:]]{1,2})[ -/][[:digit:]]{2,4})'
+          datere+='.([[:digit:]]{1,2}:[[:digit:]]{1,2}(:[[:digit:]]{1,2}(\.[[:digit:]]+)?)?)'
+          re2='<a[^>]*[[:blank:]]+href[[:blank:]]*="([^"]+)"[^>]*>.*[[:blank:]]+('+datere+')'
+          links=stregex(indl,re2,/boolean)
+        endif
+        indl=indl[where(links,/null)]
         links=stregex(indl,re2,/extract,/subexpr)
         lms=reform(links[2,*])
         links=reform(links[1,*])

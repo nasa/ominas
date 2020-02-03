@@ -17,7 +17,7 @@ if [ -z ${ominas_auto+x} ] || [ ${ominas_auto} == 0 ] ; then
 fi
 
 
-baseurl="http://naif.jpl.nasa.gov/pub/naif/CASSINI/kernels/"
+baseurl="https://naif.jpl.nasa.gov/pub/naif/CASSINI/kernels/"
 #standard download (full, nonrecursive) directories
 dirs=( fk ik lsk pck sclk )
 
@@ -28,6 +28,7 @@ ts=`eval echo "~/.ominas/timestamps/"`
 
 for dir in "${dirs[@]}"
 do
+ #echo ${wget} "${baseurl}${dir}/ --localdir=${1}/$dir/ --absolute --timestamps=$ts $@"
  ${wget} "${baseurl}${dir}/ --localdir=${1}/$dir/ --absolute --timestamps=$ts $@"
 done
 
